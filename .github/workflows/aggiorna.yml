@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: "0 20 * * 2,4,6"
 
+
+permissions:
+  contents: write
+
 jobs:
   aggiorna:
     runs-on: ubuntu-latest
