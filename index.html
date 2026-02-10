@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Lotto automatico</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+    }
+    .ruota {
+      background: #1e293b;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📊 Lotto automatico</h1>
+<div id="contenuto">Caricamento dati…</div>
+
+<script>
+fetch('storico.json')
+  .then(r => r.json())
+  .then(dati => {
+    let html = '';
+    for (const ruota in dati) {
+      html += `<div class="ruota"><strong>${ruota}</strong><br>`;
+      html += dati[ruota].slice(-1)[0].join(', ');
+      html += `</div>`;
+    }
+    document.getElementById('contenuto').innerHTML = html;
+  })
+  .catch(() => {
+    document.getElementById('contenuto').innerText =
+      'Dati non ancora disponibili.';
+  });
+</script>
+
+</body>
+</html>
