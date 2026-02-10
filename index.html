@@ -4,39 +4,81 @@
   <meta charset="UTF-8">
   <title>Lotto automatico</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #f8fafc;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #38bdf8;
-    }
-    .ruota {
-      background: #1e293b;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 10px;
-    }
+    body { font-family: Arial; background:#0f172a; color:#f8fafc; padding:20px }
+    h1 { text-align:center; color:#38bdf8 }
+    .ruota { background:#1e293b; margin:15px 0; padding:15px; border-radius:12px }
+    .numeri { font-size:18px; margin:6px 0 }
+    .small { font-size:13px; color:#cbd5f5 }
+    .badge { display:inline-block; padding:4px 8px; border-radius:8px; margin:2px; }
+    .caldo { background:#dc2626 }
+    .freddo { background:#2563eb }
+    .prev { background:#16a34a }
   </style>
 </head>
 <body>
 
 <h1>📊 Lotto automatico</h1>
-<div id="contenuto">Caricamento dati…</div>
+<div id="contenuto">Caricamento…</div>
 
 <script>
+function calcolaStatistiche(estrazioni) {
+  const freq = {};
+  const ritardo = {};
+  let ultimoIndex = {};
+
+  estrazioni.forEach((nums, i) => {
+    nums.forEach(n => {
+      freq[n] = (freq[n] || 0) + 1;
+      if (!(n in ultimoIndex)) ultimoIndex[n] = i;
+    });
+  });
+
+  for (let n = 1; n <= 90; n++) {
+    ritardo[n] = (n in ultimoIndex) ? ultimoIndex[n] : estrazioni.length;
+    if (!freq[n]) freq[n] = 0;
+  }
+
+  return { freq, ritardo };
+}
+
 fetch('storico.json')
   .then(r => r.json())
   .then(dati => {
     let html = '';
+
     for (const ruota in dati) {
-      html += `<div class="ruota"><strong>${ruota}</strong><br>`;
-      html += dati[ruota].slice(-1)[0].join(', ');
-      html += `</div>`;
+      const estrazioni = dati[ruota];
+      if (!estrazioni.length) continue;
+
+      const stats = calcolaStatistiche(estrazioni);
+
+      const caldi = Object.keys(stats.freq)
+        .sort((a,b)=>stats.freq[b]-stats.freq[a])
+        .slice(0,5);
+
+      const freddi = Object.keys(stats.ritardo)
+        .sort((a,b)=>stats.ritardo[b]-stats.ritardo[a])
+        .slice(0,5);
+
+      const prev = [...new Set([...caldi.slice(0,3), ...freddi.slice(0,2)])];
+
+      html += `<div class="ruota">
+        <h2>${ruota}</h2>
+
+        <div class="small">Ultima estrazione:</div>
+        <div class="numeri">${estrazioni[0].join(', ')}</div>
+
+        <div class="small">🔥 Numeri caldi</div>
+        ${caldi.map(n=>`<span class="badge caldo">${n}</span>`).join('')}
+
+        <div class="small">❄️ Numeri freddi</div>
+        ${freddi.map(n=>`<span class="badge freddo">${n}</span>`).join('')}
+
+        <div class="small">🎯 Previsione suggerita</div>
+        ${prev.map(n=>`<span class="badge prev">${n}</span>`).join('')}
+      </div>`;
     }
+
     document.getElementById('contenuto').innerHTML = html;
   })
   .catch(() => {
@@ -47,3 +89,4 @@ fetch('storico.json')
 
 </body>
 </html>
+
