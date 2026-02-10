@@ -11,7 +11,6 @@ permissions:
 jobs:
   aggiorna:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,17 +21,16 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: |
-          pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4
 
-     - name: Run script
-       run: |
-         python .github/workflows/aggiorna_lotto.py
-         git config user.name "github-actions"
-         git config user.email "github-actions@github.com"
-         git add storico.json
-         git commit -m "Aggiorna storico estrazioni" || echo "Nessuna modifica"
-         git push
+      - name: Run script
+        run: |
+          python .github/workflows/aggiorna_lotto.py
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add storico.json
+          git commit -m "Aggiorna storico estrazioni" || echo "Nessuna modifica"
+          git push
 
 
 
