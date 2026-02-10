@@ -25,8 +25,9 @@ jobs:
         run: |
           pip install requests beautifulsoup4
 
-      - name: Run script
-        run: python aggiorna_lotto.py
+      -  name: Run script
+  run: python .github/workflows/aggiorna_lotto.py
+
 
 
 
