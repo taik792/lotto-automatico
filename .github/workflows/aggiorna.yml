@@ -31,8 +31,11 @@ jobs:
 
       - name: Commit and push
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add storico.json
-          git commit -m "Aggiornamento estrazioni"
-          git push
+          - name: Commit and push
+  run: |
+    git config user.name "github-actions"
+    git config user.email "actions@github.com"
+    git add -A
+    git commit -m "Aggiornamento estrazioni" || echo "Nessuna modifica"
+    git push
+
