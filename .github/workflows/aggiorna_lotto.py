@@ -1,6 +1,6 @@
 import requests
 import json
-
+from bs4 import BeautifulSoup
 URL = "https://www.superenalotto.it/sites/default/files/archivio-lotto/estrazioni-lotto.csv"
 FILE = "storico.json"
 MAX_ESTRAZIONI = 5
