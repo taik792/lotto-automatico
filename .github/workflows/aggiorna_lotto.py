@@ -28,7 +28,7 @@ def scarica():
 if __name__ == "__main__":
     dati = scarica()
     salva_storico(dati)
-")
+
 
 
 
