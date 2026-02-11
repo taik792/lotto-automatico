@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Statistiche</title>
+<title>Lotto Live Statistiche</title>
 <style>
 body { font-family: Arial; background:#0f172a; color:white; padding:20px }
 h1 { text-align:center; color:#38bdf8 }
@@ -15,10 +15,13 @@ h1 { text-align:center; color:#38bdf8 }
 </head>
 <body>
 
-<h1>📊 Lotto Statistiche</h1>
-<div id="contenuto">Caricamento…</div>
+<h1>📊 Lotto Live Statistiche</h1>
+<div id="contenuto">Caricamento dati reali…</div>
 
 <script>
+
+const PROXY_URL = "https://api.allorigins.win/raw?url=";
+const TARGET_URL = "https://www.superenalotto.it/estrazioni/lotto";
 
 function calcolaStatistiche(estrazioni){
     let freq = {};
@@ -41,18 +44,33 @@ function calcolaStatistiche(estrazioni){
     return {freq, ritardi};
 }
 
-fetch("storico.json")
-.then(r=>r.json())
-.then(dati=>{
+function estraiNumeriDalTesto(testo, ruota){
+    const regex = new RegExp(ruota + ".*?(\\d{1,2}).*?(\\d{1,2}).*?(\\d{1,2}).*?(\\d{1,2}).*?(\\d{1,2})","is");
+    const match = testo.match(regex);
+    if(match){
+        return match.slice(1,6).map(n => parseInt(n));
+    }
+    return [];
+}
 
-    let html = "";
+fetch(PROXY_URL + TARGET_URL)
+.then(r => r.text())
+.then(html => {
 
-    Object.keys(dati).forEach(ruota=>{
+    const RUOTE = [
+        "Bari","Cagliari","Firenze","Genova","Milano",
+        "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
+    ];
 
-        let estrazioni = [dati[ruota]]; // per ora una sola
+    let htmlOutput = "";
 
-        if(!estrazioni[0] || estrazioni[0].length === 0) return;
+    RUOTE.forEach(ruota => {
 
+        const numeri = estraiNumeriDalTesto(html, ruota);
+
+        if(numeri.length === 0) return;
+
+        const estrazioni = [numeri];
         const stats = calcolaStatistiche(estrazioni);
 
         const caldi = Object.keys(stats.freq)
@@ -68,11 +86,11 @@ fetch("storico.json")
             ...freddi.slice(0,2)
         ])];
 
-        html += `
+        htmlOutput += `
         <div class="box">
             <h2>${ruota}</h2>
             <strong>Ultima estrazione:</strong><br>
-            ${estrazioni[0].join(", ")}<br><br>
+            ${numeri.join(", ")}<br><br>
 
             🔥 Caldi:
             ${caldi.map(n=>`<span class="badge caldi">${n}</span>`).join("")}<br><br>
@@ -86,17 +104,22 @@ fetch("storico.json")
         `;
     });
 
-    document.getElementById("contenuto").innerHTML = html;
+    if(htmlOutput === ""){
+        document.getElementById("contenuto").innerText = "Impossibile leggere dati reali (blocco CORS del sito).";
+    } else {
+        document.getElementById("contenuto").innerHTML = htmlOutput;
+    }
 
 })
 .catch(()=>{
-    document.getElementById("contenuto").innerText = "Errore caricamento dati.";
+    document.getElementById("contenuto").innerText = "Errore nel caricamento dati.";
 });
 
 </script>
 
 </body>
 </html>
+
 
 
 
