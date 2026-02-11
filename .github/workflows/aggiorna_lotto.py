@@ -10,30 +10,33 @@ RUOTE = [
     "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
 ]
 
-def salva_storico(data):
-    with open(FILE, "w") as f:
-        json.dump(data, f, indent=2)
-
 def scarica():
-    r = requests.get(URL)
-    righe = r.text.splitlines()
-    
-    estrazioni = {ruota: [] for ruota in RUOTE}
+    r = requests.get(URL, timeout=15)
+    soup = BeautifulSoup(r.text, "html.parser")
 
-    # saltiamo intestazione
-    for riga in righe[1:]:
-        parti = riga.split(";")
-        if len(parti) < 12:
-            continue
+    estrazioni = {}
 
-        ruota = parti[1]
-        numeri = list(map(int, parti[2:7]))
+    for tab in soup.find_all("table"):
+        for row in tab.find_all("tr"):
+            celle = row.find_all("td")
 
-        if ruota in RUOTE:
-            if len(estrazioni[ruota]) < MAX_ESTRAZIONI:
-                estrazioni[ruota].append(numeri)
+            if len(celle) >= 6:
+                ruota = celle[0].get_text(strip=True)
+
+                if ruota in RUOTE:
+                    numeri = []
+
+                    for c in celle[1:6]:
+                        testo = c.get_text(strip=True)
+
+                        if testo.isdigit():
+                            numeri.append(int(testo))
+
+                    if len(numeri) == 5:
+                        estrazioni[ruota] = numeri
 
     return estrazioni
+
 
 if __name__ == "__main__":
     dati = scarica()
