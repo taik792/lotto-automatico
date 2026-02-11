@@ -3,94 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <title>Lotto Live</title>
+
 <style>
-body { font-family: Arial; background:#0f172a; color:white; padding:20px }
-h1 { text-align:center; color:#38bdf8 }
-.box { background:#1e293b; padding:15px; margin:15px 0; border-radius:12px }
-.badge { padding:4px 8px; margin:2px; border-radius:8px; display:inline-block }
-.caldi { background:#dc2626 }
-.freddi { background:#2563eb }
-.prev { background:#16a34a }
-</style>
-</head>
-<body>
-
-<h1>📊 Lotto Live</h1>
-<div id="contenuto">Caricamento dati…</div>
-
-<script>
-const RUOTE = [
-"Bari","Cagliari","Firenze","Genova","Milano",
-"Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
-];
-
-// Fonte pubblica JSON di esempio
-const URL = "https://api.allorigins.win/raw?url=https://www.superenalotto.it/rest/estrazioni/lotto";
-
-function calcolaStats(estrazioni){
-    let freq = {};
-    let ritardi = {};
-    let ultimo = {};
-
-    estrazioni.forEach((estr,i)=>{
-        estr.forEach(n=>{
-            freq[n]=(freq[n]||0)+1;
-            if(!(n in ultimo)) ultimo[n]=i;
-        });
-    });
-
-    for(let n=1;n<=90;n++){
-        ritardi[n]=(n in ultimo)?ultimo[n]:estrazioni.length;
-    }
-
-    return {freq,ritardi};
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
 }
 
-fetch(URL)
-.then(r=>r.json())
-.then(data=>{
-    let html="";
-    
-    RUOTE.forEach(ruota=>{
-        let estrazioni=[];
-        
-        data.slice(0,5).forEach(e=>{
-            if(e.ruote && e.ruote[ruota]){
-                estrazioni.push(e.ruote[ruota]);
-            }
-        });
+h1 {
+    text-align: center;
+    padding: 20px;
+}
 
-        if(estrazioni.length===0) return;
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+}
 
-        const stats=calcolaStats(estrazioni);
+.card {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    margin: 10px;
+    border-radius: 10px;
+    width: 180px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+}
 
-        const caldi=Object.keys(stats.freq)
-        .sort((a,b)=>stats.freq[b]-stats.freq[a])
-        .slice(0,5);
+.ruota {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
 
-        const freddi=Object.keys(stats.ritardi)
-        .sort((a,b)=>stats.ritardi[b]-stats.ritardi[a])
-        .slice(0,5);
+.numeri {
+    font-size: 16px;
+}
+</style>
+</head>
 
-        const previsione=[...new Set([...caldi.slice(0,3),...freddi.slice(0,2)])];
+<body>
 
-        html+=`<div class="box">
-        <h2>${ruota}</h2>
-        <strong>Ultima:</strong> ${estrazioni[0].join(", ")}<br><br>
-        🔥 Caldi: ${caldi.map(n=>`<span class="badge caldi">${n}</span>`).join("")}<br><br>
-        ❄ Freddi: ${freddi.map(n=>`<span class="badge freddi">${n}</span>`).join("")}<br><br>
-        🎯 Previsione: ${previsione.map(n=>`<span class="badge prev">${n}</span>`).join("")}
-        </div>`;
-    });
+<h1>🎯 Lotto Live</h1>
+<div class="container" id="contenuto">
+Caricamento dati...
+</div>
 
-    document.getElementById("contenuto").innerHTML=html;
+<script>
+
+fetch("storico.json")
+.then(response => response.json())
+.then(data => {
+
+    const container = document.getElementById("contenuto");
+    container.innerHTML = "";
+
+    for (let ruota in data) {
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const titolo = document.createElement("div");
+        titolo.className = "ruota";
+        titolo.innerText = ruota;
+
+        const numeri = document.createElement("div");
+        numeri.className = "numeri";
+        numeri.innerText = data[ruota].join(" - ");
+
+        card.appendChild(titolo);
+        card.appendChild(numeri);
+
+        container.appendChild(card);
+    }
+
 })
-.catch(()=>{
-    document.getElementById("contenuto").innerText="Impossibile caricare dati.";
+.catch(error => {
+    document.getElementById("contenuto").innerHTML = "❌ Impossibile caricare dati.";
 });
+
 </script>
 
 </body>
 </html>
+
 
 
