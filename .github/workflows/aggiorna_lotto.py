@@ -2,35 +2,34 @@ import requests
 import json
 
 FILE = "storico.json"
-MAX_ESTRAZIONI = 5
-
-URL = "https://www.superenalotto.it/rest/estrazioni/lotto"
 
 RUOTE = [
     "Bari","Cagliari","Firenze","Genova","Milano",
     "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
 ]
 
+URL = "https://api.npoint.io/5d3f7f7c5a1b4c2d9c4b"
+
 def salva_storico(data):
     with open(FILE, "w") as f:
         json.dump(data, f, indent=2)
 
 def scarica():
-    r = requests.get(URL)
+    r = requests.get(URL, timeout=15)
     data = r.json()
 
     risultato = {r: [] for r in RUOTE}
 
-    for estrazione in data[:MAX_ESTRAZIONI]:
-        for ruota in RUOTE:
-            numeri = estrazione["ruote"].get(ruota)
-            if numeri:
-                risultato[ruota] = numeri
+    for ruota in RUOTE:
+        if ruota in data:
+            risultato[ruota] = data[ruota]
 
     return risultato
 
 dati = scarica()
 salva_storico(dati)
+
 print("Aggiornamento completato")
+
 
 
