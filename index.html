@@ -2,94 +2,102 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live</title>
-
+<title>Lotto Statistiche</title>
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: white;
-}
-
-h1 {
-    text-align: center;
-    padding: 20px;
-}
-
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 20px;
-}
-
-.card {
-    background: rgba(255,255,255,0.1);
-    padding: 15px;
-    margin: 10px;
-    border-radius: 10px;
-    width: 180px;
-    text-align: center;
-    backdrop-filter: blur(5px);
-}
-
-.ruota {
-    font-weight: bold;
-    margin-bottom: 10px;
-    font-size: 18px;
-}
-
-.numeri {
-    font-size: 16px;
-}
+body { font-family: Arial; background:#0f172a; color:white; padding:20px }
+h1 { text-align:center; color:#38bdf8 }
+.box { background:#1e293b; padding:15px; margin:15px 0; border-radius:12px }
+.badge { padding:4px 8px; margin:2px; border-radius:8px; display:inline-block }
+.caldi { background:#dc2626 }
+.freddi { background:#2563eb }
+.prev { background:#16a34a }
 </style>
 </head>
-
 <body>
 
-<h1>🎯 Lotto Live</h1>
-<div class="container" id="contenuto">
-Caricamento dati...
-</div>
+<h1>📊 Lotto Statistiche</h1>
+<div id="contenuto">Caricamento…</div>
 
 <script>
 
-fetch("storico.json")
-.then(response => response.json())
-.then(data => {
+function calcolaStatistiche(estrazioni){
+    let freq = {};
+    let ultimo = {};
+    let ritardi = {};
 
-    const container = document.getElementById("contenuto");
-    container.innerHTML = "";
+    estrazioni.forEach((numeri, index)=>{
+        numeri.forEach(n=>{
+            freq[n] = (freq[n] || 0) + 1;
+            if(!(n in ultimo)){
+                ultimo[n] = index;
+            }
+        });
+    });
 
-    for (let ruota in data) {
-
-        const card = document.createElement("div");
-        card.className = "card";
-
-        const titolo = document.createElement("div");
-        titolo.className = "ruota";
-        titolo.innerText = ruota;
-
-        const numeri = document.createElement("div");
-        numeri.className = "numeri";
-        numeri.innerText = data[ruota].join(" - ");
-
-        card.appendChild(titolo);
-        card.appendChild(numeri);
-
-        container.appendChild(card);
+    for(let n=1; n<=90; n++){
+        ritardi[n] = (n in ultimo) ? ultimo[n] : estrazioni.length;
     }
 
+    return {freq, ritardi};
+}
+
+fetch("storico.json")
+.then(r=>r.json())
+.then(dati=>{
+
+    let html = "";
+
+    Object.keys(dati).forEach(ruota=>{
+
+        let estrazioni = [dati[ruota]]; // per ora una sola
+
+        if(!estrazioni[0] || estrazioni[0].length === 0) return;
+
+        const stats = calcolaStatistiche(estrazioni);
+
+        const caldi = Object.keys(stats.freq)
+            .sort((a,b)=>stats.freq[b]-stats.freq[a])
+            .slice(0,5);
+
+        const freddi = Object.keys(stats.ritardi)
+            .sort((a,b)=>stats.ritardi[b]-stats.ritardi[a])
+            .slice(0,5);
+
+        const previsione = [...new Set([
+            ...caldi.slice(0,3),
+            ...freddi.slice(0,2)
+        ])];
+
+        html += `
+        <div class="box">
+            <h2>${ruota}</h2>
+            <strong>Ultima estrazione:</strong><br>
+            ${estrazioni[0].join(", ")}<br><br>
+
+            🔥 Caldi:
+            ${caldi.map(n=>`<span class="badge caldi">${n}</span>`).join("")}<br><br>
+
+            ❄ Freddi:
+            ${freddi.map(n=>`<span class="badge freddi">${n}</span>`).join("")}<br><br>
+
+            🎯 Previsione:
+            ${previsione.map(n=>`<span class="badge prev">${n}</span>`).join("")}
+        </div>
+        `;
+    });
+
+    document.getElementById("contenuto").innerHTML = html;
+
 })
-.catch(error => {
-    document.getElementById("contenuto").innerHTML = "❌ Impossibile caricare dati.";
+.catch(()=>{
+    document.getElementById("contenuto").innerText = "Errore caricamento dati.";
 });
 
 </script>
 
 </body>
 </html>
+
 
 
 
