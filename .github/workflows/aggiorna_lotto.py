@@ -1,6 +1,7 @@
 import requests
 import json
 
+URL = "https://www.superenalotto.it/estrazioni/lotto"
 FILE = "storico.json"
 
 RUOTE = [
@@ -13,21 +14,21 @@ def salva_storico(data):
         json.dump(data, f, indent=2)
 
 def scarica():
-    url = "https://www.superenalotto.it/estrazioni/lotto"
-    r = requests.get(url)
-    testo = r.text
+    r = requests.get(URL)
+    text = r.text
 
-    dati = {r: [] for r in RUOTE}
+    estrazioni = {r: [] for r in RUOTE}
 
     for ruota in RUOTE:
-        if ruota in testo:
-            dati[ruota] = [1,2,3,4,5]  # temporaneo per test
+        if ruota in text:
+            estrazioni[ruota] = [1,2,3,4,5]  # TEST
 
-    return dati
+    return estrazioni
 
-dati = scarica()
-salva_storico(dati)
-print("Aggiornato!")
+if __name__ == "__main__":
+    dati = scarica()
+    salva_storico(dati)
+")
 
 
 
