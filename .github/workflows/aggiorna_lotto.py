@@ -1,94 +1,44 @@
+import requests
 import json
+import csv
+from io import StringIO
 
 FILE = "storico.json"
+MAX_ESTRAZIONI = 5
+
+CSV_URL = "https://raw.githubusercontent.com/matteocontrini/lotto-data/master/lotto.csv"
+
+RUOTE = [
+    "Bari","Cagliari","Firenze","Genova","Milano",
+    "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
+]
 
 def salva(data):
     with open(FILE, "w") as f:
         json.dump(data, f, indent=2)
 
+def scarica():
+    r = requests.get(CSV_URL, timeout=20)
+    r.raise_for_status()
+
+    reader = csv.DictReader(StringIO(r.text))
+    righe = list(reader)[-MAX_ESTRAZIONI:]
+
+    risultato = {r: [] for r in RUOTE}
+
+    for riga in righe:
+        for ruota in RUOTE:
+            key = ruota.lower()
+            if key in riga and riga[key]:
+                numeri = [int(n) for n in riga[key].split()]
+                risultato[ruota].append(numeri)
+
+    return risultato
+
 if __name__ == "__main__":
-
-    dati = {
-        "Bari": [
-            [11,22,33,44,55],
-            [5,12,18,34,67],
-            [7,14,21,28,35],
-            [1,9,19,29,39],
-            [3,13,23,33,43]
-        ],
-        "Cagliari": [
-            [1,2,3,4,5],
-            [10,20,30,40,50],
-            [7,17,27,37,47],
-            [6,16,26,36,46],
-            [8,18,28,38,48]
-        ],
-        "Firenze": [
-            [6,7,8,9,10],
-            [11,21,31,41,51],
-            [2,12,22,32,42],
-            [3,13,23,33,43],
-            [4,14,24,34,44]
-        ],
-        "Genova": [
-            [10,20,30,40,50],
-            [9,19,29,39,49],
-            [8,18,28,38,48],
-            [7,17,27,37,47],
-            [6,16,26,36,46]
-        ],
-        "Milano": [
-            [5,15,25,35,45],
-            [4,14,24,34,44],
-            [3,13,23,33,43],
-            [2,12,22,32,42],
-            [1,11,21,31,41]
-        ],
-        "Napoli": [
-            [9,19,29,39,49],
-            [8,18,28,38,48],
-            [7,17,27,37,47],
-            [6,16,26,36,46],
-            [5,15,25,35,45]
-        ],
-        "Palermo": [
-            [7,17,27,37,47],
-            [8,18,28,38,48],
-            [9,19,29,39,49],
-            [10,20,30,40,50],
-            [11,21,31,41,51]
-        ],
-        "Roma": [
-            [8,18,28,38,48],
-            [3,13,23,33,43],
-            [12,22,32,42,52],
-            [14,24,34,44,54],
-            [6,16,26,36,46]
-        ],
-        "Torino": [
-            [12,24,36,48,60],
-            [11,22,33,44,55],
-            [9,18,27,36,45],
-            [5,10,15,20,25],
-            [7,14,21,28,35]
-        ],
-        "Venezia": [
-            [13,23,33,43,53],
-            [12,22,32,42,52],
-            [11,21,31,41,51],
-            [10,20,30,40,50],
-            [9,19,29,39,49]
-        ],
-        "Nazionale": [
-            [90,80,70,60,50],
-            [1,11,21,31,41],
-            [2,12,22,32,42],
-            [3,13,23,33,43],
-            [4,14,24,34,44]
-        ]
-    }
-
+    dati = scarica()
     salva(dati)
+
 
 
 
