@@ -1,44 +1,47 @@
 import requests
 import json
-from bs4 import BeautifulSoup
+
+FILE = "storico.json"
+MAX_ESTRAZIONI = 5
 
 URL = "https://www.superenalotto.it/estrazioni/lotto"
-FILE = "storico.json"
 
 RUOTE = [
     "Bari","Cagliari","Firenze","Genova","Milano",
     "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
 ]
 
-def scarica():
-    r = requests.get(URL, timeout=15)
-    soup = BeautifulSoup(r.text, "html.parser")
-
-    estrazioni = {r: [] for r in RUOTE}
-
-    for tab in soup.find_all("table"):
-        for row in tab.find_all("tr"):
-            celle = row.find_all("td")
-            if len(celle) >= 6:
-                ruota = celle[0].get_text(strip=True)
-                if ruota in RUOTE:
-                    numeri = []
-                    for c in celle[1:6]:
-                        testo = c.get_text(strip=True)
-                        if testo.isdigit():
-                            numeri.append(int(testo))
-                    if len(numeri) == 5:
-                        estrazioni[ruota] = numeri
-
-    return estrazioni
-
+def leggi_storico():
+    try:
+        with open(FILE, "r") as f:
+            return json.load(f)
+    except:
+        return {r: [] for r in RUOTE}
 
 def salva_storico(data):
     with open(FILE, "w") as f:
         json.dump(data, f, indent=2)
 
+def scarica():
+    r = requests.get(URL, timeout=20)
+    testo = r.text
 
-if __name__ == "__main__":
-    dati = scarica()
-    salva_storico(dati)
+    dati = {r: [] for r in RUOTE}
+
+    for ruota in RUOTE:
+        start = testo.find(ruota)
+        if start != -1:
+            parte = testo[start:start+300]
+            numeri = []
+            for token in parte.split():
+                if token.isdigit():
+                    numeri.append(int(token))
+            if len(numeri) >= 5:
+                dati[ruota] = numeri[:5]
+
+    return dati
+
+dati = scarica()
+salva_storico(dati)
+print("Aggiornamento completato")
 
