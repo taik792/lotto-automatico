@@ -1,5 +1,6 @@
 import requests
 import json
+import re
 
 URL = "https://www.superenalotto.it/estrazioni/lotto"
 FILE = "storico.json"
@@ -14,22 +15,20 @@ def salva_storico(data):
         json.dump(data, f, indent=2)
 
 def scarica():
-    estrazioni = {
-        "Bari": [11,22,33,44,55],
-        "Cagliari": [1,2,3,4,5],
-        "Firenze": [6,7,8,9,10],
-        "Genova": [10,20,30,40,50],
-        "Milano": [5,15,25,35,45],
-        "Napoli": [9,19,29,39,49],
-        "Palermo": [7,17,27,37,47],
-        "Roma": [8,18,28,38,48],
-        "Torino": [12,24,36,48,60],
-        "Venezia": [13,23,33,43,53],
-        "Nazionale": [90,80,70,60,50]
-    }
+    r = requests.get(URL)
+    text = r.text
+
+    estrazioni = {r: [] for r in RUOTE}
+
+    for ruota in RUOTE:
+        pattern = ruota + r".*?(\d{1,2}).*?(\d{1,2}).*?(\d{1,2}).*?(\d{1,2}).*?(\d{1,2})"
+        match = re.search(pattern, text, re.DOTALL)
+
+        if match:
+            numeri = [int(n) for n in match.groups()]
+            estrazioni[ruota] = numeri
 
     return estrazioni
-
 
 if __name__ == "__main__":
     dati = scarica()
