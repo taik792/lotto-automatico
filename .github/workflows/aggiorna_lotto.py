@@ -1,8 +1,9 @@
 import requests
 import json
-from bs4 import BeautifulSoup
+import csv
+from io import StringIO
 
-URL = "https://www.superenalotto.it/estrazioni/lotto"
+URL = "https://www.superenalotto.it/sites/default/files/archivio-estrazioni-lotto.csv"
 FILE = "storico.json"
 
 RUOTE = [
@@ -15,33 +16,35 @@ def salva_storico(data):
         json.dump(data, f, indent=2)
 
 def scarica():
-    r = requests.get(URL, timeout=15)
-    soup = BeautifulSoup(r.text, "html.parser")
+    r = requests.get(URL, timeout=20)
+    r.raise_for_status()
+
+    csv_data = StringIO(r.text)
+    reader = csv.DictReader(csv_data)
 
     estrazioni = {r: [] for r in RUOTE}
 
-    tabelle = soup.find_all("table")
+    # prendiamo l'ultima estrazione disponibile
+    rows = list(reader)
+    ultima = rows[-1]
 
-    for tabella in tabelle:
-        righe = tabella.find_all("tr")
-        for riga in righe:
-            celle = riga.find_all("td")
-            if len(celle) >= 6:
-                ruota = celle[0].get_text(strip=True)
-                if ruota in RUOTE:
-                    numeri = []
-                    for c in celle[1:6]:
-                        try:
-                            numeri.append(int(c.get_text(strip=True)))
-                        except:
-                            pass
-                    estrazioni[ruota] = numeri
+    for ruota in RUOTE:
+        numeri = []
+        for i in range(1, 6):
+            colonna = f"{ruota}_{i}"
+            if colonna in ultima:
+                try:
+                    numeri.append(int(ultima[colonna]))
+                except:
+                    pass
+        estrazioni[ruota] = numeri
 
     return estrazioni
 
 if __name__ == "__main__":
     dati = scarica()
     salva_storico(dati)
+
 
 
 
