@@ -1,35 +1,45 @@
 import requests
 import json
+import csv
+from io import StringIO
 
 FILE = "storico.json"
+MAX_ESTRAZIONI = 5
+
+CSV_URL = "https://raw.githubusercontent.com/matteocontrini/lotto-data/master/lotto.csv"
 
 RUOTE = [
     "Bari","Cagliari","Firenze","Genova","Milano",
     "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
 ]
 
-URL = "https://api.npoint.io/5d3f7f7c5a1b4c2d9c4b"
-
-def salva_storico(data):
+def salva(data):
     with open(FILE, "w") as f:
         json.dump(data, f, indent=2)
 
 def scarica():
-    r = requests.get(URL, timeout=15)
-    data = r.json()
+    r = requests.get(CSV_URL, timeout=20)
+    r.raise_for_status()
+
+    csv_data = csv.DictReader(StringIO(r.text))
+    righe = list(csv_data)[-MAX_ESTRAZIONI:]
 
     risultato = {r: [] for r in RUOTE}
 
-    for ruota in RUOTE:
-        if ruota in data:
-            risultato[ruota] = data[ruota]
+    for riga in righe:
+        for ruota in RUOTE:
+            key = ruota.lower()
+            if key in riga and riga[key]:
+                numeri = [int(n) for n in riga[key].split()]
+                risultato[ruota] = numeri
 
     return risultato
 
 dati = scarica()
-salva_storico(dati)
+salva(dati)
 
 print("Aggiornamento completato")
+
 
 
 
