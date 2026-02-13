@@ -1,0 +1,65 @@
+name: Aggiorna Lotto
+
+on:
+  schedule:
+    - cron: "0 19 * * 2,4,6"
+  workflow_dispatch:
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Aggiorna storico.json
+        run: |
+          python <<EOF
+          import requests, json, csv
+          from io import StringIO
+
+          URL = "https://raw.githubusercontent.com/matteocontrini/lotto-data/master/lotto.csv"
+          MAX_ESTRAZIONI = 5
+
+          RUOTE = [
+              "Bari","Cagliari","Firenze","Genova","Milano",
+              "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
+          ]
+
+          r = requests.get(URL)
+          r.raise_for_status()
+
+          reader = csv.DictReader(StringIO(r.text))
+          righe = list(reader)[-MAX_ESTRAZIONI:]
+
+          risultato = {r: [] for r in RUOTE}
+
+          for riga in righe:
+              for ruota in RUOTE:
+                  key = ruota.lower()
+                  if key in riga and riga[key]:
+                      numeri = [int(n) for n in riga[key].split()]
+                      risultato[ruota].append(numeri)
+
+          with open("storico.json", "w") as f:
+              json.dump(risultato, f, indent=2)
+
+          print("Aggiornamento completato")
+          EOF
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add storico.json
+          git commit -m "Aggiornamento automatico Lotto" || echo "Nessuna modifica"
+          git push
