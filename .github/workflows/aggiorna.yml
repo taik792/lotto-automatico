@@ -1,8 +1,8 @@
-name: Aggiorna Storico Lotto
+name: Aggiorna estrazioni Lotto
 
 on:
   schedule:
-    - cron: "0 20 * * 2,4,6"
+    - cron: '30 20 * * *'   # 21:30 ora italiana circa
   workflow_dispatch:
 
 permissions:
@@ -16,40 +16,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Install requests
+      - name: Install dependencies
         run: pip install requests
 
       - name: Aggiorna storico.json
         run: |
           python <<EOF
-          import requests
           import json
+          import requests
+          from datetime import datetime
 
-          URL = "https://www.superenalotto.it/estrazioni/lotto"
+          URL = "https://raw.githubusercontent.com/matteocontrini/lotto-data/master/lotto.csv"
 
           r = requests.get(URL)
-          html = r.text
+          r.raise_for_status()
 
-          # Estrazione semplice dei primi 5 numeri trovati
-          import re
-          numeri = re.findall(r'\b([1-9][0-9]?)\b', html)
+          lines = r.text.strip().split("\n")
+          header = lines[0].split(",")
+          last = lines[-1].split(",")
 
-          ultimi = [int(n) for n in numeri[:5]]
+          ruote = header[2:]
+          numeri = last[2:]
 
-          ruote = ["Bari","Cagliari","Firenze","Genova","Milano",
-                   "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"]
+          storico = {}
 
-          data = {r: ultimi for r in ruote}
+          for i, ruota in enumerate(ruote):
+              storico[ruota] = list(map(int, numeri[i*5:(i+1)*5]))
 
-          with open("storico.json","w") as f:
-              json.dump(data,f,indent=2)
+          with open("storico.json", "w") as f:
+              json.dump(storico, f, indent=2)
 
-          print("Storico aggiornato")
+          print("Storico aggiornato:", datetime.now())
           EOF
 
       - name: Commit changes
@@ -57,7 +59,7 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add storico.json
-          git commit -m "Aggiorna storico automatico" || echo "Nessuna modifica"
+          git commit -m "Aggiornamento automatico estrazioni" || echo "Nessuna modifica"
           git push
 
 
