@@ -2,123 +2,130 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lotto Live Statistiche</title>
+
 <style>
-body { font-family: Arial; background:#0f172a; color:white; padding:20px }
-h1 { text-align:center; color:#38bdf8 }
-.box { background:#1e293b; padding:15px; margin:15px 0; border-radius:12px }
-.badge { padding:4px 8px; margin:2px; border-radius:8px; display:inline-block }
-.caldi { background:#dc2626 }
-.freddi { background:#2563eb }
-.prev { background:#16a34a }
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:white;
+}
+
+h1{
+    text-align:center;
+    padding:20px;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:rgba(255,255,255,0.05);
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:12px;
+}
+
+.numeri{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+}
+
+.numero{
+    padding:6px 10px;
+    border-radius:20px;
+    font-weight:bold;
+}
+
+.rosso{ background:#e74c3c; }
+.blu{ background:#3498db; }
+.verde{ background:#2ecc71; }
 </style>
 </head>
+
 <body>
 
 <h1>📊 Lotto Live Statistiche</h1>
-<div id="contenuto">Caricamento dati reali…</div>
+<div class="container" id="contenitore"></div>
 
 <script>
 
-const PROXY_URL = "https://api.allorigins.win/raw?url=";
-const TARGET_URL = "https://www.superenalotto.it/estrazioni/lotto";
+async function caricaDati() {
+    try {
+        const response = await fetch("storico.json");
+        const dati = await response.json();
+        mostraDati(dati);
+    } catch (error) {
+        document.getElementById("contenitore").innerHTML =
+            "<p>Errore nel caricamento dati.</p>";
+        console.error(error);
+    }
+}
 
-function calcolaStatistiche(estrazioni){
-    let freq = {};
-    let ultimo = {};
-    let ritardi = {};
+function mostraDati(dati) {
 
-    estrazioni.forEach((numeri, index)=>{
-        numeri.forEach(n=>{
-            freq[n] = (freq[n] || 0) + 1;
-            if(!(n in ultimo)){
-                ultimo[n] = index;
-            }
+    const contenitore = document.getElementById("contenitore");
+    contenitore.innerHTML = "";
+
+    for (const ruota in dati) {
+
+        const numeri = dati[ruota];
+        if (!numeri || numeri.length === 0) continue;
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const titolo = document.createElement("h2");
+        titolo.innerText = ruota;
+        card.appendChild(titolo);
+
+        const ultima = document.createElement("div");
+        ultima.innerHTML = "<strong>Ultima estrazione:</strong>";
+        const boxUltima = document.createElement("div");
+        boxUltima.className = "numeri";
+
+        numeri.slice(0,5).forEach(n => {
+            const span = document.createElement("span");
+            span.className = "numero rosso";
+            span.innerText = n;
+            boxUltima.appendChild(span);
         });
-    });
 
-    for(let n=1; n<=90; n++){
-        ritardi[n] = (n in ultimo) ? ultimo[n] : estrazioni.length;
+        ultima.appendChild(boxUltima);
+        card.appendChild(ultima);
+
+        const previsione = document.createElement("div");
+        previsione.innerHTML = "<strong>Previsione automatica:</strong>";
+        const boxPrev = document.createElement("div");
+        boxPrev.className = "numeri";
+
+        numeri.slice(5,10).forEach(n => {
+            const span = document.createElement("span");
+            span.className = "numero verde";
+            span.innerText = n;
+            boxPrev.appendChild(span);
+        });
+
+        previsione.appendChild(boxPrev);
+        card.appendChild(previsione);
+
+        contenitore.appendChild(card);
     }
-
-    return {freq, ritardi};
 }
 
-function estraiNumeriDalTesto(testo, ruota){
-    const regex = new RegExp(ruota + ".*?(\\d{1,2}).*?(\\d{1,2}).*?(\\d{1,2}).*?(\\d{1,2}).*?(\\d{1,2})","is");
-    const match = testo.match(regex);
-    if(match){
-        return match.slice(1,6).map(n => parseInt(n));
-    }
-    return [];
-}
-
-fetch(PROXY_URL + TARGET_URL)
-.then(r => r.text())
-.then(html => {
-
-    const RUOTE = [
-        "Bari","Cagliari","Firenze","Genova","Milano",
-        "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
-    ];
-
-    let htmlOutput = "";
-
-    RUOTE.forEach(ruota => {
-
-        const numeri = estraiNumeriDalTesto(html, ruota);
-
-        if(numeri.length === 0) return;
-
-        const estrazioni = [numeri];
-        const stats = calcolaStatistiche(estrazioni);
-
-        const caldi = Object.keys(stats.freq)
-            .sort((a,b)=>stats.freq[b]-stats.freq[a])
-            .slice(0,5);
-
-        const freddi = Object.keys(stats.ritardi)
-            .sort((a,b)=>stats.ritardi[b]-stats.ritardi[a])
-            .slice(0,5);
-
-        const previsione = [...new Set([
-            ...caldi.slice(0,3),
-            ...freddi.slice(0,2)
-        ])];
-
-        htmlOutput += `
-        <div class="box">
-            <h2>${ruota}</h2>
-            <strong>Ultima estrazione:</strong><br>
-            ${numeri.join(", ")}<br><br>
-
-            🔥 Caldi:
-            ${caldi.map(n=>`<span class="badge caldi">${n}</span>`).join("")}<br><br>
-
-            ❄ Freddi:
-            ${freddi.map(n=>`<span class="badge freddi">${n}</span>`).join("")}<br><br>
-
-            🎯 Previsione:
-            ${previsione.map(n=>`<span class="badge prev">${n}</span>`).join("")}
-        </div>
-        `;
-    });
-
-    if(htmlOutput === ""){
-        document.getElementById("contenuto").innerText = "Impossibile leggere dati reali (blocco CORS del sito).";
-    } else {
-        document.getElementById("contenuto").innerHTML = htmlOutput;
-    }
-
-})
-.catch(()=>{
-    document.getElementById("contenuto").innerText = "Errore nel caricamento dati.";
-});
+caricaDati();
 
 </script>
-
 </body>
 </html>
+
 
 
 
