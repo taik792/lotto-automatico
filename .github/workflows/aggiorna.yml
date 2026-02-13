@@ -1,23 +1,27 @@
-name: aggiorna
+name: Aggiorna Storico Lotto
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 20 * * 2,4,6"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
-      - name: Install dependencies
+      - name: Install requests
         run: pip install requests
 
       - name: Aggiorna storico.json
@@ -27,22 +31,25 @@ jobs:
           import json
 
           URL = "https://www.superenalotto.it/estrazioni/lotto"
+
           r = requests.get(URL)
-          text = r.text
+          html = r.text
 
-          RUOTE = [
-              "Bari","Cagliari","Firenze","Genova","Milano",
-              "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
-          ]
+          # Estrazione semplice dei primi 5 numeri trovati
+          import re
+          numeri = re.findall(r'\b([1-9][0-9]?)\b', html)
 
-          estrazioni = {}
+          ultimi = [int(n) for n in numeri[:5]]
 
-          for ruota in RUOTE:
-              estrazioni[ruota] = [1,2,3,4,5]  # temporaneo stabile
+          ruote = ["Bari","Cagliari","Firenze","Genova","Milano",
+                   "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"]
+
+          data = {r: ultimi for r in ruote}
 
           with open("storico.json","w") as f:
-              json.dump(estrazioni,f,indent=2)
+              json.dump(data,f,indent=2)
 
+          print("Storico aggiornato")
           EOF
 
       - name: Commit changes
@@ -52,4 +59,5 @@ jobs:
           git add storico.json
           git commit -m "Aggiorna storico automatico" || echo "Nessuna modifica"
           git push
+
 
