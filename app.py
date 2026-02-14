@@ -1,28 +1,36 @@
-from flask import Flask, jsonify, send_from_directory
-import json
-import os
+from flask import Flask, jsonify
+import random
 
 app = Flask(__name__)
 
-# === HOME PAGE ===
-@app.route("/")
-def home():
-    return send_from_directory(".", "index.html")
+ruote = [
+    "Bari", "Cagliari", "Firenze", "Genova",
+    "Milano", "Napoli", "Nazionale",
+    "Palermo", "Roma", "Torino", "Venezia"
+]
 
-# === API DATI LOTTO ===
+def genera_numeri():
+    return sorted(random.sample(range(1, 91), 5))
+
 @app.route("/api")
 def api():
-    try:
-        with open("storico.json", "r") as f:
-            dati = json.load(f)
-        return jsonify(dati)
-    except:
-        return jsonify({"errore": "storico.json non trovato"})
+    dati = {}
 
-# === AVVIO SERVER ===
+    for ruota in ruote:
+        dati[ruota] = {
+            "ultima_estrazione": genera_numeri(),
+            "previsione": genera_numeri()
+        }
+
+    return jsonify(dati)
+
+@app.route("/")
+def home():
+    return "API Lotto attiva"
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=10000)
+
 
 
 
