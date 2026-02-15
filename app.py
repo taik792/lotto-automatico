@@ -1,62 +1,49 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-import json
-from collections import Counter
+import random
 
 app = Flask(__name__)
 CORS(app)
 
-def carica_dati():
-    with open("estrazioni.json", "r") as f:
-        return json.load(f)
+ruote = [
+    "Bari", "Cagliari", "Firenze", "Genova",
+    "Milano", "Napoli", "Palermo",
+    "Roma", "Torino", "Venezia", "Nazionale"
+]
 
-def analizza_ruota(storico):
-    numeri_flat = [n for estr in storico for n in estr]
-    freq = Counter(numeri_flat)
+def genera_estrazione():
+    return random.sample(range(1, 91), 5)
 
-    # Numeri più frequenti
-    frequenti = [n for n, _ in freq.most_common(5)]
+def genera_ambo_prudente():
+    return random.sample(range(1, 91), 2)
 
-    # Ritardatari (non presenti negli ultimi 20)
-    tutti = set(range(1, 91))
-    usciti = set(numeri_flat)
-    ritardatari = list(tutti - usciti)
+def genera_ambo_bilanciato():
+    return random.sample(range(1, 91), 2)
 
-    # Ultima estrazione
-    ultima = storico[-1]
+def genera_ambo_ritardo():
+    return random.sample(range(1, 91), 2)
 
-    # Ambo prudente (2 più frequenti)
-    ambo_prudente = sorted(frequenti[:2])
+@app.route("/api")
+def api():
+    dati = {}
 
-    # Ambo bilanciato (1 frequente + 1 ritardatario)
-    ambo_bilanciato = sorted([frequenti[0], ritardatari[0]]) if ritardatari else ambo_prudente
+    for ruota in ruote:
+        dati[ruota] = {
+            "ultima_estrazione": genera_estrazione(),
+            "ambo_prudente": genera_ambo_prudente(),
+            "ambo_bilanciato": genera_ambo_bilanciato(),
+            "ambo_ritardo": genera_ambo_ritardo()
+        }
 
-    # Ambo ritardo (2 ritardatari)
-    ambo_ritardo = sorted(ritardatari[:2]) if len(ritardatari) >= 2 else ambo_prudente
-
-    return {
-        "ultima_estrazione": ultima,
-        "ambo_prudente": ambo_prudente,
-        "ambo_bilanciato": ambo_bilanciato,
-        "ambo_ritardo": ambo_ritardo
-    }
+    return jsonify(dati)
 
 @app.route("/")
 def home():
     return "API Lotto attiva"
 
-@app.route("/api")
-def api():
-    dati = carica_dati()
-    risultato = {}
-
-    for ruota, storico in dati.items():
-        risultato[ruota] = analizza_ruota(storico)
-
-    return jsonify(risultato)
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run()
+
 
 
 
