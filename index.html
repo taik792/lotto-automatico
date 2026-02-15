@@ -1,61 +1,52 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lotto Live Statistiche</title>
+    <meta charset="UTF-8">
+    <title>Lotto Live Statistiche</title>
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: linear-gradient(to bottom, #1c8ec9, #0f4c75);
-    color: white;
-}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #0f4c75, #3282b8);
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
 
-h1 {
-    text-align: center;
-    padding: 20px;
-}
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-.container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-}
+        .ruota {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
 
-.ruota {
-    background: rgba(0,0,0,0.2);
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-}
+        .numeri span {
+            display: inline-block;
+            background: #e94560;
+            padding: 8px 12px;
+            margin: 4px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
 
-.numeri span {
-    display: inline-block;
-    background: #ff4d6d;
-    padding: 8px 12px;
-    margin: 5px;
-    border-radius: 50%;
-    font-weight: bold;
-}
-
-.ambo span {
-    background: #2ecc71;
-}
-
-.errore {
-    text-align: center;
-    font-size: 20px;
-    color: yellow;
-}
-</style>
+        .errore {
+            text-align: center;
+            font-size: 22px;
+            color: yellow;
+        }
+    </style>
 </head>
 
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
-<div class="container" id="contenitore"></div>
+
+<div id="contenitore">Caricamento...</div>
 
 <script>
 fetch("https://lotto-statistiche.onrender.com/api")
@@ -75,27 +66,7 @@ fetch("https://lotto-statistiche.onrender.com/api")
 
             <p><strong>Ultima estrazione:</strong></p>
             <div class="numeri">
-                ${data[ruota].ultima_estrazione.map(n => `<span>${n}</span>`).join("")}
-            </div>
-
-            <p><strong>Ambo prudente:</strong></p>
-            <div class="numeri ambo">
-                ${data[ruota].ambo_prudente.map(n => `<span>${n}</span>`).join("")}
-            </div>
-
-            <p><strong>Ambo bilanciato:</strong></p>
-            <div class="numeri ambo">
-                ${data[ruota].ambo_bilanciato.map(n => `<span>${n}</span>`).join("")}
-            </div>
-
-            <p><strong>Ambo ritardo:</strong></p>
-            <div class="numeri ambo">
-                ${data[ruota].ambo_ritardo.map(n => `<span>${n}</span>`).join("")}
-            </div>
-
-            <p><strong>Terno strategico:</strong></p>
-            <div class="numeri ambo">
-                ${data[ruota].terno_strategico.map(n => `<span>${n}</span>`).join("")}
+                ${data[ruota].map(n => `<span>${n}</span>`).join("")}
             </div>
         `;
 
@@ -105,12 +76,13 @@ fetch("https://lotto-statistiche.onrender.com/api")
 })
 .catch(error => {
     document.getElementById("contenitore").innerHTML =
-        "<div class='errore'>Errore caricamento dati</div>";
+        "<p class='errore'>Errore caricamento dati</p>";
 });
 </script>
 
 </body>
 </html>
+
 
 
 
