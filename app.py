@@ -1,63 +1,72 @@
-import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 import json
+import random
 
 app = Flask(__name__)
 CORS(app)
 
-with open("estrazioni.json", "r") as f:
-    estrazioni = json.load(f)
+# Ruote ufficiali
+RUOTE = [
+    "Bari", "Cagliari", "Firenze", "Genova",
+    "Milano", "Napoli", "Palermo", "Roma",
+    "Torino", "Venezia", "Nazionale"
+]
 
-def calcola_previsioni(numeri):
-    ultimi_20 = numeri[-20:]
+# Carica estrazioni dal file locale
+def carica_dati():
+    with open("estrazioni.json", "r") as f:
+        return json.load(f)
 
-    frequenze = {}
-    for estrazione in ultimi_20:
-        for numero in estrazione:
-            frequenze[numero] = frequenze.get(numero, 0) + 1
+# Genera ambo prudente (numeri bassi frequenti)
+def genera_ambo_prudente(estrazione):
+    numeri = sorted(estrazione)
+    return numeri[:2]
 
-    ordinati = sorted(frequenze.items(), key=lambda x: x[1], reverse=True)
-    piu_frequenti = [n[0] for n in ordinati]
+# Genera ambo bilanciato (uno basso uno alto)
+def genera_ambo_bilanciato(estrazione):
+    numeri = sorted(estrazione)
+    return [numeri[0], numeri[-1]]
 
-    ambo_prudente = piu_frequenti[:2]
+# Genera ambo ritardo (simulazione casuale)
+def genera_ambo_ritardo():
+    return random.sample(range(1, 91), 2)
 
-    bassi = [n for n in piu_frequenti if n <= 45]
-    alti = [n for n in piu_frequenti if n > 45]
-    ambo_bilanciato = [bassi[0], alti[0]] if bassi and alti else piu_frequenti[:2]
+# Genera terno strategico
+def genera_terno(estrazione):
+    numeri = sorted(estrazione)
+    return numeri[:3]
 
-    usciti = set(num for estrazione in ultimi_20 for num in estrazione)
-    tutti = set(range(1, 91))
-    ritardatari = list(tutti - usciti)
-    ambo_ritardo = ritardatari[:2]
-
-    terno = [ambo_prudente[0], ambo_ritardo[0], ambo_prudente[1]]
+# Analizza singola ruota
+def analizza_ruota(estrazioni_ruota):
+    ultima = estrazioni_ruota[0]
 
     return {
-        "ambo_prudente": ambo_prudente,
-        "ambo_bilanciato": ambo_bilanciato,
-        "ambo_ritardo": ambo_ritardo,
-        "terno_strategico": terno
+        "ultima_estrazione": ultima,
+        "ambo_prudente": genera_ambo_prudente(ultima),
+        "ambo_bilanciato": genera_ambo_bilanciato(ultima),
+        "ambo_ritardo": genera_ambo_ritardo(),
+        "terno_strategico": genera_terno(ultima)
     }
 
 @app.route("/api")
 def api():
-    risultato = {}
-    for ruota, estrazioni_ruota in estrazioni.items():
-        previsioni = calcola_previsioni(estrazioni_ruota)
-        risultato[ruota] = {
-            "ultima_estrazione": estrazioni_ruota[-1],
-            **previsioni
-        }
-    return jsonify(risultato)
+    try:
+        dati = carica_dati()
+        risultato = {}
+
+        for ruota in RUOTE:
+            if ruota in dati:
+                risultato[ruota] = analizza_ruota(dati[ruota])
+
+        return jsonify(risultato)
+
+    except Exception as e:
+        return jsonify({"errore": str(e)})
 
 @app.route("/")
 def home():
     return "API Lotto attiva"
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
 
 
 
