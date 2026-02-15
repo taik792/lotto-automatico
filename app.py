@@ -1,39 +1,29 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-import json
 import random
 from collections import Counter
 
 app = Flask(__name__)
 CORS(app)
 
-def carica_estrazioni():
-    with open("estrazioni.json", "r") as f:
-        return json.load(f)
+RUOTE = [
+    "Bari", "Cagliari", "Firenze", "Genova",
+    "Milano", "Napoli", "Palermo", "Roma",
+    "Torino", "Venezia", "Nazionale"
+]
 
-def genera_previsione(numeri):
-    # Logica semplice ma sensata:
-    # 1. Numeri ritardatari simulati (numeri non presenti)
-    # 2. Numeri consecutivi
-    # 3. Numeri con stessa decina
-    
-    tutti = set(range(1, 91))
-    usciti = set(numeri)
-    
-    # Ritardatari (non usciti)
-    ritardatari = list(tutti - usciti)
-    random.shuffle(ritardatari)
-    
-    # Prendiamo 3 ritardatari
-    previsione = ritardatari[:3]
-    
-    # Aggiungiamo 2 numeri casuali coerenti
-    while len(previsione) < 5:
-        n = random.randint(1, 90)
-        if n not in previsione:
-            previsione.append(n)
-    
-    return sorted(previsione)
+def genera_estrazione():
+    return sorted(random.sample(range(1, 91), 5))
+
+def genera_previsione(storico):
+    tutti_numeri = [n for estr in storico for n in estr]
+    frequenze = Counter(tutti_numeri)
+
+    freddi = sorted(frequenze, key=frequenze.get)[:10]
+    if len(freddi) >= 5:
+        return sorted(random.sample(freddi, 5))
+    else:
+        return sorted(random.sample(range(1, 91), 5))
 
 @app.route("/")
 def home():
@@ -41,23 +31,25 @@ def home():
 
 @app.route("/api")
 def api():
-    try:
-        dati = carica_estrazioni()
-        risultato = {}
-        
-        for ruota, numeri in dati.items():
-            risultato[ruota] = {
-                "ultima_estrazione": numeri,
-                "previsione": genera_previsione(numeri)
-            }
-        
-        return jsonify(risultato)
-    
-    except Exception as e:
-        return jsonify({"errore": str(e)})
+    dati = {}
+
+    for ruota in RUOTE:
+        storico = [genera_estrazione() for _ in range(20)]
+        ultima = storico[-1]
+        previsione = genera_previsione(storico)
+
+        dati[ruota] = {
+            "ultima_estrazione": ultima,
+            "previsione": previsione
+        }
+
+    return jsonify(dati)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
+        
+
 
 
 
