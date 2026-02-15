@@ -1,35 +1,38 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
-import random
-
-app = Flask(__name__)
-CORS(app)  # <-- QUESTO RISOLVE DEFINITIVAMENTE IL CORS
-
-ruote = [
-    "Bari","Cagliari","Firenze","Genova",
-    "Milano","Napoli","Nazionale",
-    "Palermo","Roma","Torino","Venezia"
-]
-
-def genera_dati():
-    dati = {}
-    for r in ruote:
-        dati[r] = {
-            "ultima_estrazione": random.sample(range(1, 91), 5),
-            "previsione": random.sample(range(1, 91), 5)
+<script>
+async function caricaDati() {
+    try {
+        const response = await fetch("https://lotto-statistiche.onrender.com/api");
+        
+        if (!response.ok) {
+            throw new Error("Errore risposta server");
         }
-    return dati
 
-@app.route("/")
-def home():
-    return "API Lotto attiva"
+        const dati = await response.json();
+        console.log(dati);
 
-@app.route("/api")
-def api():
-    return jsonify(genera_dati())
+        const container = document.getElementById("contenuto");
+        container.innerHTML = "";
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+        for (let ruota in dati) {
+            const div = document.createElement("div");
+            div.innerHTML = `
+                <h2>${ruota}</h2>
+                <p>Ultima estrazione: ${dati[ruota].ultima_estrazione.join(", ")}</p>
+                <p>Previsione: ${dati[ruota].previsione.join(", ")}</p>
+                <hr>
+            `;
+            container.appendChild(div);
+        }
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById("contenuto").innerHTML = "Errore caricamento dati";
+    }
+}
+
+caricaDati();
+</script>
+
 
 
 
