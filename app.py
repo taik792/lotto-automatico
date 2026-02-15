@@ -2,42 +2,36 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import json
 import random
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Ruote ufficiali
 RUOTE = [
     "Bari", "Cagliari", "Firenze", "Genova",
     "Milano", "Napoli", "Palermo", "Roma",
     "Torino", "Venezia", "Nazionale"
 ]
 
-# Carica estrazioni dal file locale
 def carica_dati():
     with open("estrazioni.json", "r") as f:
         return json.load(f)
 
-# Genera ambo prudente (numeri bassi frequenti)
 def genera_ambo_prudente(estrazione):
     numeri = sorted(estrazione)
     return numeri[:2]
 
-# Genera ambo bilanciato (uno basso uno alto)
 def genera_ambo_bilanciato(estrazione):
     numeri = sorted(estrazione)
     return [numeri[0], numeri[-1]]
 
-# Genera ambo ritardo (simulazione casuale)
 def genera_ambo_ritardo():
     return random.sample(range(1, 91), 2)
 
-# Genera terno strategico
 def genera_terno(estrazione):
     numeri = sorted(estrazione)
     return numeri[:3]
 
-# Analizza singola ruota
 def analizza_ruota(estrazioni_ruota):
     ultima = estrazioni_ruota[0]
 
@@ -67,6 +61,12 @@ def api():
 @app.route("/")
 def home():
     return "API Lotto attiva"
+
+# 🔥 QUESTO È IL FIX PER RENDER
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
 
 
 
