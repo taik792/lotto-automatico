@@ -1,71 +1,101 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
+from flask import Flask, jsonify, request
 import json
-import random
 import os
+import requests
+from base64 import b64encode
 
 app = Flask(__name__)
-CORS(app)
 
-RUOTE = [
-    "Bari", "Cagliari", "Firenze", "Genova",
-    "Milano", "Napoli", "Palermo", "Roma",
-    "Torino", "Venezia", "Nazionale"
-]
+# ===== CONFIG =====
+GITHUB_REPO = "TAIK792/lotto-automatico"
+FILE_PATH = "estrazioni.json"
+BRANCH = "main"
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 
+# ===== FUNZIONE LETTURA FILE LOCALE =====
 def carica_dati():
-    with open("estrazioni.json", "r") as f:
+    with open(FILE_PATH, "r") as f:
         return json.load(f)
 
-def genera_ambo_prudente(estrazione):
-    numeri = sorted(estrazione)
-    return numeri[:2]
+# ===== FUNZIONE SALVATAGGIO SU GITHUB =====
+def salva_su_github(nuovi_dati):
 
-def genera_ambo_bilanciato(estrazione):
-    numeri = sorted(estrazione)
-    return [numeri[0], numeri[-1]]
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{FILE_PATH}"
 
-def genera_ambo_ritardo():
-    return random.sample(range(1, 91), 2)
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json"
+    }
 
-def genera_terno(estrazione):
-    numeri = sorted(estrazione)
-    return numeri[:3]
+    # Recupera SHA attuale
+    r = requests.get(url, headers=headers)
+    sha = r.json()["sha"]
 
+    contenuto = json.dumps(nuovi_dati, indent=2)
+    encoded_content = b64encode(contenuto.encode()).decode()
+
+    data = {
+        "message": "Aggiornamento automatico estrazioni",
+        "content": encoded_content,
+        "sha": sha,
+        "branch": BRANCH
+    }
+
+    requests.put(url, headers=headers, json=data)
+
+# ===== ANALISI BASE =====
 def analizza_ruota(estrazioni_ruota):
     ultima = estrazioni_ruota[0]
 
     return {
         "ultima_estrazione": ultima,
-        "ambo_prudente": genera_ambo_prudente(ultima),
-        "ambo_bilanciato": genera_ambo_bilanciato(ultima),
-        "ambo_ritardo": genera_ambo_ritardo(),
-        "terno_strategico": genera_terno(ultima)
+        "ambo_prudente": sorted(ultima[:2]),
+        "ambo_bilanciato": [min(ultima), max(ultima)],
+        "ambo_ritardo": [],
+        "terno_strategico": sorted(ultima[:3])
     }
 
+# ===== API PRINCIPALE =====
 @app.route("/api")
 def api():
-    try:
-        dati = carica_dati()
-        risultato = {}
+    dati = carica_dati()
+    risultato = {}
 
-        for ruota in RUOTE:
-            if ruota in dati:
-                risultato[ruota] = analizza_ruota(dati[ruota])
+    for ruota, estrazioni in dati.items():
+        risultato[ruota] = analizza_ruota(estrazioni)
 
-        return jsonify(risultato)
+    return jsonify(risultato)
 
-    except Exception as e:
-        return jsonify({"errore": str(e)})
+# ===== AGGIORNA ESTRAZIONE =====
+@app.route("/aggiorna", methods=["POST"])
+def aggiorna():
+
+    dati = carica_dati()
+    payload = request.json
+
+    ruota = payload.get("ruota")
+    numeri = payload.get("numeri")
+
+    if ruota not in dati:
+        return jsonify({"errore": "Ruota non valida"})
+
+    if len(numeri) != 5:
+        return jsonify({"errore": "Servono 5 numeri"})
+
+    dati[ruota].insert(0, numeri)
+
+    salva_su_github(dati)
+
+    return jsonify({"successo": True})
 
 @app.route("/")
 def home():
     return "API Lotto attiva"
 
-# 🔥 QUESTO È IL FIX PER RENDER
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
