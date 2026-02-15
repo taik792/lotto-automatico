@@ -1,52 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Lotto Live Statistiche</title>
+<meta charset="UTF-8">
+<title>Lotto Live Statistiche</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #0f4c75, #3282b8);
-            margin: 0;
-            padding: 20px;
-            color: white;
-        }
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(to bottom, #0f4c75, #3282b8);
+    color: white;
+    padding: 20px;
+}
 
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+h1 {
+    text-align: center;
+}
 
-        .ruota {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-        }
+.ruota {
+    background: #1b262c;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
 
-        .numeri span {
-            display: inline-block;
-            background: #e94560;
-            padding: 8px 12px;
-            margin: 4px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
+.numeri span {
+    display: inline-block;
+    background: #e94560;
+    padding: 8px 12px;
+    margin: 4px;
+    border-radius: 20px;
+    font-weight: bold;
+}
 
-        .errore {
-            text-align: center;
-            font-size: 22px;
-            color: yellow;
-        }
-    </style>
+.am bo span {
+    background: #21e6c1;
+    color: black;
+}
+
+.errore {
+    text-align: center;
+    font-size: 22px;
+    color: yellow;
+}
+</style>
 </head>
 
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
-
-<div id="contenitore">Caricamento...</div>
+<div id="contenitore"></div>
 
 <script>
 fetch("https://lotto-statistiche.onrender.com/api")
@@ -66,8 +68,17 @@ fetch("https://lotto-statistiche.onrender.com/api")
 
             <p><strong>Ultima estrazione:</strong></p>
             <div class="numeri">
-                ${data[ruota].map(n => `<span>${n}</span>`).join("")}
+                ${data[ruota].ultima_estrazione.map(n => `<span>${n}</span>`).join("")}
             </div>
+
+            <p><strong>Ambo strategico:</strong></p>
+            <div class="numeri">
+                ${data[ruota].ambo_strategico.map(n => `<span>${n}</span>`).join("")}
+            </div>
+
+            <p><strong>Numero frequente:</strong> ${data[ruota].numero_frequente}</p>
+            <p><strong>Numero ritardo:</strong> ${data[ruota].numero_ritardo}</p>
+
         `;
 
         contenitore.appendChild(blocco);
@@ -76,12 +87,13 @@ fetch("https://lotto-statistiche.onrender.com/api")
 })
 .catch(error => {
     document.getElementById("contenitore").innerHTML =
-        "<p class='errore'>Errore caricamento dati</p>";
+        "<div class='errore'>Errore caricamento dati</div>";
 });
 </script>
 
 </body>
 </html>
+
 
 
 
