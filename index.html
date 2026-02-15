@@ -1,133 +1,81 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lotto Live Statistiche</title>
-
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: white;
-}
-
-header {
-    padding: 20px;
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-}
-
-.card {
-    background: rgba(255,255,255,0.08);
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 15px;
-    backdrop-filter: blur(5px);
-}
-
-.ruota {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.numeri {
-    margin-top: 5px;
-}
-
-.numero {
-    display: inline-block;
-    background: #ff5e57;
-    padding: 8px 12px;
-    margin: 4px;
-    border-radius: 50px;
-    font-weight: bold;
-}
-
-.previsione .numero {
-    background: #2ecc71;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Lotto Live Statistiche</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to bottom, #0f4c75, #3282b8);
+            color: white;
+            padding: 20px;
+        }
+        .card {
+            background: #1b262c;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+        .num {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 3px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .rosso { background: #e94560; }
+        .verde { background: #21e6c1; color: black; }
+        h1 { text-align: center; }
+    </style>
 </head>
-
 <body>
 
-<header>🎯 Lotto Live Statistiche</header>
-
-<div class="container" id="contenuto">
-Caricamento dati...
-</div>
+<h1>🎯 Lotto Live Statistiche</h1>
+<div id="contenuto">Caricamento...</div>
 
 <script>
-
 fetch("https://lotto-statistiche.onrender.com/api")
-.then(response => response.json())
+.then(res => res.json())
 .then(data => {
-
-    const container = document.getElementById("contenuto");
-    container.innerHTML = "";
+    let html = "";
 
     for (let ruota in data) {
+        let r = data[ruota];
 
-        const card = document.createElement("div");
-        card.className = "card";
+        html += `<div class="card">
+            <h2>${ruota}</h2>
 
-        const titolo = document.createElement("div");
-        titolo.className = "ruota";
-        titolo.innerText = ruota;
-
-        const ultima = document.createElement("div");
-        ultima.innerHTML = "<strong>Ultima estrazione:</strong>";
-
-        const numeriUltima = document.createElement("div");
-        numeriUltima.className = "numeri";
-
-        data[ruota].ultima_estrazione.forEach(n => {
-            const span = document.createElement("span");
-            span.className = "numero";
-            span.innerText = n;
-            numeriUltima.appendChild(span);
+            <strong>Ultima estrazione:</strong><br>`;
+        r.ultima_estrazione.forEach(n => {
+            html += `<span class="num rosso">${n}</span>`;
         });
 
-        const previsione = document.createElement("div");
-        previsione.innerHTML = "<strong>Previsione automatica:</strong>";
-
-        const numeriPrev = document.createElement("div");
-        numeriPrev.className = "numeri previsione";
-
-        data[ruota].previsione.forEach(n => {
-            const span = document.createElement("span");
-            span.className = "numero";
-            span.innerText = n;
-            numeriPrev.appendChild(span);
+        html += `<br><br><strong>Ambo Prudente:</strong><br>`;
+        r.ambo_prudente.forEach(n => {
+            html += `<span class="num verde">${n}</span>`;
         });
 
-        card.appendChild(titolo);
-        card.appendChild(ultima);
-        card.appendChild(numeriUltima);
-        card.appendChild(previsione);
-        card.appendChild(numeriPrev);
+        html += `<br><br><strong>Ambo Bilanciato:</strong><br>`;
+        r.ambo_bilanciato.forEach(n => {
+            html += `<span class="num verde">${n}</span>`;
+        });
 
-        container.appendChild(card);
+        html += `<br><br><strong>Ambo Ritardo:</strong><br>`;
+        r.ambo_ritardo.forEach(n => {
+            html += `<span class="num verde">${n}</span>`;
+        });
+
+        html += `</div>`;
     }
 
+    document.getElementById("contenuto").innerHTML = html;
 })
-.catch(error => {
+.catch(err => {
     document.getElementById("contenuto").innerHTML = "Errore caricamento dati";
-    console.error(error);
 });
-
 </script>
 
 </body>
 </html>
+
 
