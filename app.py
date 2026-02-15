@@ -1,68 +1,47 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import requests
+import os
 import base64
-import json
 
 app = Flask(__name__)
+CORS(app)
 
-# CONFIGURAZIONE REPOSITORY
-GITHUB_USER = "taik792"
-GITHUB_REPO = "lotto-automatico"
-FILE_NAME = "estrazioni.json"
+GITHUB_TOKEN = os.environ.get("TOKEN")
 
-
-def leggi_estrazioni():
-    url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/contents/{FILE_NAME}"
-
-    response = requests.get(url)
-
-    if response.status_code != 200:
-        raise Exception(f"Errore GitHub: {response.text}")
-
-    data = response.json()
-
-    if "content" not in data:
-        raise Exception(f"Risposta GitHub non valida: {data}")
-
-    contenuto = base64.b64decode(data["content"]).decode("utf-8")
-
-    return json.loads(contenuto)
-
-
-def analizza_ruota(numeri):
-    return {
-        "ultima_estrazione": numeri,
-        "ambo_prudente": numeri[:2],
-        "ambo_bilanciato": numeri[1:3],
-        "ambo_ritardo": numeri[-2:],
-        "terno_strategico": numeri[:3]
-    }
-
-
-@app.route("/api")
-def api():
-    try:
-        estrazioni = leggi_estrazioni()
-        risultato = {}
-
-        for ruota, numeri in estrazioni.items():
-            risultato[ruota] = analizza_ruota(numeri)
-
-        return jsonify(risultato)
-
-    except Exception as e:
-        return jsonify({"errore": str(e)})
-
+REPO_OWNER = "taik792"
+REPO_NAME = "lotto-automatico"
+FILE_PATH = "estrazioni.json"
 
 @app.route("/")
 def home():
     return "API Lotto attiva"
 
+@app.route("/api")
+def get_data():
+    try:
+        url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}"
+        
+        headers = {
+            "Authorization": f"token {GITHUB_TOKEN}"
+        }
+
+        response = requests.get(url, headers=headers)
+        data = response.json()
+
+        if "content" not in data:
+            return jsonify({"errore": data})
+
+        content = base64.b64decode(data["content"]).decode("utf-8")
+        return content
+
+    except Exception as e:
+        return jsonify({"errore": str(e)})
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
