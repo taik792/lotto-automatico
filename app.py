@@ -1,62 +1,39 @@
+import os
 from flask import Flask, jsonify
 from flask_cors import CORS
 import json
-from collections import Counter
 
 app = Flask(__name__)
 CORS(app)
 
-RUOTE = [
-    "Bari","Cagliari","Firenze","Genova","Milano",
-    "Napoli","Palermo","Roma","Torino","Venezia","Nazionale"
-]
+with open("estrazioni.json", "r") as f:
+    estrazioni = json.load(f)
 
-def carica_dati():
-    with open("estrazioni.json", "r", encoding="utf-8") as f:
-        return json.load(f)
+def calcola_previsioni(numeri):
+    ultimi_20 = numeri[-20:]
 
-def analizza_ruota(estrazioni_ruota):
-    ultime20 = estrazioni_ruota[:20]
+    frequenze = {}
+    for estrazione in ultimi_20:
+        for numero in estrazione:
+            frequenze[numero] = frequenze.get(numero, 0) + 1
 
-    # Frequenze
-    frequenze = Counter()
-    for estrazione in ultime20:
-        frequenze.update(estrazione)
+    ordinati = sorted(frequenze.items(), key=lambda x: x[1], reverse=True)
+    piu_frequenti = [n[0] for n in ordinati]
 
-    # Numeri più frequenti
-    caldi = [n for n,_ in frequenze.most_common(5)]
+    ambo_prudente = piu_frequenti[:2]
 
-    # Ritardi (numeri non usciti nelle 20)
-    tutti = set(range(1,91))
-    usciti = set(frequenze.keys())
+    bassi = [n for n in piu_frequenti if n <= 45]
+    alti = [n for n in piu_frequenti if n > 45]
+    ambo_bilanciato = [bassi[0], alti[0]] if bassi and alti else piu_frequenti[:2]
+
+    usciti = set(num for estrazione in ultimi_20 for num in estrazione)
+    tutti = set(range(1, 91))
     ritardatari = list(tutti - usciti)
-    ritardatari.sort()
+    ambo_ritardo = ritardatari[:2]
 
-    # Ambo Prudente
-    ambo_prudente = [caldi[0], caldi[1]] if len(caldi) >= 2 else caldi
-
-    # Ambo Bilanciato
-    bassi = [n for n in caldi if n <= 45]
-    alti = [n for n in caldi if n > 45]
-    if bassi and alti:
-        ambo_bilanciato = [bassi[0], alti[0]]
-    else:
-        ambo_bilanciato = ambo_prudente
-
-    # Ambo Ritardo
-    ambo_ritardo = ritardatari[:2] if len(ritardatari) >= 2 else []
-
-    # Terno Strategico
-    terno = []
-    if caldi:
-        terno.append(caldi[0])
-    if ritardatari:
-        terno.append(ritardatari[0])
-    if len(caldi) > 2:
-        terno.append(caldi[2])
+    terno = [ambo_prudente[0], ambo_ritardo[0], ambo_prudente[1]]
 
     return {
-        "ultima_estrazione": estrazioni_ruota[0],
         "ambo_prudente": ambo_prudente,
         "ambo_bilanciato": ambo_bilanciato,
         "ambo_ritardo": ambo_ritardo,
@@ -65,25 +42,22 @@ def analizza_ruota(estrazioni_ruota):
 
 @app.route("/api")
 def api():
-    try:
-        dati = carica_dati()
-        risultato = {}
-
-        for ruota in RUOTE:
-            if ruota in dati:
-                risultato[ruota] = analizza_ruota(dati[ruota])
-
-        return jsonify(risultato)
-
-    except Exception as e:
-        return jsonify({"errore": str(e)})
+    risultato = {}
+    for ruota, estrazioni_ruota in estrazioni.items():
+        previsioni = calcola_previsioni(estrazioni_ruota)
+        risultato[ruota] = {
+            "ultima_estrazione": estrazioni_ruota[-1],
+            **previsioni
+        }
+    return jsonify(risultato)
 
 @app.route("/")
 def home():
     return "API Lotto attiva"
 
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
 
 
