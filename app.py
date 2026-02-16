@@ -4,87 +4,136 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# DATI SIMULATI (poi li sistemiamo automatici)
-dati = {
-    "Bari": [12, 34, 45, 56, 78],
-    "Cagliari": [17, 18, 29, 40, 51],
-    "Firenze": [3, 14, 25, 36, 47],
-    "Genova": [6, 17, 28, 39, 50],
-    "Milano": [5, 16, 27, 38, 49],
-    "Napoli": [11, 22, 33, 44, 55],
-    "Palermo": [2, 13, 24, 35, 46],
-    "Roma": [15, 26, 37, 48, 59],
-    "Torino": [8, 19, 30, 41, 52],
-    "Venezia": [9, 20, 31, 42, 53]
+# DATI DEMO (poi li collegheremo al tuo algoritmo)
+DATI = {
+    "Bari": {
+        "ultima_estrazione": [12, 34, 46, 68, 78],
+        "ambo_strategico": [12, 34],
+        "numero_frequente": [46],
+        "numero_ritardo": [78],
+        "terno_strategico": [12, 34, 46]
+    },
+    "Cagliari": {
+        "ultima_estrazione": [17, 18, 29, 40, 61],
+        "ambo_strategico": [17, 29],
+        "numero_frequente": [40],
+        "numero_ritardo": [61],
+        "terno_strategico": [17, 29, 40]
+    },
+    "Firenze": {
+        "ultima_estrazione": [3, 14, 25, 36, 47],
+        "ambo_strategico": [14, 36],
+        "numero_frequente": [25],
+        "numero_ritardo": [47],
+        "terno_strategico": [14, 25, 36]
+    },
+    "Genova": {
+        "ultima_estrazione": [8, 17, 28, 39, 50],
+        "ambo_strategico": [17, 28],
+        "numero_frequente": [39],
+        "numero_ritardo": [50],
+        "terno_strategico": [17, 28, 39]
+    }
 }
 
-@app.route("/api")
-def api():
-    return jsonify(dati)
+HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+<title>Lotto Live Statistiche</title>
+<style>
+body {
+    margin:0;
+    font-family: Arial;
+    background: linear-gradient(to bottom, #0f4c75, #3282b8);
+    color:white;
+}
+h1 {
+    text-align:center;
+    padding:20px;
+}
+.container {
+    width:90%;
+    margin:auto;
+}
+.blocco {
+    background: rgba(0,0,0,0.3);
+    padding:20px;
+    margin:20px 0;
+    border-radius:10px;
+}
+.numero {
+    display:inline-block;
+    background:#ffcc00;
+    color:black;
+    padding:10px 15px;
+    margin:5px;
+    border-radius:50%;
+    font-weight:bold;
+}
+.titolo {
+    font-size:20px;
+    margin-bottom:10px;
+}
+</style>
+</head>
+<body>
+
+<h1>🎯 Lotto Live Statistiche</h1>
+<div class="container" id="contenitore"></div>
+
+<script>
+fetch("/api")
+.then(r => r.json())
+.then(data => {
+
+    const contenitore = document.getElementById("contenitore");
+
+    Object.entries(data).forEach(([ruota, valori]) => {
+
+        const blocco = document.createElement("div");
+        blocco.className = "blocco";
+
+        blocco.innerHTML = `
+            <div class="titolo">${ruota}</div>
+
+            <p><strong>Ultima estrazione:</strong></p>
+            ${valori.ultima_estrazione.map(n => `<span class="numero">${n}</span>`).join("")}
+
+            <p><strong>Modalità Prudente (Ambo strategico):</strong></p>
+            ${valori.ambo_strategico.map(n => `<span class="numero">${n}</span>`).join("")}
+
+            <p><strong>Numero Frequente:</strong></p>
+            ${valori.numero_frequente.map(n => `<span class="numero">${n}</span>`).join("")}
+
+            <p><strong>Numero Ritardo:</strong></p>
+            ${valori.numero_ritardo.map(n => `<span class="numero">${n}</span>`).join("")}
+
+            <p><strong>Modalità Aggressiva (Terno strategico):</strong></p>
+            ${valori.terno_strategico.map(n => `<span class="numero">${n}</span>`).join("")}
+        `;
+
+        contenitore.appendChild(blocco);
+    });
+
+});
+</script>
+
+</body>
+</html>
+"""
 
 @app.route("/")
 def home():
-    return render_template_string("""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Lotto Live Statistiche</title>
-        <style>
-            body {
-                font-family: Arial;
-                background: linear-gradient(to bottom, #004e92, #000428);
-                color: white;
-                text-align: center;
-                padding: 30px;
-            }
-            .ruota {
-                margin: 20px;
-                padding: 15px;
-                background: rgba(255,255,255,0.1);
-                border-radius: 10px;
-            }
-            span {
-                display: inline-block;
-                margin: 5px;
-                padding: 10px;
-                background: orange;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                line-height: 20px;
-                font-weight: bold;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>🎯 Lotto Live Statistiche</h1>
-        <div id="contenitore"></div>
+    return render_template_string(HTML)
 
-        <script>
-            fetch("/api")
-            .then(res => res.json())
-            .then(data => {
-                const cont = document.getElementById("contenitore");
-
-                Object.entries(data).forEach(([ruota, numeri]) => {
-                    const div = document.createElement("div");
-                    div.className = "ruota";
-                    div.innerHTML = "<h2>" + ruota + "</h2>" +
-                        numeri.map(n => "<span>"+n+"</span>").join("");
-                    cont.appendChild(div);
-                });
-            })
-            .catch(err => {
-                document.getElementById("contenitore").innerHTML =
-                    "<h2>Errore caricamento dati</h2>";
-            });
-        </script>
-    </body>
-    </html>
-    """)
+@app.route("/api")
+def api():
+    return jsonify(DATI)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run()
+
 
 
 
