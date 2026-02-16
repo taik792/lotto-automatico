@@ -1,6 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Lotto Live Statistiche</title>
+
+<style>
+body {
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #0f4c75, #3282b8);
+    color:white;
+}
+
+h1 {
+    text-align:center;
+    padding:20px;
+}
+
+.container {
+    width:90%;
+    margin:auto;
+}
+
+.ruota {
+    background:rgba(0,0,0,0.3);
+    padding:15px;
+    margin-bottom:20px;
+    border-radius:10px;
+}
+
+.numeri span {
+    background:#ff5959;
+    padding:8px 12px;
+    border-radius:20px;
+    margin:5px;
+    display:inline-block;
+    font-weight:bold;
+}
+
+.error {
+    text-align:center;
+    font-size:22px;
+    color:yellow;
+}
+</style>
+
+</head>
+<body>
+
+<h1>🎯 Lotto Live Statistiche</h1>
+<div class="container" id="contenitore"></div>
+
 <script>
+
 fetch("https://lotto-statistiche.onrender.com/api")
-.then(response => response.json())
+.then(res => res.json())
 .then(data => {
 
     const contenitore = document.getElementById("contenitore");
@@ -10,10 +63,9 @@ fetch("https://lotto-statistiche.onrender.com/api")
 
     Object.entries(data).forEach(([ruota, valori]) => {
 
-        // Calcolo punteggio semplice
         punteggi[ruota] =
-            valori.numero_frequente.reduce((a,b) => a+b,0) -
-            valori.numero_ritardo.reduce((a,b) => a+b,0);
+            valori.numero_frequente.reduce((a,b)=>a+b,0) -
+            valori.numero_ritardo.reduce((a,b)=>a+b,0);
 
         const blocco = document.createElement("div");
         blocco.className = "ruota";
@@ -53,8 +105,7 @@ fetch("https://lotto-statistiche.onrender.com/api")
         contenitore.appendChild(blocco);
     });
 
-    // Trova ruota più forte
-    const ruotaTop = Object.keys(punteggi).reduce((a, b) =>
+    const ruotaTop = Object.keys(punteggi).reduce((a,b) =>
         punteggi[a] > punteggi[b] ? a : b
     );
 
@@ -63,7 +114,7 @@ fetch("https://lotto-statistiche.onrender.com/api")
     evidenza.style.fontSize = "26px";
     evidenza.style.margin = "20px";
     evidenza.style.color = "yellow";
-    evidenza.innerHTML = `🔥 RUOTA PIÙ FORTE: ${ruotaTop}`;
+    evidenza.innerHTML = "🔥 RUOTA PIÙ FORTE: " + ruotaTop;
 
     contenitore.prepend(evidenza);
 
@@ -73,7 +124,13 @@ fetch("https://lotto-statistiche.onrender.com/api")
         "<div class='error'>Errore caricamento dati</div>";
     console.error(error);
 });
+
 </script>
+
+</body>
+</html>
+
+
 
 
 
