@@ -1,99 +1,84 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Lotto Live Statistiche</title>
+<script>
+fetch("https://lotto-statistiche.onrender.com/api")
+.then(response => response.json())
+.then(data => {
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #0f4c75, #3282b8);
-      color: white;
-    }
+    const contenitore = document.getElementById("contenitore");
+    contenitore.innerHTML = "";
 
-    h1 {
-      text-align: center;
-      padding: 20px;
-    }
+    let punteggi = {};
 
-    .container {
-      width: 90%;
-      margin: auto;
-    }
+    Object.entries(data).forEach(([ruota, valori]) => {
 
-    .ruota {
-      background: rgba(0,0,0,0.3);
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-    }
+        // Calcolo punteggio ruota (algoritmo base)
+        let punteggio =
+            valori.numero_frequente.length * 2 +
+            valori.numero_ritardo.length * 3 +
+            valori.ambo_strategico.length * 4 +
+            valori.terno_strategico.length * 5;
 
-    .numeri span {
-      background: #ff5959;
-      padding: 8px 12px;
-      border-radius: 20px;
-      margin: 5px;
-      display: inline-block;
-      font-weight: bold;
-    }
+        punteggi[ruota] = punteggio;
 
-    .error {
-      text-align: center;
-      font-size: 22px;
-      color: yellow;
-      margin-top: 40px;
-    }
-  </style>
-</head>
+        const blocco = document.createElement("div");
+        blocco.className = "ruota";
 
-<body>
-
-  <h1>🎯 Lotto Live Statistiche</h1>
-
-  <div class="container" id="contenitore"></div>
-
-  <script>
-    fetch("https://lotto-statistiche.onrender.com/api")
-      .then(response => response.json())
-      .then(data => {
-
-        const contenitore = document.getElementById("contenitore");
-        contenitore.innerHTML = "";
-
-        Object.keys(data).forEach(ruota => {
-
-          const valori = data[ruota];
-
-          const blocco = document.createElement("div");
-          blocco.className = "ruota";
-
-          blocco.innerHTML = `
+        blocco.innerHTML = `
             <h2>${ruota}</h2>
 
             <p><strong>Ultima estrazione:</strong></p>
             <div class="numeri">
-              ${valori[0].map(n => `<span>${n}</span>`).join("")}
+                ${valori.ultima_estrazione.map(n => `<span>${n}</span>`).join("")}
             </div>
 
             <p><strong>Ambo strategico:</strong></p>
             <div class="numeri">
-              ${valori[1].map(n => `<span>${n}</span>`).join("")}
+                ${valori.ambo_strategico.map(n => `<span>${n}</span>`).join("")}
             </div>
-          `;
 
-          contenitore.appendChild(blocco);
-        });
+            <p><strong>Numero frequente:</strong></p>
+            <div class="numeri">
+                ${valori.numero_frequente.map(n => `<span>${n}</span>`).join("")}
+            </div>
 
-      })
-      .catch(error => {
-        document.getElementById("contenitore").innerHTML =
-          "<div class='error'>Errore caricamento dati</div>";
-        console.error(error);
-      });
-  </script>
+            <p><strong>Numero ritardo:</strong></p>
+            <div class="numeri">
+                ${valori.numero_ritardo.map(n => `<span>${n}</span>`).join("")}
+            </div>
 
-</body>
-</html>
+            <p><strong>Terno strategico:</strong></p>
+            <div class="numeri">
+                ${valori.terno_strategico.map(n => `<span>${n}</span>`).join("")}
+            </div>
+
+            <p><strong>Modalità Prudente:</strong> Ambo strategico</p>
+            <p><strong>Modalità Aggressiva:</strong> Terno strategico</p>
+        `;
+
+        contenitore.appendChild(blocco);
+    });
+
+    // Trova ruota più forte
+    const ruotaTop = Object.keys(punteggi).reduce((a, b) =>
+        punteggi[a] > punteggi[b] ? a : b
+    );
+
+    const evidenza = document.createElement("div");
+    evidenza.style.textAlign = "center";
+    evidenza.style.fontSize = "24px";
+    evidenza.style.margin = "20px";
+    evidenza.style.color = "yellow";
+    evidenza.innerHTML = `🔥 RUOTA PIÙ FORTE: ${ruotaTop}`;
+
+    contenitore.prepend(evidenza);
+
+})
+.catch(error => {
+    document.getElementById("contenitore").innerHTML =
+        "<div class='error'>Errore caricamento dati</div>";
+    console.error(error);
+});
+</script>
+
 
 
 
