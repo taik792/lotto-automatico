@@ -1,129 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Lotto Live Statistiche</title>
+    <meta charset="UTF-8">
+    <title>Lotto Live Statistiche</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #0f4c75, #3282b8);
+            color: white;
+            text-align: center;
+        }
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #0f4c75, #3282b8);
-      color: white;
-    }
+        h1 {
+            padding: 20px;
+        }
 
-    h1 {
-      text-align: center;
-      padding: 20px;
-    }
+        .ruota {
+            margin: 30px auto;
+            padding: 20px;
+            width: 80%;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+        }
 
-    .container {
-      width: 90%;
-      margin: auto;
-    }
+        .numeri span {
+            display: inline-block;
+            background: gold;
+            color: black;
+            font-weight: bold;
+            border-radius: 50%;
+            padding: 15px;
+            margin: 10px;
+            width: 50px;
+        }
 
-    .ruota {
-      background: rgba(0,0,0,0.3);
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-    }
-
-    .numeri span {
-      background: #ff5959;
-      padding: 8px 12px;
-      border-radius: 20px;
-      margin: 5px;
-      display: inline-block;
-      font-weight: bold;
-    }
-
-    .errore {
-      text-align: center;
-      font-size: 22px;
-      color: yellow;
-      margin-top: 40px;
-    }
-  </style>
+        .loading {
+            font-size: 20px;
+            margin-top: 40px;
+        }
+    </style>
 </head>
-
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
-
-<div class="container" id="contenitore"></div>
+<div id="contenitore">
+    <div class="loading">⏳ Connessione al server...</div>
+</div>
 
 <script>
-fetch("/api")
-  .then(response => response.json())
-  .then(data => {
 
-    const contenitore = document.getElementById("contenitore");
-    contenitore.innerHTML = "";
+async function caricaDati(tentativi = 5) {
 
-    const punteggi = {};
+    try {
 
-    Object.entries(data).forEach(([ruota, valori]) => {
+        const response = await fetch("https://lotto-statistiche.onrender.com/api");
+        const data = await response.json();
 
-      // 🔢 Calcolo punteggio ruota
-      const sommaFreq = valori.numero_frequente.reduce((a,b) => a+b,0);
-      const sommaRit  = valori.numero_ritardo.reduce((a,b) => a+b,0);
-      const punteggio = sommaFreq - (sommaRit / 2);
+        const contenitore = document.getElementById("contenitore");
+        contenitore.innerHTML = "";
 
-      punteggi[ruota] = punteggio;
+        Object.entries(data).forEach(([ruota, numeri]) => {
 
-      const blocco = document.createElement("div");
-      blocco.className = "ruota";
+            const blocco = document.createElement("div");
+            blocco.className = "ruota";
 
-      blocco.innerHTML = `
-        <h2>${ruota}</h2>
+            blocco.innerHTML = `
+                <h2>${ruota}</h2>
+                <div class="numeri">
+                    ${numeri[0].map(n => `<span>${n}</span>`).join("")}
+                </div>
+            `;
 
-        <p><strong>Ultima estrazione:</strong></p>
-        <div class="numeri">
-          ${valori.ultima_estrazione.map(n => `<span>${n}</span>`).join("")}
-        </div>
+            contenitore.appendChild(blocco);
+        });
 
-        <p><strong>Numero frequente:</strong></p>
-        <div class="numeri">
-          ${valori.numero_frequente.map(n => `<span>${n}</span>`).join("")}
-        </div>
+    } catch (errore) {
 
-        <p><strong>Numero ritardo:</strong></p>
-        <div class="numeri">
-          ${valori.numero_ritardo.map(n => `<span>${n}</span>`).join("")}
-        </div>
+        if (tentativi > 0) {
+            setTimeout(() => {
+                caricaDati(tentativi - 1);
+            }, 4000);
+        } else {
+            document.getElementById("contenitore").innerHTML =
+                "<div class='loading'>❌ Server temporaneamente in avvio... Riprova tra 30 secondi.</div>";
+        }
 
-        <p><strong>Ambata strategica (prudente):</strong>
-        ${valori.numero_frequente[0]}</p>
+    }
+}
 
-        <p><strong>Terno strategico (aggressivo):</strong>
-        ${valori.numero_frequente.slice(0,3).join(" - ")}</p>
-      `;
+caricaDati();
 
-      contenitore.appendChild(blocco);
-    });
-
-    // 🏆 Trova ruota più forte
-    const ruotaTop = Object.keys(punteggi).reduce((a,b)=>
-      punteggi[a] > punteggi[b] ? a : b
-    );
-
-    const evidenza = document.createElement("div");
-    evidenza.style.textAlign = "center";
-    evidenza.style.fontSize = "28px";
-    evidenza.style.margin = "20px";
-    evidenza.style.color = "yellow";
-    evidenza.innerHTML = `🔥 RUOTA PIÙ FORTE: ${ruotaTop}`;
-
-    contenitore.prepend(evidenza);
-
-  })
-  .catch(error => {
-    document.getElementById("contenitore").innerHTML =
-      "<div class='error'>Errore caricamento dati</div>";
-    console.error(error);
-  });
 </script>
-
 
 </body>
 </html>
