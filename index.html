@@ -1,113 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lotto Live Statistiche</title>
+  <title>Lotto Live Statistiche</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #0f4c75, #3282b8);
-            color: white;
-        }
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #0f4c75, #3282b8);
+      color: white;
+    }
 
-        h1 {
-            text-align: center;
-            padding: 20px;
-        }
+    h1 {
+      text-align: center;
+      padding: 20px;
+    }
 
-        .container {
-            width: 90%;
-            margin: auto;
-        }
+    .container {
+      width: 90%;
+      margin: auto;
+    }
 
-        .ruota {
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-        }
+    .ruota {
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
 
-        .numeri span {
-            background: #ff5959;
-            padding: 8px 12px;
-            border-radius: 20px;
-            margin: 5px;
-            display: inline-block;
-            font-weight: bold;
-        }
+    .numeri span {
+      background: #ff5959;
+      padding: 8px 12px;
+      border-radius: 20px;
+      margin: 5px;
+      display: inline-block;
+      font-weight: bold;
+    }
 
-        .error {
-            text-align: center;
-            font-size: 22px;
-            color: yellow;
-        }
-    </style>
+    .errore {
+      text-align: center;
+      font-size: 22px;
+      color: yellow;
+      margin-top: 40px;
+    }
+  </style>
 </head>
 
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
+
 <div class="container" id="contenitore"></div>
 
 <script>
+
 fetch("https://lotto-statistiche.onrender.com/api")
-.then(response => response.json())
-.then(data => {
+  .then(response => response.json())
+  .then(data => {
 
     const contenitore = document.getElementById("contenitore");
     contenitore.innerHTML = "";
 
     Object.entries(data).forEach(([ruota, valori]) => {
 
-        const blocco = document.createElement("div");
-        blocco.className = "ruota";
+      const blocco = document.createElement("div");
+      blocco.className = "ruota";
 
-        blocco.innerHTML = `
-            <h2>${ruota}</h2>
+      blocco.innerHTML = `
+        <h2>${ruota}</h2>
 
-            <p><strong>Ultima estrazione:</strong></p>
-            <div class="numeri">
-                ${valori.ultima_estrazione.map(n => `<span>${n}</span>`).join("")}
-            </div>
+        <p><strong>Ultima estrazione:</strong></p>
+        <div class="numeri">
+          ${valori.ultima_estrazione.map(n => `<span>${n}</span>`).join("")}
+        </div>
 
-            <p><strong>Ambo strategico:</strong></p>
-            <div class="numeri">
-                ${valori.ambo_strategico.map(n => `<span>${n}</span>`).join("")}
-            </div>
+        <p><strong>Ambo strategico:</strong></p>
+        <div class="numeri">
+          ${valori.ambo_strategico.map(n => `<span>${n}</span>`).join("")}
+        </div>
 
-            <p><strong>Numero frequente:</strong></p>
-            <div class="numeri">
-                ${valori.numero_frequente.map(n => `<span>${n}</span>`).join("")}
-            </div>
+        <p><strong>Numero frequente:</strong></p>
+        <div class="numeri">
+          ${valori.numero_frequente.map(n => `<span>${n}</span>`).join("")}
+        </div>
 
-            <p><strong>Numero ritardo:</strong></p>
-            <div class="numeri">
-                ${valori.numero_ritardo.map(n => `<span>${n}</span>`).join("")}
-            </div>
+        <p><strong>Numero ritardo:</strong></p>
+        <div class="numeri">
+          ${valori.numero_ritardo.map(n => `<span>${n}</span>`).join("")}
+        </div>
 
-            <p><strong>Terno strategico:</strong></p>
-            <div class="numeri">
-                ${valori.terno_strategico.map(n => `<span>${n}</span>`).join("")}
-            </div>
+        <p><strong>Terno strategico:</strong></p>
+        <div class="numeri">
+          ${valori.terno_strategico.map(n => `<span>${n}</span>`).join("")}
+        </div>
+      `;
 
-            <p><strong>Modalità Prudente:</strong> Ambo strategico</p>
-            <p><strong>Modalità Aggressiva:</strong> Terno strategico</p>
-        `;
-
-        contenitore.appendChild(blocco);
+      contenitore.appendChild(blocco);
     });
 
-})
-.catch(error => {
+  })
+  .catch(error => {
     document.getElementById("contenitore").innerHTML =
-        "<div class='error'>Errore caricamento dati</div>";
+      '<div class="errore">Errore caricamento dati</div>';
     console.error(error);
-});
+  });
+
 </script>
 
 </body>
 </html>
+
 
 
 
