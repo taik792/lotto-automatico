@@ -1,71 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Lotto Live Statistiche</title>
+    <title>Lotto Live Statistiche</title>
 
-<style>
-body {
-    margin:0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #0f4c75, #3282b8);
-    color:white;
-}
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #0f4c75, #3282b8);
+            color: white;
+        }
 
-h1 {
-    text-align:center;
-    padding:20px;
-}
+        h1 {
+            text-align: center;
+            padding: 20px;
+        }
 
-.container {
-    width:90%;
-    margin:auto;
-}
+        .container {
+            width: 90%;
+            margin: auto;
+        }
 
-.ruota {
-    background:rgba(0,0,0,0.3);
-    padding:15px;
-    margin-bottom:20px;
-    border-radius:10px;
-}
+        .ruota {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
 
-.numeri span {
-    background:#ff5959;
-    padding:8px 12px;
-    border-radius:20px;
-    margin:5px;
-    display:inline-block;
-    font-weight:bold;
-}
+        .numeri span {
+            background: #ff5959;
+            padding: 8px 12px;
+            border-radius: 20px;
+            margin: 5px;
+            display: inline-block;
+            font-weight: bold;
+        }
 
-.error {
-    text-align:center;
-    font-size:22px;
-    color:yellow;
-}
-</style>
-
+        .error {
+            text-align: center;
+            font-size: 22px;
+            color: yellow;
+        }
+    </style>
 </head>
+
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
 <div class="container" id="contenitore"></div>
 
 <script>
-
 fetch("https://lotto-statistiche.onrender.com/api")
-.then(res => res.json())
+.then(response => response.json())
 .then(data => {
 
     const contenitore = document.getElementById("contenitore");
     contenitore.innerHTML = "";
 
-    let punteggi = {};
-
     Object.entries(data).forEach(([ruota, valori]) => {
-
-        punteggi[ruota] =
-            valori.numero_frequente.reduce((a,b)=>a+b,0) -
-            valori.numero_ritardo.reduce((a,b)=>a+b,0);
 
         const blocco = document.createElement("div");
         blocco.className = "ruota";
@@ -105,30 +98,17 @@ fetch("https://lotto-statistiche.onrender.com/api")
         contenitore.appendChild(blocco);
     });
 
-    const ruotaTop = Object.keys(punteggi).reduce((a,b) =>
-        punteggi[a] > punteggi[b] ? a : b
-    );
-
-    const evidenza = document.createElement("div");
-    evidenza.style.textAlign = "center";
-    evidenza.style.fontSize = "26px";
-    evidenza.style.margin = "20px";
-    evidenza.style.color = "yellow";
-    evidenza.innerHTML = "🔥 RUOTA PIÙ FORTE: " + ruotaTop;
-
-    contenitore.prepend(evidenza);
-
 })
 .catch(error => {
     document.getElementById("contenitore").innerHTML =
         "<div class='error'>Errore caricamento dati</div>";
     console.error(error);
 });
-
 </script>
 
 </body>
 </html>
+
 
 
 
