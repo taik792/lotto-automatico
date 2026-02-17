@@ -6,13 +6,25 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# ===== CARICAMENTO DATI =====
-with open("estrazioni.json", "r") as f:
-    dati = json.load(f)
+# ===== CARICAMENTO DATI SICURO =====
+try:
+    with open("estrazioni.json", "r") as f:
+        raw_data = json.load(f)
+except Exception as e:
+    print("Errore caricamento JSON:", e)
+    raw_data = {}
+
+# Se i dati sono dentro "ruote", li prendiamo
+if isinstance(raw_data, dict) and "ruote" in raw_data:
+    dati = raw_data["ruote"]
+else:
+    dati = raw_data
+
 
 @app.route("/")
 def home():
     return "Lotto Live Statistiche API attiva"
+
 
 @app.route("/api")
 def api():
@@ -25,32 +37,33 @@ def api():
 
     for ruota, estrazioni in dati.items():
 
-        if not isinstance(estrazioni, list) or len(estrazioni) < 5:
+        # Se non è lista, salta
+        if not isinstance(estrazioni, list):
             continue
 
-        ultime_20 = estrazioni[-20:] if len(estrazioni) >= 20 else estrazioni
-        ultime_5 = estrazioni[-5:]
-        ultima = estrazioni[-1]
+        if len(estrazioni) == 0:
+            continue
 
-        freq_totale = 0
-        trend = 0
-        penalita = 0
+        # Garantiamo che ogni estrazione sia lista di numeri
+        estrazioni_pulite = [
+            e for e in estrazioni if isinstance(e, list)
+        ]
 
-        # Frequenza totale ultimi 20
-        for estrazione in ultime_20:
-            freq_totale += len(estrazione)
+        if len(estrazioni_pulite) == 0:
+            continue
 
-        # Trend ultime 5
-        for estrazione in ultime_5:
-            trend += len(estrazione)
+        ultime_20 = estrazioni_pulite[-20:]
+        ultime_5 = estrazioni_pulite[-5:]
+        ultima = estrazioni_pulite[-1]
 
-        # Penalità numeri appena usciti
+        freq_totale = sum(len(e) for e in ultime_20)
+        trend = sum(len(e) for e in ultime_5)
         penalita = len(ultima)
 
         # ===== ALGORITMO INTELLIGENTE =====
         if mode == "prudente":
             score = (freq_totale * 2) + (trend * 1) - (penalita * 1)
-        else:  # aggressiva
+        else:
             score = (freq_totale * 1) + (trend * 3) - (penalita * 0.5)
 
         risultati.append({
@@ -74,7 +87,6 @@ def api():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-
 
 
 
