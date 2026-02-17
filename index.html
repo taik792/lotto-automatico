@@ -1,125 +1,135 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lotto Live Statistiche</title>
-
 <style>
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #0f4c81, #0b3d66);
+    font-family: Arial;
+    background: linear-gradient(to bottom, #0f4c81, #1b6ca8);
     color: white;
     text-align: center;
 }
 
-h1 {
-    padding: 20px;
-}
-
-#contenitore {
-    padding: 20px;
+.container {
+    width: 80%;
+    margin: auto;
 }
 
 .ruota {
-    background: rgba(255,255,255,0.05);
-    margin: 20px auto;
+    background: rgba(255,255,255,0.1);
     padding: 20px;
-    border-radius: 12px;
-    width: 80%;
-}
-
-.numeri {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 15px;
+    margin: 20px 0;
+    border-radius: 15px;
 }
 
 .numeri span {
     background: gold;
     color: black;
-    font-weight: bold;
-    width: 45px;
-    height: 45px;
+    padding: 10px 15px;
+    margin: 5px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.forte {
+    border: 3px solid orange;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
 }
 </style>
 </head>
-
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
 
-<div id="contenitore">
-    Caricamento dati...
-</div>
+<button onclick="modalita('prudente')">Modalità Prudente</button>
+<button onclick="modalita('aggressiva')">Modalità Aggressiva</button>
+
+<h2 id="ruotaForte"></h2>
+
+<div class="container" id="contenitore"></div>
 
 <script>
 
-const API_URL = "https://lotto-statistiche.onrender.com/api";
+let datiGlobali = {};
+let tipoGioco = "prudente";
 
-async function caricaDati(retry = 0) {
-    try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error("Errore server");
+function modalita(tipo){
+    tipoGioco = tipo;
+    carica();
+}
 
-        const data = await response.json();
-        mostraDati(data);
-
-    } catch (error) {
-        if (retry < 5) {
-            setTimeout(() => caricaDati(retry + 1), 3000);
-        } else {
-            document.getElementById("contenitore").innerHTML =
-                "<div style='color:yellow;'>Server in avvio... attendi qualche secondo</div>";
-        }
+async function carica(){
+    try{
+        let response = await fetch("https://lotto-statistiche.onrender.com/api");
+        let dati = await response.json();
+        datiGlobali = dati;
+        mostra(dati);
+    } catch {
+        document.getElementById("contenitore").innerHTML = "<h2>Errore caricamento dati</h2>";
     }
 }
 
-function mostraDati(data) {
+function mostra(dati){
 
-    const contenitore = document.getElementById("contenitore");
-    contenitore.innerHTML = "";
+    let cont = document.getElementById("contenitore");
+    cont.innerHTML = "";
 
-    let punteggi = {};
+    let maxSomma = 0;
+    let ruotaForte = "";
 
-    Object.entries(data).forEach(([ruota, estrazioni]) => {
+    for(let ruota in dati){
 
-        const ultima = estrazioni[0];
-        const somma = ultima.reduce((a, b) => a + b, 0);
-        punteggi[ruota] = somma;
+        let estrazioni = dati[ruota];
+        let ultima = estrazioni[estrazioni.length - 1];
 
-        const blocco = document.createElement("div");
-        blocco.className = "ruota";
+        let somma = ultima.reduce((a,b)=>a+b,0);
 
-        blocco.innerHTML = `
-            <h2>${ruota}</h2>
-            <div class="numeri">
-                ${ultima.map(n => `<span>${n}</span>`).join("")}
-            </div>
-        `;
+        if(somma > maxSomma){
+            maxSomma = somma;
+            ruotaForte = ruota;
+        }
+    }
 
-        contenitore.appendChild(blocco);
-    });
+    document.getElementById("ruotaForte").innerHTML = "🔥 RUOTA PIÙ FORTE: " + ruotaForte;
 
-    const ruotaTop = Object.keys(punteggi).reduce((a, b) =>
-        punteggi[a] > punteggi[b] ? a : b
-    );
+    for(let ruota in dati){
 
-    const evidenza = document.createElement("div");
-    evidenza.style.fontSize = "22px";
-    evidenza.style.marginBottom = "20px";
-    evidenza.innerHTML = `🔥 RUOTA PIÙ FORTE: <strong>${ruotaTop}</strong>`;
+        let estrazioni = dati[ruota];
+        let ultima = estrazioni[estrazioni.length - 1];
 
-    contenitore.prepend(evidenza);
+        if(tipoGioco === "prudente"){
+            ultima = ultima.slice(0,3);
+        }
+
+        let div = document.createElement("div");
+        div.className = "ruota";
+
+        if(ruota === ruotaForte){
+            div.classList.add("forte");
+        }
+
+        div.innerHTML = "<h3>"+ruota+"</h3><div class='numeri'>";
+
+        ultima.forEach(n=>{
+            div.innerHTML += "<span>"+n+"</span>";
+        });
+
+        div.innerHTML += "</div>";
+
+        cont.appendChild(div);
+    }
 }
 
-caricaDati();
+carica();
 
 </script>
 
