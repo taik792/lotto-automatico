@@ -39,7 +39,7 @@ def api():
             continue
 
         estrazioni = [e for e in estrazioni if isinstance(e, list)]
-        if len(estrazioni) < 5:
+        if len(estrazioni) == 0:
             continue
 
         ultime_20 = estrazioni[-20:]
@@ -60,20 +60,9 @@ def api():
             f5 = freq_5.get(numero, 0)
 
             if mode == "prudente":
-                # premia continuità lunga
-                score += (f20 * 4) + (f5 * 1)
-
-                # penalizza se appena uscito
-                if numero in ultima:
-                    score -= 1
-
-            else:  # aggressiva
-                # premia accelerazione forte
-                score += (f5 * 5) + (f20 * 1)
-
-                # premia se appena uscito (trend caldo)
-                if numero in ultima:
-                    score += 2
+                score += (f20 * 3) + (f5 * 1)
+            else:
+                score += (f5 * 4) + (f20 * 1)
 
         punteggi.append(score)
 
@@ -83,13 +72,15 @@ def api():
             "score": score
         })
 
-    # ===== NORMALIZZAZIONE =====
-    if punteggi:
-        max_score = max(punteggi)
-        min_score = min(punteggi)
-    else:
-        max_score = 1
-        min_score = 0
+    if not risultati:
+        return jsonify({
+            "modalita": mode,
+            "ruota_piu_forte": None,
+            "ruote": []
+        })
+
+    max_score = max(punteggi)
+    min_score = min(punteggi)
 
     for r in risultati:
         if max_score == min_score:
@@ -99,7 +90,7 @@ def api():
 
         r["percentuale"] = round(percentuale, 1)
 
-    ruota_piu_forte = max(risultati, key=lambda x: x["percentuale"])["ruota"] if risultati else None
+    ruota_piu_forte = max(risultati, key=lambda x: x["percentuale"])["ruota"]
 
     return jsonify({
         "modalita": mode,
@@ -111,6 +102,7 @@ def api():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
