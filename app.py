@@ -38,17 +38,16 @@ def api():
         if not isinstance(estrazioni, list) or len(estrazioni) == 0:
             continue
 
-        estrazioni_pulite = [e for e in estrazioni if isinstance(e, list)]
-        if len(estrazioni_pulite) == 0:
+        estrazioni = [e for e in estrazioni if isinstance(e, list)]
+        if len(estrazioni) < 5:
             continue
 
-        ultime_20 = estrazioni_pulite[-20:]
-        ultime_5 = estrazioni_pulite[-5:]
-        ultima = estrazioni_pulite[-1]
+        ultime_20 = estrazioni[-20:]
+        ultime_5 = estrazioni[-5:]
+        ultima = estrazioni[-1]
 
-        # ===== CALCOLO FREQUENZE REALI =====
-        numeri_20 = [num for estrazione in ultime_20 for num in estrazione]
-        numeri_5 = [num for estrazione in ultime_5 for num in estrazione]
+        numeri_20 = [n for e in ultime_20 for n in e]
+        numeri_5 = [n for e in ultime_5 for n in e]
 
         freq_20 = Counter(numeri_20)
         freq_5 = Counter(numeri_5)
@@ -61,9 +60,20 @@ def api():
             f5 = freq_5.get(numero, 0)
 
             if mode == "prudente":
-                score += (f20 * 2) + f5
-            else:
-                score += f20 + (f5 * 3)
+                # premia continuità lunga
+                score += (f20 * 4) + (f5 * 1)
+
+                # penalizza se appena uscito
+                if numero in ultima:
+                    score -= 1
+
+            else:  # aggressiva
+                # premia accelerazione forte
+                score += (f5 * 5) + (f20 * 1)
+
+                # premia se appena uscito (trend caldo)
+                if numero in ultima:
+                    score += 2
 
         punteggi.append(score)
 
@@ -74,7 +84,7 @@ def api():
         })
 
     # ===== NORMALIZZAZIONE =====
-    if len(punteggi) > 0:
+    if punteggi:
         max_score = max(punteggi)
         min_score = min(punteggi)
     else:
