@@ -59,8 +59,7 @@ button {
 
 <script>
 
-let datiGlobali = {};
-let tipoGioco = "prudente";
+let tipoGioco = "aggressiva";
 
 function modalita(tipo){
     tipoGioco = tipo;
@@ -71,7 +70,6 @@ async function carica(){
     try{
         let response = await fetch("https://lotto-statistiche.onrender.com/api");
         let dati = await response.json();
-        datiGlobali = dati;
         mostra(dati);
     } catch {
         document.getElementById("contenitore").innerHTML = "<h2>Errore caricamento dati</h2>";
@@ -89,6 +87,8 @@ function mostra(dati){
     for(let ruota in dati){
 
         let estrazioni = dati[ruota];
+
+        // Prendiamo SOLO ultima estrazione
         let ultima = estrazioni[estrazioni.length - 1];
 
         let somma = ultima.reduce((a,b)=>a+b,0);
@@ -99,7 +99,8 @@ function mostra(dati){
         }
     }
 
-    document.getElementById("ruotaForte").innerHTML = "🔥 RUOTA PIÙ FORTE: " + ruotaForte;
+    document.getElementById("ruotaForte").innerHTML =
+        "🔥 RUOTA PIÙ FORTE: " + ruotaForte;
 
     for(let ruota in dati){
 
@@ -117,14 +118,15 @@ function mostra(dati){
             div.classList.add("forte");
         }
 
-        div.innerHTML = "<h3>"+ruota+"</h3><div class='numeri'>";
+        let html = "<h3>"+ruota+"</h3><div class='numeri'>";
 
-        ultima.forEach(n=>{
-            div.innerHTML += "<span>"+n+"</span>";
+        ultima.forEach(numero=>{
+            html += "<span>"+numero+"</span>";
         });
 
-        div.innerHTML += "</div>";
+        html += "</div>";
 
+        div.innerHTML = html;
         cont.appendChild(div);
     }
 }
