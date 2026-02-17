@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# ===== CARICAMENTO DATI SICURO =====
+# ===== CARICAMENTO DATI =====
 try:
     with open("estrazioni.json", "r") as f:
         raw_data = json.load(f)
@@ -14,7 +14,6 @@ except Exception as e:
     print("Errore caricamento JSON:", e)
     raw_data = {}
 
-# Se i dati sono dentro "ruote", li prendiamo
 if isinstance(raw_data, dict) and "ruote" in raw_data:
     dati = raw_data["ruote"]
 else:
@@ -32,23 +31,14 @@ def api():
     mode = request.args.get("mode", "prudente")
 
     risultati = []
-    ruota_piu_forte = None
-    punteggio_massimo = -1
+    punteggi = []
 
     for ruota, estrazioni in dati.items():
 
-        # Se non è lista, salta
-        if not isinstance(estrazioni, list):
+        if not isinstance(estrazioni, list) or len(estrazioni) == 0:
             continue
 
-        if len(estrazioni) == 0:
-            continue
-
-        # Garantiamo che ogni estrazione sia lista di numeri
-        estrazioni_pulite = [
-            e for e in estrazioni if isinstance(e, list)
-        ]
-
+        estrazioni_pulite = [e for e in estrazioni if isinstance(e, list)]
         if len(estrazioni_pulite) == 0:
             continue
 
@@ -60,11 +50,12 @@ def api():
         trend = sum(len(e) for e in ultime_5)
         penalita = len(ultima)
 
-        # ===== ALGORITMO INTELLIGENTE =====
         if mode == "prudente":
-            score = (freq_totale * 2) + (trend * 1) - (penalita * 1)
+            score = (freq_totale * 2) + (trend * 1) - penalita
         else:
             score = (freq_totale * 1) + (trend * 3) - (penalita * 0.5)
+
+        punteggi.append(score)
 
         risultati.append({
             "ruota": ruota,
@@ -72,9 +63,23 @@ def api():
             "score": round(score, 2)
         })
 
-        if score > punteggio_massimo:
-            punteggio_massimo = score
-            ruota_piu_forte = ruota
+    # ===== NORMALIZZAZIONE PERCENTUALE =====
+    if len(punteggi) > 0:
+        max_score = max(punteggi)
+        min_score = min(punteggi)
+    else:
+        max_score = 1
+        min_score = 0
+
+    for r in risultati:
+        if max_score == min_score:
+            percentuale = 50
+        else:
+            percentuale = ((r["score"] - min_score) / (max_score - min_score)) * 100
+
+        r["percentuale"] = round(percentuale, 1)
+
+    ruota_piu_forte = max(risultati, key=lambda x: x["percentuale"])["ruota"] if risultati else None
 
     return jsonify({
         "modalita": mode,
@@ -83,10 +88,10 @@ def api():
     })
 
 
-# ===== AVVIO CORRETTO PER RENDER =====
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
