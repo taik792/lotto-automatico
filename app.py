@@ -3,6 +3,7 @@ from flask_cors import CORS
 import json
 import os
 from collections import Counter
+import random
 
 app = Flask(__name__)
 CORS(app)
@@ -28,10 +29,7 @@ def home():
 @app.route("/api")
 def api():
 
-    mode = request.args.get("mode", "prudente")
-
     risultati = []
-    punteggi = []
 
     for ruota, estrazioni in dati.items():
 
@@ -39,62 +37,50 @@ def api():
             continue
 
         estrazioni = [e for e in estrazioni if isinstance(e, list)]
-        if len(estrazioni) == 0:
-            continue
-
-        ultime_20 = estrazioni[-20:]
-        ultime_5 = estrazioni[-5:]
         ultima = estrazioni[-1]
 
-        numeri_20 = [n for e in ultime_20 for n in e]
-        numeri_5 = [n for e in ultime_5 for n in e]
+        # ===== NUMERI ULTIME 10 =====
+        ultime_10 = estrazioni[-10:]
+        numeri_10 = [n for e in ultime_10 for n in e]
+        freq_10 = Counter(numeri_10)
 
-        freq_20 = Counter(numeri_20)
-        freq_5 = Counter(numeri_5)
+        # 🔥 Numeri caldi (top 3)
+        numeri_caldi = [n for n, _ in freq_10.most_common(3)]
 
-        score = 0
+        # ===== RITARDI =====
+        tutti_numeri = list(range(1, 91))
+        ritardi = {}
 
-        for numero in ultima:
+        for numero in tutti_numeri:
+            ritardo = 0
+            for estr in reversed(estrazioni):
+                if numero in estr:
+                    break
+                ritardo += 1
+            ritardi[numero] = ritardo
 
-            f20 = freq_20.get(numero, 0)
-            f5 = freq_5.get(numero, 0)
+        # ❄️ Numeri freddi (top 3 ritardo massimo)
+        numeri_freddi = sorted(ritardi, key=ritardi.get, reverse=True)[:3]
 
-            if mode == "prudente":
-                score += (f20 * 3) + (f5 * 1)
-            else:
-                score += (f5 * 4) + (f20 * 1)
+        # ⏳ Ritardo massimo della ruota
+        ritardo_massimo = max(ritardi.values())
 
-        punteggi.append(score)
+        # 🎲 Simulatore combinazioni (3 combinazioni casuali)
+        combinazioni = []
+        for _ in range(3):
+            combinazione = sorted(random.sample(range(1, 91), 5))
+            combinazioni.append(combinazione)
 
         risultati.append({
             "ruota": ruota,
-            "numeri": ultima,
-            "score": score
+            "ultima_estrazione": ultima,
+            "numeri_caldi": numeri_caldi,
+            "numeri_freddi": numeri_freddi,
+            "ritardo_massimo": ritardo_massimo,
+            "combinazioni_suggerite": combinazioni
         })
-
-    if not risultati:
-        return jsonify({
-            "modalita": mode,
-            "ruota_piu_forte": None,
-            "ruote": []
-        })
-
-    max_score = max(punteggi)
-    min_score = min(punteggi)
-
-    for r in risultati:
-        if max_score == min_score:
-            percentuale = 50
-        else:
-            percentuale = ((r["score"] - min_score) / (max_score - min_score)) * 100
-
-        r["percentuale"] = round(percentuale, 1)
-
-    ruota_piu_forte = max(risultati, key=lambda x: x["percentuale"])["ruota"]
 
     return jsonify({
-        "modalita": mode,
-        "ruota_piu_forte": ruota_piu_forte,
         "ruote": risultati
     })
 
@@ -102,6 +88,7 @@ def api():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
