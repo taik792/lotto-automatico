@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import json
 import os
+from collections import Counter
 
 app = Flask(__name__)
 CORS(app)
@@ -10,8 +11,7 @@ CORS(app)
 try:
     with open("estrazioni.json", "r") as f:
         raw_data = json.load(f)
-except Exception as e:
-    print("Errore caricamento JSON:", e)
+except:
     raw_data = {}
 
 if isinstance(raw_data, dict) and "ruote" in raw_data:
@@ -46,24 +46,34 @@ def api():
         ultime_5 = estrazioni_pulite[-5:]
         ultima = estrazioni_pulite[-1]
 
-        freq_totale = sum(len(e) for e in ultime_20)
-        trend = sum(len(e) for e in ultime_5)
-        penalita = len(ultima)
+        # ===== CALCOLO FREQUENZE REALI =====
+        numeri_20 = [num for estrazione in ultime_20 for num in estrazione]
+        numeri_5 = [num for estrazione in ultime_5 for num in estrazione]
 
-        if mode == "prudente":
-            score = (freq_totale * 2) + (trend * 1) - penalita
-        else:
-            score = (freq_totale * 1) + (trend * 3) - (penalita * 0.5)
+        freq_20 = Counter(numeri_20)
+        freq_5 = Counter(numeri_5)
+
+        score = 0
+
+        for numero in ultima:
+
+            f20 = freq_20.get(numero, 0)
+            f5 = freq_5.get(numero, 0)
+
+            if mode == "prudente":
+                score += (f20 * 2) + f5
+            else:
+                score += f20 + (f5 * 3)
 
         punteggi.append(score)
 
         risultati.append({
             "ruota": ruota,
             "numeri": ultima,
-            "score": round(score, 2)
+            "score": score
         })
 
-    # ===== NORMALIZZAZIONE PERCENTUALE =====
+    # ===== NORMALIZZAZIONE =====
     if len(punteggi) > 0:
         max_score = max(punteggi)
         min_score = min(punteggi)
