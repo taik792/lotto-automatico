@@ -1,55 +1,54 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Lotto Live Statistiche</title>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
-      color: white;
-      text-align: center;
-    }
+<meta charset="UTF-8">
+<title>Lotto Live Statistiche</title>
 
-    h1 { margin-top: 30px; }
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(to bottom,#0f2027,#203a43,#2c5364);
+  color:white;
+  text-align:center;
+}
 
-    #ruota-forte {
-      font-size: 22px;
-      margin: 15px 0;
-      font-weight: bold;
-      color: orange;
-    }
+h1{margin-top:30px;}
 
-    #contenitore {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding-bottom: 50px;
-    }
+#ruota-forte{
+  font-size:22px;
+  margin:15px 0;
+  font-weight:bold;
+  color:orange;
+}
 
-    .card {
-      background: rgba(255,255,255,0.1);
-      padding: 20px;
-      border-radius: 15px;
-      width: 320px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-      transition: 0.3s;
-    }
+#contenitore{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
+  padding-bottom:50px;
+}
 
-    .highlight {
-      background: linear-gradient(135deg, #00ff99, #00cc66);
-      color: black;
-      font-weight: bold;
-    }
+.card{
+  background:rgba(255,255,255,0.1);
+  padding:20px;
+  border-radius:15px;
+  width:320px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.4);
+  transition:0.3s;
+}
 
-    p { margin: 6px 0; }
-  </style>
+.highlight{
+  background:linear-gradient(135deg,#00ff99,#00cc66);
+  color:black;
+  font-weight:bold;
+}
+
+p{margin:6px 0;}
+</style>
 </head>
+
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
@@ -58,29 +57,36 @@
 
 <script>
 
-async function caricaDati() {
-  try {
-    const response = await fetch("https://lotto-statistiche.onrender.com/api?v=" + Date.now());
-    const json = await response.json();
+async function caricaDati(){
 
-    console.log("RISPOSTA API:", json);
+  try{
 
-    if (!json.dati || !json.ruota_piu_forte) {
-      throw new Error("Formato JSON non corretto");
+    const response = await fetch("https://lotto-statistiche.onrender.com/api?nocache=" + Date.now());
+    const dati = await response.json();
+
+    console.log("JSON ricevuto:", dati);
+
+    if(!Array.isArray(dati)){
+      throw new Error("Formato JSON non valido");
     }
 
+    // Trova ruota più forte
+    let ruotaForte = dati.reduce((max, r) =>
+      r.indice_pressione > max.indice_pressione ? r : max
+    );
+
     document.getElementById("ruota-forte").innerHTML =
-      "🔥 RUOTA PIÙ FORTE: " + json.ruota_piu_forte;
+      "🔥 RUOTA PIÙ FORTE: " + ruotaForte.ruota;
 
     const container = document.getElementById("contenitore");
     container.innerHTML = "";
 
-    json.dati.forEach(ruota => {
+    dati.forEach(ruota => {
 
       const card = document.createElement("div");
       card.className = "card";
 
-      if (ruota.ruota === json.ruota_piu_forte) {
+      if(ruota.ruota === ruotaForte.ruota){
         card.classList.add("highlight");
       }
 
@@ -96,7 +102,7 @@ async function caricaDati() {
       container.appendChild(card);
     });
 
-  } catch (error) {
+  }catch(error){
     console.error("ERRORE:", error);
     document.getElementById("ruota-forte").innerHTML =
       "Errore caricamento dati";
