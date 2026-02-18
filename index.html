@@ -8,14 +8,10 @@
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
     color: white;
     text-align: center;
-}
-
-h1 {
-    margin-top: 30px;
 }
 
 .container {
@@ -29,11 +25,13 @@ h1 {
     padding: 20px;
     margin: 20px 0;
     border-radius: 15px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    transition: 0.3s;
 }
 
-.card h2 {
-    margin-bottom: 10px;
+.forte {
+    background: linear-gradient(135deg, #1f4037, #99f2c8);
+    color: black;
+    box-shadow: 0 0 20px #00ff99;
 }
 
 .hot { color: #ff6b6b; }
@@ -45,28 +43,33 @@ h1 {
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
+<h2 id="top"></h2>
+
 <div class="container" id="content">
-    Caricamento dati...
+Caricamento dati...
 </div>
 
 <script>
 
 fetch("https://lotto-statistiche.onrender.com/api")
-.then(response => response.json())
+.then(res => res.json())
 .then(data => {
 
     const container = document.getElementById("content");
+    const top = document.getElementById("top");
+
     container.innerHTML = "";
 
-    if (!data.ruote) {
-        container.innerHTML = "Errore caricamento dati";
-        return;
-    }
+    top.innerHTML = "🔥 RUOTA PIÙ FORTE: " + data.ruota_piu_forte;
 
     data.ruote.forEach(ruota => {
 
         let card = document.createElement("div");
         card.className = "card";
+
+        if (ruota.ruota === data.ruota_piu_forte) {
+            card.classList.add("forte");
+        }
 
         card.innerHTML = `
             <h2>${ruota.ruota}</h2>
@@ -85,7 +88,7 @@ fetch("https://lotto-statistiche.onrender.com/api")
     });
 
 })
-.catch(error => {
+.catch(() => {
     document.getElementById("content").innerHTML = "Errore caricamento dati";
 });
 
