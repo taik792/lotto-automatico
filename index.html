@@ -1,90 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-    <title>Lotto Live Statistiche</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: linear-gradient(#083b44, #062f35);
-            color: white;
-            text-align: center;
-        }
+  <meta charset="UTF-8">
+  <title>Lotto Live Statistiche</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+      color: white;
+      text-align: center;
+    }
 
-        .card {
-            background: #0d4c55;
-            padding: 20px;
-            margin: 20px auto;
-            border-radius: 12px;
-            width: 320px;
-        }
+    h1 {
+      margin-top: 30px;
+    }
 
-        .forte {
-            background: #0d6b3b;
-            box-shadow: 0 0 20px #00ff88;
-        }
+    #ruota-forte {
+      font-size: 22px;
+      margin: 15px 0;
+      font-weight: bold;
+      color: orange;
+    }
 
-        h1 { margin-top: 30px; }
-    </style>
+    #contenitore {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 50px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 15px;
+      width: 320px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .highlight {
+      background: linear-gradient(135deg, #00ff99, #00cc66);
+      color: black;
+      font-weight: bold;
+    }
+
+    p {
+      margin: 6px 0;
+    }
+  </style>
 </head>
 <body>
 
-<h1>🎯 Lotto Live Statistiche</h1>
-<h2 id="ruotaForte"></h2>
-<div id="contenuto"></div>
+  <h1>🎯 Lotto Live Statistiche</h1>
+  <div id="ruota-forte">Caricamento...</div>
+  <div id="contenitore"></div>
 
-<script>
-fetch("https://lotto-statistiche.onrender.com/api")
-.then(res => res.json())
-.then(data => {
+  <script>
+    fetch("https://lotto-statistiche.onrender.com/api?t=" + new Date().getTime())
+      .then(res => res.json())
+      .then(response => {
 
-    if (!data || !data.dati) {
-        document.body.innerHTML += "<h3>Errore caricamento dati</h3>";
-        return;
-    }
+        const data = response.dati;
+        const ruotaForte = response.ruota_piu_forte;
 
-    document.getElementById("ruotaForte").innerHTML =
-        "🔥 RUOTA PIÙ FORTE: " + (data.ruota_piu_forte || "N/D");
+        document.getElementById("ruota-forte").innerHTML =
+          "🔥 RUOTA PIÙ FORTE: " + ruotaForte;
 
-    const container = document.getElementById("contenuto");
+        const container = document.getElementById("contenitore");
+        container.innerHTML = "";
 
-    data.dati.forEach(r => {
+        data.forEach(ruota => {
 
-        let card = document.createElement("div");
-        card.className = "card";
+          const card = document.createElement("div");
+          card.className = "card";
 
-        if(r.ruota === data.ruota_piu_forte){
-            card.classList.add("forte");
-        }
+          if (ruota.ruota === ruotaForte) {
+            card.classList.add("highlight");
+          }
 
-        let caldi = r.numeri_caldi ? r.numeri_caldi.join(" - ") : "N/D";
-        let freddi = r.numeri_freddi ? r.numeri_freddi.join(" - ") : "N/D";
-        let bilanciate = r.combinazioni_bilanciate 
-            ? r.combinazioni_bilanciate.map(c => c.join(" - ")).join("<br>")
-            : "N/D";
-        let aggressive = r.combinazioni_aggressive 
-            ? r.combinazioni_aggressive.map(c => c.join(" - ")).join("<br>")
-            : "N/D";
+          card.innerHTML = `
+            <h2>${ruota.ruota}</h2>
+            <p><strong>Ultima estrazione:</strong> ${ruota.ultima_estrazione.join(" - ")}</p>
+            <p>🔥 Caldi: ${ruota.numeri_caldi.join(" - ")}</p>
+            <p>❄️ Freddi: ${ruota.numeri_freddi.join(" - ")}</p>
+            <p>⏳ Ritardo massimo: ${ruota.ritardo_massimo}</p>
+            <p>📊 Indice pressione: ${ruota.indice_pressione}</p>
+          `;
 
-        card.innerHTML = `
-            <h2>${r.ruota || ""}</h2>
-            <p>Ultima: ${(r.ultima_estrazione || []).join(" - ")}</p>
-            <p>🔥 Caldi: ${caldi}</p>
-            <p>❄️ Freddi: ${freddi}</p>
-            <p>⏳ Ritardatario: ${r.ritardatario || "N/D"}</p>
-            <p>📊 Ritardo max: ${r.ritardo_massimo || "N/D"}</p>
-            <p>📈 Indice pressione: ${r.indice_pressione || "N/D"}</p>
-            <p><b>Combinazioni bilanciate:</b><br>${bilanciate}</p>
-            <p><b>Combinazioni aggressive:</b><br>${aggressive}</p>
-        `;
+          container.appendChild(card);
+        });
 
-        container.appendChild(card);
-    });
-
-})
-.catch(err => {
-    document.body.innerHTML += "<h3>Errore caricamento dati</h3>";
-});
-</script>
+      })
+      .catch(error => {
+        console.error(error);
+        document.getElementById("ruota-forte").innerHTML = "Errore caricamento dati";
+      });
+  </script>
 
 </body>
 </html>
