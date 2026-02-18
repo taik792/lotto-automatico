@@ -1,46 +1,53 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <title>Lotto Live Statistiche</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #111;
-            color: white;
-            padding: 20px;
-        }
+<meta charset="UTF-8">
+<title>Lotto Live Statistiche</title>
 
-        h1 {
-            text-align: center;
-        }
+<style>
+body {
+    font-family: Arial;
+    background: #111;
+    color: white;
+    padding: 20px;
+}
 
-        .ruota {
-            background: #1e1e1e;
-            margin: 15px 0;
-            padding: 15px;
-            border-radius: 8px;
-        }
+h1 {
+    text-align: center;
+}
 
-        .forte {
-            border: 2px solid gold;
-        }
+.ruota {
+    background: #1e1e1e;
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 8px;
+}
 
-        .caldi { color: red; }
-        .freddi { color: cyan; }
-        .ritardo { color: orange; }
-        .suggeriti { color: lime; }
-    </style>
+.forte {
+    border: 3px solid gold;
+}
+
+.ruota-forte-label {
+    color: gold;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.caldi { color: red; }
+.freddi { color: cyan; }
+.ritardo { color: orange; }
+.suggeriti { color: lime; font-size: 18px; font-weight: bold; }
+</style>
 </head>
+
 <body>
 
 <h1>🔥 Lotto Live Statistiche 🔥</h1>
-
-<div id="contenuto">Caricamento dati...</div>
+<div id="contenuto">Caricamento...</div>
 
 <script>
 fetch("https://lotto-statistiche.onrender.com/api")
-.then(response => response.json())
+.then(res => res.json())
 .then(data => {
 
     let html = "";
@@ -48,28 +55,31 @@ fetch("https://lotto-statistiche.onrender.com/api")
 
     for (let ruota in data.dati) {
 
+        let info = data.dati[ruota];
         let classe = "ruota";
+        let label = "";
+
         if (ruota === ruotaForte) {
             classe += " forte";
+            label = '<div class="ruota-forte-label">⭐ RUOTA FORTE</div>';
         }
-
-        let info = data.dati[ruota];
 
         html += `
             <div class="${classe}">
                 <h2>${ruota}</h2>
+                ${label}
                 <p class="caldi">🔥 Caldi: ${info.caldi.join(", ")}</p>
                 <p class="freddi">❄️ Freddi: ${info.freddi.join(", ")}</p>
                 <p class="ritardo">⏳ Ritardatario: ${info.ritardatario}</p>
-                <p class="suggeriti">⭐ Suggeriti: ${info.suggeriti.join(", ")}</p>
+                <p class="suggeriti">🎯 DA GIOCARE: ${info.suggeriti.join(", ")}</p>
             </div>
         `;
     }
 
     document.getElementById("contenuto").innerHTML = html;
 })
-.catch(error => {
-    document.getElementById("contenuto").innerHTML = "Errore caricamento API";
+.catch(() => {
+    document.getElementById("contenuto").innerHTML = "Errore caricamento dati.";
 });
 </script>
 
