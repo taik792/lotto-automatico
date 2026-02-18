@@ -1,116 +1,150 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import json
-from collections import Counter
 import random
-import os
+from collections import Counter
 
 app = Flask(__name__)
 CORS(app)
 
-def calcola_statistiche(dati_ruota):
+# ================================
+# CARICAMENTO DATI
+# ================================
+def carica_dati():
+    with open("estrazioni.json", "r") as f:
+        return json.load(f)
 
-    if not dati_ruota or len(dati_ruota) == 0:
-        return [], [], 0, 0, []
+# ================================
+# CALCOLO FREQUENZE PESATE 50/100
+# ================================
+def calcola_punteggi(estrazioni):
+    ultime_50 = estrazioni[-50:] if len(estrazioni) >= 50 else estrazioni
+    ultime_100 = estrazioni[-100:] if len(estrazioni) >= 100 else estrazioni
 
-    dati_ruota = dati_ruota[-400:]
+    freq_50 = Counter()
+    freq_100 = Counter()
 
-    tutte_estrazioni = []
-    for estrazione in dati_ruota:
-        tutte_estrazioni.extend(estrazione)
+    for estr in ultime_50:
+        freq_50.update(estr)
 
-    conteggio = Counter(tutte_estrazioni)
+    for estr in ultime_100:
+        freq_100.update(estr)
 
-    numeri_caldi = [num for num, _ in conteggio.most_common(5)]
+    punteggi = {}
 
-    tutti_numeri = set(range(1, 91))
-    numeri_presenti = set(tutte_estrazioni)
-    numeri_assenti = list(tutti_numeri - numeri_presenti)
+    for numero in range(1, 91):
+        punteggio = (freq_50[numero] * 2) + (freq_100[numero] * 1)
+        punteggi[numero] = punteggio
 
-    numeri_freddi = numeri_assenti if len(numeri_assenti) >= 5 else list(tutti_numeri)
+    return punteggi
 
+# ================================
+# CALCOLO RITARDI
+# ================================
+def calcola_ritardi(estrazioni):
     ritardi = {}
-    for numero in tutti_numeri:
+    totale = len(estrazioni)
+
+    for numero in range(1, 91):
         ritardo = 0
-        for estrazione in reversed(dati_ruota):
-            if numero in estrazione:
+        for i in range(totale - 1, -1, -1):
+            if numero in estrazioni[i]:
                 break
             ritardo += 1
         ritardi[numero] = ritardo
 
-    ritardo_massimo = max(ritardi.values()) if ritardi else 0
+    return ritardi
 
-    indice_pressione = round(
-        (ritardo_massimo * 0.6) +
-        (sum(sorted(ritardi.values(), reverse=True)[:5]) * 0.4 / 5),
-        2
-    )
-
+# ================================
+# COMBINAZIONI INTELLIGENTI
+# ================================
+def genera_combinazioni(caldi, freddi, medi, ritardatari):
     combinazioni = []
 
     for _ in range(3):
-        combo = []
+        combo = set()
 
-        caldi_pool = numeri_caldi if len(numeri_caldi) >= 2 else list(tutti_numeri)
-        freddi_pool = numeri_freddi if len(numeri_freddi) >= 2 else list(tutti_numeri)
+        if caldi:
+            combo.add(random.choice(caldi))
+        if freddi:
+            combo.add(random.choice(freddi))
+        if medi:
+            combo.add(random.choice(medi))
+        if ritardatari:
+            combo.add(random.choice(ritardatari))
 
-        combo += random.sample(caldi_pool, 2)
-        combo += random.sample(freddi_pool, 2)
+        while len(combo) < 5:
+            combo.add(random.randint(1, 90))
 
-        restante = list(tutti_numeri - set(combo))
-        if len(restante) >= 1:
-            combo += random.sample(restante, 1)
+        combinazioni.append(sorted(list(combo)))
 
-        combinazioni.append(sorted(combo))
+    return combinazioni
 
-    return (
-        numeri_caldi[:3],
-        numeri_freddi[:3],
-        ritardo_massimo,
-        indice_pressione,
-        combinazioni
-    )
-
-
+# ================================
+# API PRINCIPALE
+# ================================
 @app.route("/api")
 def api():
     try:
-        with open("estrazioni.json", "r") as file:
-            dati = json.load(file)
-
-        risultato = {}
-        pressione_massima = -1
-        ruota_forte = None
+        dati = carica_dati()
+        risultato = []
+        ruota_piu_forte = None
+        pressione_massima = 0
 
         for ruota, estrazioni in dati.items():
+            if len(estrazioni) == 0:
+                continue
 
-            caldi, freddi, ritardo, pressione, combinazioni = calcola_statistiche(estrazioni)
+            punteggi = calcola_punteggi(estrazioni)
+            ritardi = calcola_ritardi(estrazioni)
 
-            risultato[ruota] = {
-                "ultima_estrazione": estrazioni[-1] if estrazioni else [],
-                "numeri_caldi": caldi,
-                "numeri_freddi": freddi,
-                "ritardo_massimo": ritardo,
-                "indice_pressione": pressione,
+            ordinati = sorted(punteggi.items(), key=lambda x: x[1], reverse=True)
+
+            numeri_caldi = [x[0] for x in ordinati[:3]]
+            numeri_freddi = [x[0] for x in ordinati[-3:]]
+
+            valori_medi = ordinati[20:40]
+            numeri_medi = [x[0] for x in valori_medi[:10]]
+
+            top_ritardi = sorted(ritardi.items(), key=lambda x: x[1], reverse=True)
+            numeri_ritardatari = [x[0] for x in top_ritardi[:5]]
+
+            indice_pressione = sum([punteggi[n] for n in numeri_caldi]) / 3
+
+            if indice_pressione > pressione_massima:
+                pressione_massima = indice_pressione
+                ruota_piu_forte = ruota
+
+            combinazioni = genera_combinazioni(
+                numeri_caldi,
+                numeri_freddi,
+                numeri_medi,
+                numeri_ritardatari
+            )
+
+            risultato.append({
+                "ruota": ruota,
+                "ultima_estrazione": estrazioni[-1],
+                "numeri_caldi": numeri_caldi,
+                "numeri_freddi": numeri_freddi,
+                "ritardo_massimo": top_ritardi[0][1],
+                "indice_pressione": round(indice_pressione, 2),
                 "combinazioni_suggerite": combinazioni
-            }
+            })
 
-            if pressione > pressione_massima:
-                pressione_massima = pressione
-                ruota_forte = ruota
-
-        risultato["ruota_piu_forte"] = ruota_forte
-
-        return jsonify(risultato)
+        return jsonify({
+            "ruote": risultato,
+            "ruota_piu_forte": ruota_piu_forte
+        })
 
     except Exception as e:
         return jsonify({"errore": str(e)})
 
-
-# 🔥 PARTE IMPORTANTE PER RENDER
+# ================================
+# AVVIO SERVER
+# ================================
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=10000)
 
 
 
