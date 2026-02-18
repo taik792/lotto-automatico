@@ -1,55 +1,121 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import json
+import os
+from collections import Counter
 
 app = Flask(__name__)
-CORS(app)  # 👈 QUESTA RIGA È FONDAMENTALE
+CORS(app)
 
-@app.route("/")
-def home():
-    return "API Lotto attiva"
+# ==========================
+# CONFIGURAZIONE
+# ==========================
+
+FILE_DATI = "estrazioni.json"
+FINESTRA_BREVE = 50
+FINESTRA_MEDIA = 100
+
+# ==========================
+# FUNZIONI UTILI
+# ==========================
+
+def carica_dati():
+    with open(FILE_DATI, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def calcola_statistiche(estrazioni_ruota):
+    tutte = []
+    for estrazione in estrazioni_ruota:
+        tutte.extend(estrazione)
+
+    frequenze = Counter(tutte)
+
+    # Calcolo ultimi 50
+    ultime_50 = estrazioni_ruota[-FINESTRA_BREVE:]
+    freq_50 = Counter([n for e in ultime_50 for n in e])
+
+    # Calcolo ultimi 100
+    ultime_100 = estrazioni_ruota[-FINESTRA_MEDIA:]
+    freq_100 = Counter([n for e in ultime_100 for n in e])
+
+    # Numeri caldi = top ultimi 50
+    numeri_caldi = [n for n, _ in freq_50.most_common(3)]
+
+    # Numeri freddi = meno frequenti ultimi 50
+    numeri_freddi = sorted(freq_50, key=freq_50.get)[:3]
+
+    # Ritardatario (numero con maggior assenza)
+    ritardi = {}
+    for numero in range(1, 91):
+        ritardo = 0
+        for estrazione in reversed(estrazioni_ruota):
+            if numero in estrazione:
+                break
+            ritardo += 1
+        ritardi[numero] = ritardo
+
+    ritardatario = max(ritardi, key=ritardi.get)
+    ritardo_massimo = ritardi[ritardatario]
+
+    # Indice pressione (formula bilanciata)
+    indice_pressione = round(
+        (sum(freq_50.values()) / (len(freq_50) or 1))
+        + (ritardo_massimo * 0.5),
+        2
+    )
+
+    # Numeri suggeriti (mix caldo + ritardatario)
+    suggeriti = list(set(numeri_caldi + [ritardatario]))[:5]
+
+    return {
+        "ultima_estrazione": estrazioni_ruota[-1],
+        "numeri_caldi": numeri_caldi,
+        "numeri_freddi": numeri_freddi,
+        "ritardatario": ritardatario,
+        "ritardo_massimo": ritardo_massimo,
+        "indice_pressione": indice_pressione,
+        "numeri_suggeriti": suggeriti
+    }
+
+# ==========================
+# API
+# ==========================
 
 @app.route("/api")
 def api():
+    try:
+        dati = carica_dati()
+        risultato = []
+        ruota_piu_forte = None
+        pressione_massima = 0
 
-    with open("estrazioni.json", "r", encoding="utf-8") as f:
-        archivio = json.load(f)
+        for ruota, estrazioni in dati.items():
+            stats = calcola_statistiche(estrazioni)
 
-    risultato = []
-    ruota_forte = None
-    punteggio_max = 0
+            if stats["indice_pressione"] > pressione_massima:
+                pressione_massima = stats["indice_pressione"]
+                ruota_piu_forte = ruota
 
-    for ruota, estrazioni in archivio.items():
+            risultato.append({
+                "ruota": ruota,
+                **stats
+            })
 
-        ultime_50 = estrazioni[-50:]
-        conteggio = {}
-
-        for estrazione in ultime_50:
-            for numero in estrazione:
-                conteggio[numero] = conteggio.get(numero, 0) + 1
-
-        numeri_caldi = sorted(conteggio, key=conteggio.get, reverse=True)[:3]
-        indice_pressione = sum(conteggio[n] for n in numeri_caldi)
-
-        if indice_pressione > punteggio_max:
-            punteggio_max = indice_pressione
-            ruota_forte = ruota
-
-        risultato.append({
-            "ruota": ruota,
-            "ultima_estrazione": estrazioni[-1],
-            "numeri_caldi": numeri_caldi,
-            "indice_pressione": indice_pressione
+        return jsonify({
+            "ruota_piu_forte": ruota_piu_forte,
+            "dati": risultato
         })
 
-    return jsonify({
-        "dati": risultato,
-        "ruota_piu_forte": ruota_forte
-    })
+    except Exception as e:
+        return jsonify({"errore": str(e)}), 500
+
+# ==========================
+# AVVIO PER RENDER
+# ==========================
 
 if __name__ == "__main__":
-    app.run()
-
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
 
 
 
