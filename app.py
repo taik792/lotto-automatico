@@ -1,117 +1,97 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 import json
-import os
 from collections import Counter
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# ==========================
-# CONFIGURAZIONE
-# ==========================
+FILE_ESTRAZIONI = "estrazioni.json"
 
-FILE_DATI = "estrazioni.json"
-FINESTRA_BREVE = 50
-FINESTRA_MEDIA = 100
-
-# ==========================
-# FUNZIONI UTILI
-# ==========================
+FINESTRA_50 = 50
+FINESTRA_100 = 100
 
 def carica_dati():
-    with open(FILE_DATI, "r", encoding="utf-8") as f:
+    with open(FILE_ESTRAZIONI, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def calcola_statistiche(estrazioni_ruota):
+def analizza_ruota(estrazioni, ruota):
     tutte = []
-    for estrazione in estrazioni_ruota:
-        tutte.extend(estrazione)
+    
+    for estrazione in estrazioni:
+        if ruota in estrazione:
+            tutte.extend(estrazione[ruota])
 
-    frequenze = Counter(tutte)
+    totale = len(tutte)
 
-    # Calcolo ultimi 50
-    ultime_50 = estrazioni_ruota[-FINESTRA_BREVE:]
-    freq_50 = Counter([n for e in ultime_50 for n in e])
+    ultimi_50 = tutte[-FINESTRA_50:]
+    ultimi_100 = tutte[-FINESTRA_100:]
 
-    # Calcolo ultimi 100
-    ultime_100 = estrazioni_ruota[-FINESTRA_MEDIA:]
-    freq_100 = Counter([n for e in ultime_100 for n in e])
+    freq_totale = Counter(tutte)
+    freq_50 = Counter(ultimi_50)
+    freq_100 = Counter(ultimi_100)
 
-    # Numeri caldi = top ultimi 50
-    numeri_caldi = [n for n, _ in freq_50.most_common(3)]
+    # Numeri caldi (top 5 ultimi 50)
+    caldi = [n for n, _ in freq_50.most_common(5)]
 
-    # Numeri freddi = meno frequenti ultimi 50
-    numeri_freddi = sorted(freq_50, key=freq_50.get)[:3]
+    # Numeri freddi (mai usciti ultimi 100)
+    freddi = [n for n in range(1, 91) if freq_100[n] == 0][:5]
 
-    # Ritardatario (numero con maggior assenza)
+    # Ritardatario
     ritardi = {}
     for numero in range(1, 91):
         ritardo = 0
-        for estrazione in reversed(estrazioni_ruota):
-            if numero in estrazione:
+        for n in reversed(tutte):
+            if n != numero:
+                ritardo += 1
+            else:
                 break
-            ritardo += 1
         ritardi[numero] = ritardo
 
     ritardatario = max(ritardi, key=ritardi.get)
-    ritardo_massimo = ritardi[ritardatario]
 
-    # Indice pressione (formula bilanciata)
-    indice_pressione = round(
-        (sum(freq_50.values()) / (len(freq_50) or 1))
-        + (ritardo_massimo * 0.5),
-        2
-    )
+    # Indice pressione
+    pressione = {}
+    for numero in range(1, 91):
+        pressione[numero] = (
+            freq_50[numero] * 3 +
+            freq_100[numero] * 2 +
+            freq_totale[numero]
+        )
 
-    # Numeri suggeriti (mix caldo + ritardatario)
-    suggeriti = list(set(numeri_caldi + [ritardatario]))[:5]
+    pressione_ordinata = sorted(pressione.items(), key=lambda x: x[1], reverse=True)
+    suggeriti = [n for n, _ in pressione_ordinata[:5]]
 
     return {
-        "ultima_estrazione": estrazioni_ruota[-1],
-        "numeri_caldi": numeri_caldi,
-        "numeri_freddi": numeri_freddi,
+        "caldi": caldi,
+        "freddi": freddi,
         "ritardatario": ritardatario,
-        "ritardo_massimo": ritardo_massimo,
-        "indice_pressione": indice_pressione,
-        "numeri_suggeriti": suggeriti
+        "suggeriti": suggeriti,
+        "pressione_top": suggeriti
     }
-
-# ==========================
-# API
-# ==========================
 
 @app.route("/api")
 def api():
     try:
-        dati = carica_dati()
-        risultato = []
-        ruota_piu_forte = None
-        pressione_massima = 0
+        estrazioni = carica_dati()
+        risultato = {}
+        punteggi_ruote = {}
 
-        for ruota, estrazioni in dati.items():
-            stats = calcola_statistiche(estrazioni)
+        for ruota in estrazioni[0].keys():
+            analisi = analizza_ruota(estrazioni, ruota)
+            risultato[ruota] = analisi
+            punteggi_ruote[ruota] = sum(analisi["pressione_top"])
 
-            if stats["indice_pressione"] > pressione_massima:
-                pressione_massima = stats["indice_pressione"]
-                ruota_piu_forte = ruota
-
-            risultato.append({
-                "ruota": ruota,
-                **stats
-            })
+        ruota_forte = max(punteggi_ruote, key=punteggi_ruote.get)
 
         return jsonify({
-            "ruota_piu_forte": ruota_piu_forte,
+            "ruota_forte": ruota_forte,
             "dati": risultato
         })
 
     except Exception as e:
         return jsonify({"errore": str(e)}), 500
-
-# ==========================
-# AVVIO PER RENDER
-# ==========================
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
