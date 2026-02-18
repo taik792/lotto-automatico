@@ -15,24 +15,21 @@
             padding: 20px;
             margin: 20px auto;
             border-radius: 12px;
-            width: 300px;
+            width: 320px;
         }
 
         .forte {
             background: #0d6b3b;
-            box-shadow: 0 0 15px #00ff88;
+            box-shadow: 0 0 20px #00ff88;
         }
 
-        h1 {
-            margin-top: 30px;
-        }
+        h1 { margin-top: 30px; }
     </style>
 </head>
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
 <h2 id="ruotaForte"></h2>
-
 <div id="contenuto"></div>
 
 <script>
@@ -40,13 +37,13 @@ fetch("https://lotto-statistiche.onrender.com/api")
 .then(res => res.json())
 .then(data => {
 
-    if(data.errore){
+    if (!data || !data.dati) {
         document.body.innerHTML += "<h3>Errore caricamento dati</h3>";
         return;
     }
 
     document.getElementById("ruotaForte").innerHTML =
-        "🔥 RUOTA PIÙ FORTE: " + data.ruota_piu_forte;
+        "🔥 RUOTA PIÙ FORTE: " + (data.ruota_piu_forte || "N/D");
 
     const container = document.getElementById("contenuto");
 
@@ -59,18 +56,25 @@ fetch("https://lotto-statistiche.onrender.com/api")
             card.classList.add("forte");
         }
 
+        let caldi = r.numeri_caldi ? r.numeri_caldi.join(" - ") : "N/D";
+        let freddi = r.numeri_freddi ? r.numeri_freddi.join(" - ") : "N/D";
+        let bilanciate = r.combinazioni_bilanciate 
+            ? r.combinazioni_bilanciate.map(c => c.join(" - ")).join("<br>")
+            : "N/D";
+        let aggressive = r.combinazioni_aggressive 
+            ? r.combinazioni_aggressive.map(c => c.join(" - ")).join("<br>")
+            : "N/D";
+
         card.innerHTML = `
-            <h2>${r.ruota}</h2>
-            <p>Ultima: ${r.ultima_estrazione.join(" - ")}</p>
-            <p>🔥 Caldi: ${r.numeri_caldi.join(" - ")}</p>
-            <p>❄️ Freddi: ${r.numeri_freddi.join(" - ")}</p>
-            <p>⏳ Ritardatario: ${r.ritardatario}</p>
-            <p>📊 Ritardo max: ${r.ritardo_massimo}</p>
-            <p>📈 Indice pressione: ${r.indice_pressione}</p>
-            <p><b>Combinazioni bilanciate:</b></p>
-            ${r.combinazioni_bilanciate.map(c => c.join(" - ")).join("<br>")}
-            <p><b>Combinazioni aggressive:</b></p>
-            ${r.combinazioni_aggressive.map(c => c.join(" - ")).join("<br>")}
+            <h2>${r.ruota || ""}</h2>
+            <p>Ultima: ${(r.ultima_estrazione || []).join(" - ")}</p>
+            <p>🔥 Caldi: ${caldi}</p>
+            <p>❄️ Freddi: ${freddi}</p>
+            <p>⏳ Ritardatario: ${r.ritardatario || "N/D"}</p>
+            <p>📊 Ritardo max: ${r.ritardo_massimo || "N/D"}</p>
+            <p>📈 Indice pressione: ${r.indice_pressione || "N/D"}</p>
+            <p><b>Combinazioni bilanciate:</b><br>${bilanciate}</p>
+            <p><b>Combinazioni aggressive:</b><br>${aggressive}</p>
         `;
 
         container.appendChild(card);
