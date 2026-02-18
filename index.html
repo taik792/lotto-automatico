@@ -1,114 +1,78 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lotto Live Statistiche</title>
 
 <style>
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
     color: white;
     text-align: center;
 }
 
-h1 {
-    margin-top: 30px;
-}
-
-.ruota-forte {
-    margin: 20px;
-    font-size: 20px;
-    font-weight: bold;
-    color: orange;
-}
-
-.container {
-    width: 90%;
-    max-width: 600px;
-    margin: auto;
-}
-
 .card {
     background: rgba(255,255,255,0.1);
     padding: 20px;
+    margin: 20px auto;
     border-radius: 15px;
-    margin: 20px 0;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    transition: 0.3s;
+    width: 300px;
 }
 
-.card.forte {
-    background: linear-gradient(45deg, #00c853, #64dd17);
+.forte {
+    background: #39ff14 !important;
     color: black;
     font-weight: bold;
-    box-shadow: 0 0 20px #00ff88;
 }
-
 </style>
 </head>
 
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
+<h2 id="ruotaForte"></h2>
 
-<div class="ruota-forte">
-🔥 RUOTA PIÙ FORTE: <span id="ruotaForte">Caricamento...</span>
-</div>
-
-<div class="container" id="contenuto"></div>
+<div id="contenitore"></div>
 
 <script>
+fetch("https://lotto-statistiche.onrender.com/api")
+.then(res => res.json())
+.then(data => {
 
-async function caricaDati() {
-    try {
+    const contenitore = document.getElementById("contenitore");
+    const ruotaForte = data.ruota_piu_forte;
 
-        const response = await fetch("https://lotto-statistiche.onrender.com/api");
-        const data = await response.json();
+    document.getElementById("ruotaForte").innerHTML =
+        "🔥 RUOTA PIÙ FORTE: " + ruotaForte;
 
-        const ruotaForte = data.ruota_piu_forte;
-        document.getElementById("ruotaForte").innerText = ruotaForte;
+    data.ruote.forEach(ruota => {
 
-        const container = document.getElementById("contenuto");
-        container.innerHTML = "";
+        const card = document.createElement("div");
+        card.className = "card";
 
-        for (const ruota in data) {
-
-            if (ruota === "ruota_piu_forte") continue;
-
-            const r = data[ruota];
-
-            const card = document.createElement("div");
-            card.classList.add("card");
-
-            if (ruota === ruotaForte) {
-                card.classList.add("forte");
-            }
-
-            card.innerHTML = `
-                <h2>${ruota}</h2>
-                <p><b>Ultima estrazione:</b> ${r.ultima_estrazione.join(" - ")}</p>
-                <p>🔥 Numeri caldi: ${r.numeri_caldi.join(" - ")}</p>
-                <p>❄️ Numeri freddi: ${r.numeri_freddi.join(" - ")}</p>
-                <p>⏳ Ritardo massimo: ${r.ritardo_massimo}</p>
-                <p>📊 Indice pressione: ${r.indice_pressione}</p>
-                <p>🎲 Combinazioni suggerite:</p>
-                ${r.combinazioni_suggerite.map(c => `<div>${c.join(" - ")}</div>`).join("")}
-            `;
-
-            container.appendChild(card);
+        if (ruota.ruota === ruotaForte) {
+            card.classList.add("forte");
         }
 
-    } catch (error) {
-        document.getElementById("contenuto").innerHTML =
-            "<p style='color:red'>Errore caricamento dati</p>";
-    }
-}
+        card.innerHTML = `
+            <h3>${ruota.ruota}</h3>
+            <p><b>Ultima estrazione:</b> ${ruota.ultima_estrazione.join(" - ")}</p>
+            <p>🔥 Caldi: ${ruota.numeri_caldi.join(" - ")}</p>
+            <p>❄️ Freddi: ${ruota.numeri_freddi.join(" - ")}</p>
+            <p>⏳ Ritardo massimo: ${ruota.ritardo_massimo}</p>
+            <p>📊 Indice pressione: ${ruota.indice_pressione}</p>
+            <p><b>Combinazioni:</b></p>
+            ${ruota.combinazioni_suggerite.map(c => `<p>${c.join(" - ")}</p>`).join("")}
+        `;
 
-caricaDati();
+        contenitore.appendChild(card);
+    });
 
+})
+.catch(error => {
+    document.body.innerHTML += "<h2>Errore caricamento dati</h2>";
+});
 </script>
 
 </body>
