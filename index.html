@@ -1,69 +1,118 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<title>Lotto Live Statistiche</title>
-</head>
+from flask import Flask, jsonify
+from flask_cors import CORS
+import json
+import os
+from collections import Counter
 
-<body style="margin:0;font-family:Arial;background:linear-gradient(to bottom,#0f2027,#203a43,#2c5364);color:white;text-align:center;">
+app = Flask(__name__)
+CORS(app)
 
-<h1 style="margin-top:30px;">🎯 Lotto Live Statistiche</h1>
-<div id="ruota-forte" style="font-size:22px;margin:15px 0;font-weight:bold;color:orange;">Caricamento...</div>
-<div id="contenitore"></div>
+# ==========================
+# CONFIGURAZIONE
+# ==========================
 
-<script>
+FILE_DATI = "estrazioni.json"
+FINESTRA_BREVE = 50
+FINESTRA_MEDIA = 100
 
-async function caricaDati(){
+# ==========================
+# FUNZIONI UTILI
+# ==========================
 
-  try{
+def carica_dati():
+    with open(FILE_DATI, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-    const response = await fetch("https://lotto-statistiche.onrender.com/api");
-    const json = await response.json();
+def calcola_statistiche(estrazioni_ruota):
+    tutte = []
+    for estrazione in estrazioni_ruota:
+        tutte.extend(estrazione)
 
-    console.log(json);
+    frequenze = Counter(tutte)
 
-    const dati = json.dati;
-    const ruotaForte = json.ruota_piu_forte;
+    # Calcolo ultimi 50
+    ultime_50 = estrazioni_ruota[-FINESTRA_BREVE:]
+    freq_50 = Counter([n for e in ultime_50 for n in e])
 
-    document.getElementById("ruota-forte").innerHTML =
-      "🔥 RUOTA PIÙ FORTE: " + ruotaForte;
+    # Calcolo ultimi 100
+    ultime_100 = estrazioni_ruota[-FINESTRA_MEDIA:]
+    freq_100 = Counter([n for e in ultime_100 for n in e])
 
-    const container = document.getElementById("contenitore");
-    container.innerHTML = "";
+    # Numeri caldi = top ultimi 50
+    numeri_caldi = [n for n, _ in freq_50.most_common(3)]
 
-    dati.forEach(ruota => {
+    # Numeri freddi = meno frequenti ultimi 50
+    numeri_freddi = sorted(freq_50, key=freq_50.get)[:3]
 
-      const div = document.createElement("div");
-      div.style.margin="20px auto";
-      div.style.padding="15px";
-      div.style.width="300px";
-      div.style.background="rgba(255,255,255,0.1)";
-      div.style.borderRadius="10px";
+    # Ritardatario (numero con maggior assenza)
+    ritardi = {}
+    for numero in range(1, 91):
+        ritardo = 0
+        for estrazione in reversed(estrazioni_ruota):
+            if numero in estrazione:
+                break
+            ritardo += 1
+        ritardi[numero] = ritardo
 
-      if(ruota.ruota === ruotaForte){
-        div.style.background="#00cc66";
-        div.style.color="black";
-      }
+    ritardatario = max(ritardi, key=ritardi.get)
+    ritardo_massimo = ritardi[ritardatario]
 
-      div.innerHTML = `
-        <h3>${ruota.ruota}</h3>
-        <p>${ruota.ultima_estrazione.join(" - ")}</p>
-      `;
+    # Indice pressione (formula bilanciata)
+    indice_pressione = round(
+        (sum(freq_50.values()) / (len(freq_50) or 1))
+        + (ritardo_massimo * 0.5),
+        2
+    )
 
-      container.appendChild(div);
+    # Numeri suggeriti (mix caldo + ritardatario)
+    suggeriti = list(set(numeri_caldi + [ritardatario]))[:5]
 
-    });
+    return {
+        "ultima_estrazione": estrazioni_ruota[-1],
+        "numeri_caldi": numeri_caldi,
+        "numeri_freddi": numeri_freddi,
+        "ritardatario": ritardatario,
+        "ritardo_massimo": ritardo_massimo,
+        "indice_pressione": indice_pressione,
+        "numeri_suggeriti": suggeriti
+    }
 
-  }catch(error){
-    console.error(error);
-    document.getElementById("ruota-forte").innerHTML = "Errore caricamento dati";
-  }
+# ==========================
+# API
+# ==========================
 
-}
+@app.route("/api")
+def api():
+    try:
+        dati = carica_dati()
+        risultato = []
+        ruota_piu_forte = None
+        pressione_massima = 0
 
-caricaDati();
+        for ruota, estrazioni in dati.items():
+            stats = calcola_statistiche(estrazioni)
 
-</script>
+            if stats["indice_pressione"] > pressione_massima:
+                pressione_massima = stats["indice_pressione"]
+                ruota_piu_forte = ruota
 
-</body>
-</html>
+            risultato.append({
+                "ruota": ruota,
+                **stats
+            })
+
+        return jsonify({
+            "ruota_piu_forte": ruota_piu_forte,
+            "dati": risultato
+        })
+
+    except Exception as e:
+        return jsonify({"errore": str(e)}), 500
+
+# ==========================
+# AVVIO PER RENDER
+# ==========================
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
