@@ -1,77 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Lotto Live Statistiche</title>
+    <title>Lotto Live Statistiche</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(#083b44, #062f35);
+            color: white;
+            text-align: center;
+        }
 
-<style>
-body {
-    font-family: Arial;
-    background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
-    color: white;
-    text-align: center;
-}
+        .card {
+            background: #0d4c55;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 12px;
+            width: 300px;
+        }
 
-.card {
-    background: rgba(255,255,255,0.1);
-    padding: 20px;
-    margin: 20px auto;
-    border-radius: 15px;
-    width: 300px;
-}
+        .forte {
+            background: #0d6b3b;
+            box-shadow: 0 0 15px #00ff88;
+        }
 
-.forte {
-    background: #39ff14 !important;
-    color: black;
-    font-weight: bold;
-}
-</style>
+        h1 {
+            margin-top: 30px;
+        }
+    </style>
 </head>
-
 <body>
 
 <h1>🎯 Lotto Live Statistiche</h1>
 <h2 id="ruotaForte"></h2>
 
-<div id="contenitore"></div>
+<div id="contenuto"></div>
 
 <script>
 fetch("https://lotto-statistiche.onrender.com/api")
 .then(res => res.json())
 .then(data => {
 
-    const contenitore = document.getElementById("contenitore");
-    const ruotaForte = data.ruota_piu_forte;
+    if(data.errore){
+        document.body.innerHTML += "<h3>Errore caricamento dati</h3>";
+        return;
+    }
 
     document.getElementById("ruotaForte").innerHTML =
-        "🔥 RUOTA PIÙ FORTE: " + ruotaForte;
+        "🔥 RUOTA PIÙ FORTE: " + data.ruota_piu_forte;
 
-    data.ruote.forEach(ruota => {
+    const container = document.getElementById("contenuto");
 
-        const card = document.createElement("div");
+    data.dati.forEach(r => {
+
+        let card = document.createElement("div");
         card.className = "card";
 
-        if (ruota.ruota === ruotaForte) {
+        if(r.ruota === data.ruota_piu_forte){
             card.classList.add("forte");
         }
 
         card.innerHTML = `
-            <h3>${ruota.ruota}</h3>
-            <p><b>Ultima estrazione:</b> ${ruota.ultima_estrazione.join(" - ")}</p>
-            <p>🔥 Caldi: ${ruota.numeri_caldi.join(" - ")}</p>
-            <p>❄️ Freddi: ${ruota.numeri_freddi.join(" - ")}</p>
-            <p>⏳ Ritardo massimo: ${ruota.ritardo_massimo}</p>
-            <p>📊 Indice pressione: ${ruota.indice_pressione}</p>
-            <p><b>Combinazioni:</b></p>
-            ${ruota.combinazioni_suggerite.map(c => `<p>${c.join(" - ")}</p>`).join("")}
+            <h2>${r.ruota}</h2>
+            <p>Ultima: ${r.ultima_estrazione.join(" - ")}</p>
+            <p>🔥 Caldi: ${r.numeri_caldi.join(" - ")}</p>
+            <p>❄️ Freddi: ${r.numeri_freddi.join(" - ")}</p>
+            <p>⏳ Ritardatario: ${r.ritardatario}</p>
+            <p>📊 Ritardo max: ${r.ritardo_massimo}</p>
+            <p>📈 Indice pressione: ${r.indice_pressione}</p>
+            <p><b>Combinazioni bilanciate:</b></p>
+            ${r.combinazioni_bilanciate.map(c => c.join(" - ")).join("<br>")}
+            <p><b>Combinazioni aggressive:</b></p>
+            ${r.combinazioni_aggressive.map(c => c.join(" - ")).join("<br>")}
         `;
 
-        contenitore.appendChild(card);
+        container.appendChild(card);
     });
 
 })
-.catch(error => {
-    document.body.innerHTML += "<h2>Errore caricamento dati</h2>";
+.catch(err => {
+    document.body.innerHTML += "<h3>Errore caricamento dati</h3>";
 });
 </script>
 
