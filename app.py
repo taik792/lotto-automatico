@@ -3,6 +3,7 @@ from flask_cors import CORS
 import json
 from collections import Counter
 import random
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -12,7 +13,6 @@ def calcola_statistiche(dati_ruota):
     if not dati_ruota or len(dati_ruota) == 0:
         return [], [], 0, 0, []
 
-    # Limitiamo agli ultimi 400 concorsi per performance
     dati_ruota = dati_ruota[-400:]
 
     tutte_estrazioni = []
@@ -107,8 +107,11 @@ def api():
         return jsonify({"errore": str(e)})
 
 
+# 🔥 PARTE IMPORTANTE PER RENDER
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
 
 
 
