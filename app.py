@@ -20,12 +20,6 @@ def carica_dati():
 
 
 def analizza_ruota(lista_estrazioni):
-    # lista_estrazioni è tipo:
-    # [
-    #   [26,59,60,67,17],
-    #   [84,80,40,15,9],
-    #   ...
-    # ]
 
     tutte = []
     for estrazione in lista_estrazioni:
@@ -67,13 +61,19 @@ def analizza_ruota(lista_estrazioni):
         )
 
     top_pressione = sorted(pressione.items(), key=lambda x: x[1], reverse=True)
-    suggeriti = [n for n, _ in top_pressione[:5]]
+
+    # 🔥 SOLO 3 NUMERI SUGGERITI
+    suggeriti = [n for n, _ in top_pressione[:3]]
+
+    # punteggio per ruota forte
+    punteggio = sum([p for _, p in top_pressione[:3]])
 
     return {
         "caldi": caldi,
         "freddi": freddi,
         "ritardatario": ritardatario,
-        "suggeriti": suggeriti
+        "suggeriti": suggeriti,
+        "punteggio": punteggio
     }
 
 
@@ -88,14 +88,14 @@ def api():
         dati = carica_dati()
 
         risultato = {}
-        punteggi_ruote = {}
+        punteggi = {}
 
         for ruota, estrazioni in dati.items():
             analisi = analizza_ruota(estrazioni)
             risultato[ruota] = analisi
-            punteggi_ruote[ruota] = sum(analisi["suggeriti"])
+            punteggi[ruota] = analisi["punteggio"]
 
-        ruota_forte = max(punteggi_ruote, key=punteggi_ruote.get)
+        ruota_forte = max(punteggi, key=punteggi.get)
 
         return jsonify({
             "ruota_forte": ruota_forte,
@@ -111,6 +111,7 @@ def api():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
