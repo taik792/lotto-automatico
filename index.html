@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Lotto Live Statistiche</title>
+
 <style>
 body {
     background: #111827;
@@ -17,6 +18,7 @@ h1 {
     color: orange;
 }
 
+/* CARD */
 .card {
     background: #1f2937;
     padding: 20px;
@@ -29,11 +31,33 @@ h1 {
     border: 3px solid gold;
 }
 
+/* COLORI */
 .caldi { color: red; }
 .freddi { color: cyan; }
 .ritardo { color: orange; }
 .giocare { color: lime; }
 .ambi { color: pink; }
+
+/* LOADER */
+.loader-container {
+    text-align: center;
+    margin-top: 60px;
+}
+
+.spinner {
+    margin: 20px auto;
+    width: 50px;
+    height: 50px;
+    border: 6px solid #333;
+    border-top: 6px solid orange;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 .pressione-bar {
     height: 8px;
@@ -43,16 +67,27 @@ h1 {
 }
 </style>
 </head>
+
 <body>
 
 <h1>🔥 Lotto Live Statistiche 🔥</h1>
-<div id="contenuto"></div>
+
+<div id="loader" class="loader-container">
+    <div class="spinner"></div>
+    <p>📡 Connessione al server...<br>⚡ Analisi in corso...</p>
+</div>
+
+<div id="contenuto" style="display:none;"></div>
 
 <script>
 
 fetch("https://lotto-statistiche.onrender.com/api")
 .then(res => res.json())
 .then(data => {
+
+    // Nasconde loader
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("contenuto").style.display = "block";
 
     const container = document.getElementById("contenuto");
     container.innerHTML = "";
@@ -96,8 +131,8 @@ fetch("https://lotto-statistiche.onrender.com/api")
 
 })
 .catch(err => {
-    document.getElementById("contenuto").innerHTML = "Errore caricamento dati";
-    console.error(err);
+    document.getElementById("loader").innerHTML = 
+        "<p>❌ Errore di connessione. Riprova tra qualche secondo.</p>";
 });
 
 </script>
