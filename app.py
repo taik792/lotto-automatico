@@ -20,32 +20,25 @@ def carica_dati():
 
 
 def analizza_ruota(lista_estrazioni):
-
     tutte = []
     for estrazione in lista_estrazioni:
         tutte.extend(estrazione)
 
-    ultimi_50 = tutte[-FINESTRA_50:]
-    ultimi_100 = tutte[-FINESTRA_100:]
+    ultime_50 = tutte[-FINESTRA_50:]
+    ultime_100 = tutte[-FINESTRA_100:]
 
     freq_totale = Counter(tutte)
-    freq_50 = Counter(ultimi_50)
-    freq_100 = Counter(ultimi_100)
-
-    caldi = [n for n, _ in freq_50.most_common(5)]
-    freddi = [n for n in range(1, 91) if freq_100[n] == 0][:5]
+    freq_50 = Counter(ultime_50)
+    freq_100 = Counter(ultime_100)
 
     ritardi = {}
     for numero in range(1, 91):
         ritardo = 0
         for estrazione in reversed(lista_estrazioni):
-            if numero not in estrazione:
-                ritardo += 1
-            else:
+            if numero in estrazione:
                 break
+            ritardo += 1
         ritardi[numero] = ritardo
-
-    ritardatario = max(ritardi, key=ritardi.get)
 
     pressione = {}
     for numero in range(1, 91):
@@ -55,52 +48,38 @@ def analizza_ruota(lista_estrazioni):
             freq_totale[numero]
         )
 
-    top_pressione = sorted(pressione.items(), key=lambda x: x[1], reverse=True)
-    suggeriti = [n for n, _ in top_pressione[:3]]
-    punteggio = sum([p for _, p in top_pressione[:3]])
+    caldi = [n for n, _ in freq_50.most_common(5)]
+    freddi = sorted(ritardi, key=ritardi.get, reverse=True)[:5]
+    ritardatario = max(ritardi, key=ritardi.get)
+    suggeriti = sorted(pressione, key=pressione.get, reverse=True)[:3]
 
-    # ✅ QUI PRENDIAMO L'ULTIMA ESTRAZIONE
-    ultima_estrazione = lista_estrazioni[-1]
+    indice_pressione = max(pressione.values())
 
     return {
+        "ultima_estrazione": lista_estrazioni[-1] if lista_estrazioni else [],
         "caldi": caldi,
         "freddi": freddi,
         "ritardatario": ritardatario,
         "suggeriti": suggeriti,
-        "punteggio": punteggio,
-        "ultima_estrazione": ultima_estrazione
+        "indice_pressione": indice_pressione
     }
-
-
-@app.route("/")
-def home():
-    return "Backend Lotto Statistiche attivo"
 
 
 @app.route("/api")
 def api():
-    try:
-        dati = carica_dati()
+    dati = carica_dati()
+    risultato = {}
 
-        risultato = {}
-        punteggi = {}
+    for ruota, estrazioni in dati.items():
+        risultato[ruota] = analizza_ruota(estrazioni)
 
-        for ruota, estrazioni in dati.items():
-            analisi = analizza_ruota(estrazioni)
-            risultato[ruota] = analisi
-            punteggi[ruota] = analisi["punteggio"]
+    return jsonify(risultato)
 
-        ruota_forte = max(punteggi, key=punteggi.get)
 
-        return jsonify({
-            "ruota_forte": ruota_forte,
-            "dati": risultato
-        })
-
-    except Exception as e:
-        return jsonify({"errore": str(e)}), 500
+@app.route("/")
+def home():
+    return "Backend Lotto attivo 🔥"
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=10000)
