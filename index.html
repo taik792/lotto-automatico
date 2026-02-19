@@ -1,91 +1,105 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Lotto Live Statistiche</title>
-
 <style>
 body {
-    background: #0f1115;
-    font-family: Arial, sans-serif;
+    background: #111827;
     color: white;
+    font-family: Arial;
     margin: 0;
     padding: 20px;
 }
 
 h1 {
     text-align: center;
-    color: #ff9800;
+    color: orange;
 }
 
 .card {
-    background: #1b1f27;
+    background: #1f2937;
     padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    margin: 20px 0;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
 }
 
-.caldi { color: #ff5252; }
-.freddi { color: #29b6f6; }
-.ritardo { color: #ffd54f; }
-.suggeriti { color: #00e676; font-weight: bold; }
+.ruota-forte {
+    border: 3px solid gold;
+}
+
+.caldi { color: red; }
+.freddi { color: cyan; }
+.ritardo { color: orange; }
+.giocare { color: lime; }
+.ambi { color: pink; }
 
 .pressione-bar {
-    height: 12px;
-    background: #333;
-    border-radius: 6px;
-    margin-top: 8px;
-    overflow: hidden;
-}
-
-.pressione-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ff5252, #ff9800);
-    width: 0%;
-    transition: width 0.6s ease;
+    height: 8px;
+    background: linear-gradient(to right, red, orange);
+    border-radius: 5px;
+    margin-top: 10px;
 }
 </style>
 </head>
-
 <body>
 
 <h1>🔥 Lotto Live Statistiche 🔥</h1>
-<div id="contenitore"></div>
+<div id="contenuto"></div>
 
 <script>
+
 fetch("https://lotto-statistiche.onrender.com/api")
 .then(res => res.json())
 .then(data => {
 
-    const container = document.getElementById("contenitore");
+    const container = document.getElementById("contenuto");
+    container.innerHTML = "";
 
-    Object.keys(data).forEach(ruota => {
+    const ruotaForte = data.ruota_forte;
+
+    for (let ruota in data) {
+
+        if (ruota === "ruota_forte") continue;
 
         const info = data[ruota];
 
-        const card = document.createElement("div");
-        card.className = "card";
+        const div = document.createElement("div");
+        div.className = "card";
 
-        const percentuale = Math.min(info.indice_pressione / 50 * 100, 100);
+        if (ruota === ruotaForte) {
+            div.classList.add("ruota-forte");
+        }
 
-        card.innerHTML = `
-            <h2>${ruota}</h2>
-            <p>📊 Ultima estrazione: ${info.ultima_estrazione.join(", ")}</p>
+        div.innerHTML = `
+            <h2>${ruota} ${ruota === ruotaForte ? "⭐ RUOTA FORTE" : ""}</h2>
+
+            <p>📋 Ultima estrazione: ${info.ultima_estrazione.join(", ")}</p>
+
             <p class="caldi">🔥 Caldi: ${info.caldi.join(", ")}</p>
-            <p class="freddi">❄️ Freddi: ${info.freddi.join(", ")}</p>
+            <p class="freddi">❄ Freddi: ${info.freddi.join(", ")}</p>
             <p class="ritardo">⏳ Ritardatario: ${info.ritardatario}</p>
-            <p class="suggeriti">🎯 DA GIOCARE: ${info.suggeriti.join(", ")}</p>
+
+            <p class="giocare">🎯 DA GIOCARE: ${info.da_giocare.join(", ")}</p>
+
+            <p class="ambi">💎 AMBI FORTI: 
+                ${info.ambi_forti.map(a => a[0] + "-" + a[1]).join(" | ")}
+            </p>
 
             <p>⚡ Indice di Pressione: ${info.indice_pressione}</p>
-            <div class="pressione-bar">
-                <div class="pressione-fill" style="width:${percentuale}%"></div>
-            </div>
+            <div class="pressione-bar"></div>
         `;
 
-        container.appendChild(card);
-    });
+        container.appendChild(div);
+    }
+
+})
+.catch(err => {
+    document.getElementById("contenuto").innerHTML = "Errore caricamento dati";
+    console.error(err);
 });
+
 </script>
 
 </body>
