@@ -56,16 +56,19 @@ def analizza_ruota(lista_estrazioni):
         )
 
     top_pressione = sorted(pressione.items(), key=lambda x: x[1], reverse=True)
-
     suggeriti = [n for n, _ in top_pressione[:3]]
     punteggio = sum([p for _, p in top_pressione[:3]])
+
+    # ✅ QUI PRENDIAMO L'ULTIMA ESTRAZIONE
+    ultima_estrazione = lista_estrazioni[-1]
 
     return {
         "caldi": caldi,
         "freddi": freddi,
         "ritardatario": ritardatario,
         "suggeriti": suggeriti,
-        "punteggio": punteggio
+        "punteggio": punteggio,
+        "ultima_estrazione": ultima_estrazione
     }
 
 
@@ -101,40 +104,3 @@ def api():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
