@@ -6,68 +6,76 @@
 
 <style>
 body {
-    font-family: Arial;
     background: #111;
     color: white;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.card {
+    background: #1c1c1c;
     padding: 20px;
+    margin: 15px 0;
+    border-radius: 10px;
+}
+
+.ruota-forte {
+    border: 3px solid gold;
+    box-shadow: 0 0 15px gold;
 }
 
 h1 {
     text-align: center;
+    margin-top: 20px;
 }
 
-.ruota {
-    background: #1e1e1e;
-    margin: 15px 0;
-    padding: 15px;
-    border-radius: 8px;
-}
+.caldi { color: #ff4d4d; }
+.freddi { color: #00c3ff; }
+.ritardo { color: orange; }
+.suggeriti { color: #00ff66; font-weight: bold; }
+.estrazione { color: #cccccc; }
 
-.forte {
-    border: 3px solid gold;
-}
-
-.ruota-forte-label {
+.label-forte {
     color: gold;
     font-weight: bold;
-    font-size: 14px;
 }
-
-.caldi { color: red; }
-.freddi { color: cyan; }
-.ritardo { color: orange; }
-.suggeriti { color: lime; font-size: 18px; font-weight: bold; }
 </style>
 </head>
 
 <body>
 
 <h1>🔥 Lotto Live Statistiche 🔥</h1>
-<div id="contenuto">Caricamento...</div>
+
+<div class="container" id="contenitore"></div>
 
 <script>
+
 fetch("https://lotto-statistiche.onrender.com/api")
-.then(res => res.json())
+.then(response => response.json())
 .then(data => {
 
+    const contenitore = document.getElementById("contenitore");
+    const ruotaForte = data.ruota_forte;
+    const ruote = data.dati;
+
     let html = "";
-    let ruotaForte = data.ruota_forte;
 
-    for (let ruota in data.dati) {
+    for (let ruota in ruote) {
 
-        let info = data.dati[ruota];
-        let classe = "ruota";
-        let label = "";
+        const info = ruote[ruota];
 
-        if (ruota === ruotaForte) {
-            classe += " forte";
-            label = '<div class="ruota-forte-label">⭐ RUOTA FORTE</div>';
-        }
+        const classe = ruota === ruotaForte ? "card ruota-forte" : "card";
+        const label = ruota === ruotaForte ? "<div class='label-forte'>⭐ RUOTA FORTE</div>" : "";
 
         html += `
             <div class="${classe}">
                 <h2>${ruota}</h2>
                 ${label}
+                <p class="estrazione">📊 Ultima estrazione: ${info.ultima_estrazione ? info.ultima_estrazione.join(", ") : "N/D"}</p>
                 <p class="caldi">🔥 Caldi: ${info.caldi.join(", ")}</p>
                 <p class="freddi">❄️ Freddi: ${info.freddi.join(", ")}</p>
                 <p class="ritardo">⏳ Ritardatario: ${info.ritardatario}</p>
@@ -76,11 +84,13 @@ fetch("https://lotto-statistiche.onrender.com/api")
         `;
     }
 
-    document.getElementById("contenuto").innerHTML = html;
+    contenitore.innerHTML = html;
+
 })
-.catch(() => {
-    document.getElementById("contenuto").innerHTML = "Errore caricamento dati.";
+.catch(error => {
+    console.error("Errore:", error);
 });
+
 </script>
 
 </body>
