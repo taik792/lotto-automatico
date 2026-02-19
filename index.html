@@ -6,42 +6,44 @@
 
 <style>
 body {
-    background: #111;
-    color: white;
+    background: #0f1115;
     font-family: Arial, sans-serif;
-}
-
-.container {
-    max-width: 900px;
-    margin: auto;
-}
-
-.card {
-    background: #1c1c1c;
+    color: white;
+    margin: 0;
     padding: 20px;
-    margin: 15px 0;
-    border-radius: 10px;
-}
-
-.ruota-forte {
-    border: 3px solid gold;
-    box-shadow: 0 0 15px gold;
 }
 
 h1 {
     text-align: center;
-    margin-top: 20px;
+    color: #ff9800;
 }
 
-.caldi { color: #ff4d4d; }
-.freddi { color: #00c3ff; }
-.ritardo { color: orange; }
-.suggeriti { color: #00ff66; font-weight: bold; }
-.estrazione { color: #cccccc; }
+.card {
+    background: #1b1f27;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.6);
+}
 
-.label-forte {
-    color: gold;
-    font-weight: bold;
+.caldi { color: #ff5252; }
+.freddi { color: #29b6f6; }
+.ritardo { color: #ffd54f; }
+.suggeriti { color: #00e676; font-weight: bold; }
+
+.pressione-bar {
+    height: 12px;
+    background: #333;
+    border-radius: 6px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.pressione-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff5252, #ff9800);
+    width: 0%;
+    transition: width 0.6s ease;
 }
 </style>
 </head>
@@ -49,48 +51,41 @@ h1 {
 <body>
 
 <h1>🔥 Lotto Live Statistiche 🔥</h1>
-
-<div class="container" id="contenitore"></div>
+<div id="contenitore"></div>
 
 <script>
-
 fetch("https://lotto-statistiche.onrender.com/api")
-.then(response => response.json())
+.then(res => res.json())
 .then(data => {
 
-    const contenitore = document.getElementById("contenitore");
-    const ruotaForte = data.ruota_forte;
-    const ruote = data.dati;
+    const container = document.getElementById("contenitore");
 
-    let html = "";
+    Object.keys(data).forEach(ruota => {
 
-    for (let ruota in ruote) {
+        const info = data[ruota];
 
-        const info = ruote[ruota];
+        const card = document.createElement("div");
+        card.className = "card";
 
-        const classe = ruota === ruotaForte ? "card ruota-forte" : "card";
-        const label = ruota === ruotaForte ? "<div class='label-forte'>⭐ RUOTA FORTE</div>" : "";
+        const percentuale = Math.min(info.indice_pressione / 50 * 100, 100);
 
-        html += `
-            <div class="${classe}">
-                <h2>${ruota}</h2>
-                ${label}
-                <p class="estrazione">📊 Ultima estrazione: ${info.ultima_estrazione ? info.ultima_estrazione.join(", ") : "N/D"}</p>
-                <p class="caldi">🔥 Caldi: ${info.caldi.join(", ")}</p>
-                <p class="freddi">❄️ Freddi: ${info.freddi.join(", ")}</p>
-                <p class="ritardo">⏳ Ritardatario: ${info.ritardatario}</p>
-                <p class="suggeriti">🎯 DA GIOCARE: ${info.suggeriti.join(", ")}</p>
+        card.innerHTML = `
+            <h2>${ruota}</h2>
+            <p>📊 Ultima estrazione: ${info.ultima_estrazione.join(", ")}</p>
+            <p class="caldi">🔥 Caldi: ${info.caldi.join(", ")}</p>
+            <p class="freddi">❄️ Freddi: ${info.freddi.join(", ")}</p>
+            <p class="ritardo">⏳ Ritardatario: ${info.ritardatario}</p>
+            <p class="suggeriti">🎯 DA GIOCARE: ${info.suggeriti.join(", ")}</p>
+
+            <p>⚡ Indice di Pressione: ${info.indice_pressione}</p>
+            <div class="pressione-bar">
+                <div class="pressione-fill" style="width:${percentuale}%"></div>
             </div>
         `;
-    }
 
-    contenitore.innerHTML = html;
-
-})
-.catch(error => {
-    console.error("Errore:", error);
+        container.appendChild(card);
+    });
 });
-
 </script>
 
 </body>
