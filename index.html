@@ -1,41 +1,57 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Lotto Live Statistiche</title>
-  <style>
-    body {
-      background: #0f172a;
-      color: white;
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
+<meta charset="UTF-8">
+<title>Lotto Live Statistiche</title>
 
-    h1 {
-      color: orange;
-      text-align: center;
-    }
+<style>
+body {
+  background: #0f172a;
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
 
-    .card {
-      background: #1e293b;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      border: 2px solid #334155;
-    }
+h1 {
+  color: orange;
+  text-align: center;
+}
 
-    .ruota-forte {
-      border: 2px solid gold;
-    }
+.card {
+  background: #1e293b;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 2px solid #334155;
+}
 
-    .premium-box {
-      background: #111;
-      padding: 20px;
-      border-radius: 12px;
-      border: 2px solid gold;
-    }
-  </style>
+.ruota-forte {
+  border: 2px solid gold;
+}
+
+button {
+  background: orange;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+button:hover {
+  background: gold;
+}
+
+.premium-box {
+  background: #111;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid gold;
+}
+</style>
 </head>
+
 <body>
 
 <h1>🔥 Lotto Live Statistiche 🔥</h1>
@@ -53,6 +69,20 @@
 
 const API_URL = "https://lotto-statistiche.onrender.com";
 
+function salvaAmbo(num1, num2, ruota) {
+
+  fetch(API_URL + "/salva-ambo", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ num1, num2, ruota })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert("Ambo salvato! Durata: " + data.durata_calcolata);
+    caricaGiocatePremium();
+  });
+}
+
 function caricaDati() {
   fetch(API_URL + "/api")
     .then(res => res.json())
@@ -68,11 +98,21 @@ function caricaDati() {
         if (ruota === "ruota_forte") continue;
 
         const stats = data[ruota];
-
         let classe = "card";
-        if (ruota === ruotaForte) {
-          classe += " ruota-forte";
-        }
+        if (ruota === ruotaForte) classe += " ruota-forte";
+
+        let ambiHTML = "";
+
+        stats.ambi_forti.forEach(ambo => {
+          ambiHTML += `
+            <div>
+              💎 ${ambo[0]}-${ambo[1]}
+              <button onclick="salvaAmbo(${ambo[0]}, ${ambo[1]}, '${ruota}')">
+                💾 Salva Premium
+              </button>
+            </div>
+          `;
+        });
 
         container.innerHTML += `
           <div class="${classe}">
@@ -82,17 +122,15 @@ function caricaDati() {
             <p>❄️ Freddi: ${stats.freddi.join(", ")}</p>
             <p>⏳ Ritardatario: ${stats.ritardatario}</p>
             <p>🎯 DA GIOCARE: ${stats.da_giocare.join(", ")}</p>
-            <p>💎 AMBI FORTI: ${stats.ambi_forti.map(a => a.join("-")).join(" | ")}</p>
             <p>⚡ Indice Pressione: ${stats.indice_pressione}</p>
+            <div>${ambiHTML}</div>
           </div>
         `;
       }
-
     });
 }
 
 function caricaGiocatePremium() {
-
   fetch(API_URL + "/giocate-attive")
     .then(res => res.json())
     .then(data => {
@@ -138,7 +176,6 @@ function caricaGiocatePremium() {
           </div>
         `;
       });
-
     });
 }
 
