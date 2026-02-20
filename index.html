@@ -2,57 +2,61 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live Statistiche</title>
+<title>Lotto Live Statistiche Premium</title>
 
 <style>
-body {
-    margin:0;
-    font-family:Arial;
-    background:linear-gradient(to bottom,#0f2027,#203a43,#2c5364);
-    color:white;
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(to bottom,#0f2027,#203a43,#2c5364);
+color:white;
 }
 
-h1 {
-    text-align:center;
-    padding:20px;
-    color:orange;
+h1{
+text-align:center;
+padding:20px;
+color:orange;
 }
 
-.container {
-    width:90%;
-    margin:auto;
+.container{
+width:90%;
+margin:auto;
 }
 
-.ruota {
-    border:2px solid orange;
-    border-radius:10px;
-    padding:15px;
-    margin:15px 0;
-    background:rgba(0,0,0,0.4);
+.ruota{
+border:2px solid orange;
+border-radius:10px;
+padding:15px;
+margin:15px 0;
+background:rgba(0,0,0,0.4);
 }
 
-button {
-    background:orange;
-    border:none;
-    padding:5px 10px;
-    cursor:pointer;
-    border-radius:5px;
-    margin-top:5px;
+.premium-box{
+border:2px solid gold;
+padding:15px;
+margin:20px 0;
+border-radius:10px;
+background:rgba(0,0,0,0.6);
 }
 
-.premium-box {
-    border:2px solid gold;
-    padding:15px;
-    margin:20px 0;
-    border-radius:10px;
-    background:rgba(0,0,0,0.6);
+button{
+background:orange;
+border:none;
+padding:5px 10px;
+cursor:pointer;
+border-radius:5px;
+margin-top:5px;
+}
+
+select{
+margin-top:5px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🔥 Lotto Live Statistiche 🔥</h1>
+<h1>🔥 Lotto Live Statistiche Premium 🔥</h1>
 
 <div class="container">
 
@@ -70,104 +74,137 @@ button {
 let estrazioniData = {};
 
 fetch("estrazioni.json")
-.then(response => response.json())
+.then(res => res.json())
 .then(data => {
-    estrazioniData = data;
-    generaRuote();
-})
-.catch(error => {
-    console.error("Errore caricamento JSON:", error);
+estrazioniData = data;
+generaRuote();
 });
 
-function generaRuote() {
+function generaRuote(){
 
-    const ordineRuote = [
-        "Bari",
-        "Cagliari",
-        "Firenze",
-        "Genova",
-        "Milano",
-        "Napoli",
-        "Palermo",
-        "Roma",
-        "Torino",
-        "Venezia",
-        "Nazionale"
-    ];
+const ordine = ["Bari","Cagliari","Firenze","Genova","Milano","Napoli","Palermo","Roma","Torino","Venezia","Nazionale"];
 
-    const container = document.getElementById("ruote");
-    container.innerHTML = "";
+const container = document.getElementById("ruote");
+container.innerHTML="";
 
-    ordineRuote.forEach(ruota => {
+ordine.forEach(ruota=>{
 
-        if (!estrazioniData[ruota]) return;
+if(!estrazioniData[ruota]) return;
 
-        let ultima = estrazioniData[ruota][0];
+let estrazioni = estrazioniData[ruota];
+let ultima = estrazioni[0];
 
-        let div = document.createElement("div");
-        div.className = "ruota";
+let stats = calcolaStatistiche(estrazioni);
 
-        div.innerHTML = `
-            <h3>${ruota}</h3>
-            <p>Ultima estrazione: ${ultima.join(" - ")}</p>
-            <button onclick="salvaGiocata('${ruota}', ${ultima[0]}, ${ultima[1]})">
-                Salva ambo ${ultima[0]} - ${ultima[1]}
-            </button>
-        `;
+let div = document.createElement("div");
+div.className="ruota";
 
-        container.appendChild(div);
+div.innerHTML=`
+<h3>${ruota}</h3>
+<p><b>Ultima:</b> ${ultima.join(" - ")}</p>
 
-    });
+<p><b>🔥 Caldi:</b> ${stats.caldi.join(", ")}</p>
+<p><b>❄ Freddi:</b> ${stats.freddi.join(", ")}</p>
+<p><b>⏳ Ritardo max:</b> ${stats.ritardo}</p>
+<p><b>🎯 Ambo forte:</b> ${stats.ambo[0]} - ${stats.ambo[1]}</p>
 
-    mostraGiocate();
+<select id="estrazioni_${ruota}">
+<option value="5">5 estrazioni</option>
+<option value="10">10 estrazioni</option>
+<option value="15">15 estrazioni</option>
+<option value="20">20 estrazioni</option>
+</select>
+
+<br>
+
+<button onclick="salvaGiocata('${ruota}',${stats.ambo[0]},${stats.ambo[1]})">
+Salva ambo forte
+</button>
+`;
+
+container.appendChild(div);
+
+});
+
+mostraGiocate();
 }
 
-function salvaGiocata(ruota, n1, n2) {
+function calcolaStatistiche(lista){
 
-    let giocate = JSON.parse(localStorage.getItem("giocate")) || [];
+let freq = {};
+let ultimi100 = lista.slice(0,100);
 
-    giocate.push({
-        ruota: ruota,
-        num1: n1,
-        num2: n2
-    });
+ultimi100.forEach(estr=>{
+estr.forEach(n=>{
+freq[n]=(freq[n]||0)+1;
+});
+});
 
-    localStorage.setItem("giocate", JSON.stringify(giocate));
+let numeri = Object.keys(freq).map(n=>({n:parseInt(n),f:freq[n]}));
 
-    mostraGiocate();
+numeri.sort((a,b)=>b.f-a.f);
+let caldi = numeri.slice(0,3).map(x=>x.n);
+
+numeri.sort((a,b)=>a.f-b.f);
+let freddi = numeri.slice(0,3).map(x=>x.n);
+
+let ritardo = freddi[0];
+
+return{
+caldi:caldi,
+freddi:freddi,
+ritardo:ritardo,
+ambo:[caldi[0],caldi[1]]
+};
 }
 
-function mostraGiocate() {
+function salvaGiocata(ruota,n1,n2){
 
-    let box = document.getElementById("giocatePremium");
-    let giocate = JSON.parse(localStorage.getItem("giocate")) || [];
+let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
 
-    if (giocate.length === 0) {
-        box.innerHTML = "Nessuna giocata attiva";
-        return;
-    }
+let selettore = document.getElementById("estrazioni_"+ruota);
+let durata = parseInt(selettore.value);
 
-    box.innerHTML = "";
+giocate.push({
+ruota:ruota,
+num1:n1,
+num2:n2,
+restanti:durata
+});
 
-    giocate.forEach((g, index) => {
-        box.innerHTML += `
-            <div>
-                ${g.ruota} → ${g.num1} - ${g.num2}
-                <button onclick="rimuoviGiocata(${index})">X</button>
-            </div>
-        `;
-    });
+localStorage.setItem("giocate",JSON.stringify(giocate));
+
+mostraGiocate();
 }
 
-function rimuoviGiocata(index) {
+function mostraGiocate(){
 
-    let giocate = JSON.parse(localStorage.getItem("giocate")) || [];
+let box = document.getElementById("giocatePremium");
+let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
 
-    giocate.splice(index, 1);
+if(giocate.length===0){
+box.innerHTML="Nessuna giocata attiva";
+return;
+}
 
-    localStorage.setItem("giocate", JSON.stringify(giocate));
+box.innerHTML="";
 
-    mostraGiocate();
+giocate.forEach((g,i)=>{
+box.innerHTML+=`
+<div>
+${g.ruota} → ${g.num1}-${g.num2} 
+(ancora ${g.restanti} estr.)
+<button onclick="rimuoviGiocata(${i})">X</button>
+</div>
+`;
+});
+}
+
+function rimuoviGiocata(i){
+let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
+giocate.splice(i,1);
+localStorage.setItem("giocate",JSON.stringify(giocate));
+mostraGiocate();
 }
 
 </script>
