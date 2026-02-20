@@ -48,6 +48,7 @@ button:hover {
     padding: 20px;
     border-radius: 12px;
     border: 2px solid gold;
+    margin-top: 30px;
 }
 </style>
 </head>
@@ -66,12 +67,13 @@ button:hover {
 </div>
 
 <script>
+
 const API_URL = "https://lotto-statistiche.onrender.com";
 
-async function caricaDati() {
-    try {
-        const res = await fetch(API_URL + "/api");
-        const data = await res.json();
+function caricaDati() {
+    fetch(API_URL + "/api")
+    .then(res => res.json())
+    .then(data => {
 
         const container = document.getElementById("contenuto");
         container.innerHTML = "";
@@ -79,9 +81,11 @@ async function caricaDati() {
         const ruotaForte = data.ruota_forte;
 
         for (let ruota in data) {
+
             if (ruota === "ruota_forte") continue;
 
             const stats = data[ruota];
+
             let classe = "card";
             if (ruota === ruotaForte) classe += " ruota-forte";
 
@@ -91,8 +95,8 @@ async function caricaDati() {
                 ambiHTML += `
                     <div>
                         ${ambo[0]} - ${ambo[1]}
-                        <button onclick="salvaGiocata('${ambo[0]}','${ambo[1]}','${ruota}')">
-                            💎 Salva Premium
+                        <button onclick="salvaGiocata(${ambo[0]}, ${ambo[1]}, '${ruota}')">
+                            💾 Salva Premium
                         </button>
                     </div>
                 `;
@@ -100,49 +104,46 @@ async function caricaDati() {
 
             container.innerHTML += `
                 <div class="${classe}">
-                    <h2>${ruota} ${ruota === ruotaForte ? "⭐ RUOTA FORTE" : ""}</h2>
-                    <p>🔥 Caldi: ${stats.caldi.join(", ")}</p>
-                    <p>❄️ Freddi: ${stats.freddi.join(", ")}</p>
-                    <p>⏳ Ritardatario: ${stats.ritardatario}</p>
+                    <h2>${ruota}</h2>
+                    <p><b>Ultima:</b> ${stats.ultima_estrazione.join(", ")}</p>
+                    <p><b>Caldi:</b> ${stats.caldi.join(", ")}</p>
+                    <p><b>Freddi:</b> ${stats.freddi.join(", ")}</p>
                     <div>${ambiHTML}</div>
                 </div>
             `;
         }
-
-    } catch (error) {
-        console.error("Errore caricamento dati:", error);
-    }
+    })
+    .catch(error => {
+        console.error("Errore API:", error);
+    });
 }
 
-async function salvaGiocata(num1, num2, ruota) {
-    try {
-        const res = await fetch(API_URL + "/salva_giocata", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                tipo: "ambo",
-                num1: num1,
-                num2: num2,
-                ruota: ruota,
-                stato: "attivo",
-                data_attuale: new Date().toLocaleDateString(),
-                estrazioni_passate: 0
-            })
-        });
-
-        const data = await res.json();
+function salvaGiocata(num1, num2, ruota) {
+    fetch(API_URL + "/salva_giocata", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            num1: num1,
+            num2: num2,
+            ruota: ruota
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
         alert("Giocata salvata!");
         caricaGiocatePremium();
-
-    } catch (error) {
+    })
+    .catch(error => {
         console.error("Errore salvataggio:", error);
-    }
+    });
 }
 
-async function caricaGiocatePremium() {
-    try {
-        const res = await fetch(API_URL + "/giocate_attive");
-        const data = await res.json();
+function caricaGiocatePremium() {
+    fetch(API_URL + "/giocate_attive")
+    .then(res => res.json())
+    .then(data => {
 
         const container = document.getElementById("listaGiocate");
         container.innerHTML = "";
@@ -153,6 +154,7 @@ async function caricaGiocatePremium() {
         }
 
         data.forEach(g => {
+
             container.innerHTML += `
                 <div style="
                     margin-bottom:15px;
@@ -161,21 +163,22 @@ async function caricaGiocatePremium() {
                     border-radius:8px;
                     background:#1a1a1a;
                 ">
-                    <strong>${g.tipo.toUpperCase()} ${g.num1}-${g.num2}</strong><br>
-                    Ruota: ${g.ruota}<br>
-                    Data: ${g.data_attuale}<br>
+                    <strong>${g.ruota}</strong><br>
+                    Ambo: ${g.num1} - ${g.num2}<br>
                     Stato: ${g.stato}
                 </div>
             `;
         });
 
-    } catch (error) {
-        console.error("Errore caricamento premium:", error);
-    }
+    })
+    .catch(error => {
+        console.error("Errore giocate:", error);
+    });
 }
 
 caricaDati();
 caricaGiocatePremium();
+
 </script>
 
 </body>
