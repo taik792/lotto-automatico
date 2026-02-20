@@ -6,48 +6,48 @@
 
 <style>
 body {
-  background: #0f172a;
-  color: white;
-  font-family: Arial, sans-serif;
-  margin: 20px;
+    background: #0f172a;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 20px;
 }
 
 h1 {
-  color: orange;
-  text-align: center;
+    color: orange;
+    text-align: center;
 }
 
 .card {
-  background: #1e293b;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  border: 2px solid #334155;
+    background: #1e293b;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    border: 2px solid #334155;
 }
 
 .ruota-forte {
-  border: 2px solid gold;
+    border: 2px solid gold;
 }
 
 button {
-  background: orange;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 5px;
+    background: orange;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 5px;
 }
 
 button:hover {
-  background: gold;
+    background: gold;
 }
 
 .premium-box {
-  background: #111;
-  padding: 20px;
-  border-radius: 12px;
-  border: 2px solid gold;
+    background: #111;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid gold;
 }
 </style>
 </head>
@@ -61,127 +61,121 @@ button:hover {
 <hr style="margin:40px 0; border:2px solid orange;">
 
 <div class="premium-box">
-  <h2 style="color:gold;">🎯 Giocate Attive Premium</h2>
-  <div id="listaGiocate"></div>
+    <h2 style="color:gold;">🎯 Giocate Attive Premium</h2>
+    <div id="listaGiocate"></div>
 </div>
 
 <script>
-
 const API_URL = "https://lotto-statistiche.onrender.com";
 
-function salvaAmbo(num1, num2, ruota) {
+async function caricaDati() {
+    try {
+        const res = await fetch(API_URL + "/api");
+        const data = await res.json();
 
-  fetch(API_URL + "/salva-ambo", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ num1, num2, ruota })
-  })
-  .then(res => res.json())
-  .then(data => {
-    alert("Ambo salvato! Durata: " + data.durata_calcolata);
-    caricaGiocatePremium();
-  });
+        const container = document.getElementById("contenuto");
+        container.innerHTML = "";
+
+        const ruotaForte = data.ruota_forte;
+
+        for (let ruota in data) {
+            if (ruota === "ruota_forte") continue;
+
+            const stats = data[ruota];
+            let classe = "card";
+            if (ruota === ruotaForte) classe += " ruota-forte";
+
+            let ambiHTML = "";
+
+            stats.ambi_forti.forEach(ambo => {
+                ambiHTML += `
+                    <div>
+                        ${ambo[0]} - ${ambo[1]}
+                        <button onclick="salvaGiocata('${ambo[0]}','${ambo[1]}','${ruota}')">
+                            💎 Salva Premium
+                        </button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML += `
+                <div class="${classe}">
+                    <h2>${ruota} ${ruota === ruotaForte ? "⭐ RUOTA FORTE" : ""}</h2>
+                    <p>🔥 Caldi: ${stats.caldi.join(", ")}</p>
+                    <p>❄️ Freddi: ${stats.freddi.join(", ")}</p>
+                    <p>⏳ Ritardatario: ${stats.ritardatario}</p>
+                    <div>${ambiHTML}</div>
+                </div>
+            `;
+        }
+
+    } catch (error) {
+        console.error("Errore caricamento dati:", error);
+    }
 }
 
-function caricaDati() {
-  fetch(API_URL + "/api")
-    .then(res => res.json())
-    .then(data => {
-
-      const container = document.getElementById("contenuto");
-      container.innerHTML = "";
-
-      const ruotaForte = data.ruota_forte;
-
-      for (let ruota in data) {
-
-        if (ruota === "ruota_forte") continue;
-
-        const stats = data[ruota];
-        let classe = "card";
-        if (ruota === ruotaForte) classe += " ruota-forte";
-
-        let ambiHTML = "";
-
-        stats.ambi_forti.forEach(ambo => {
-          ambiHTML += `
-            <div>
-              💎 ${ambo[0]}-${ambo[1]}
-              <button onclick="salvaAmbo(${ambo[0]}, ${ambo[1]}, '${ruota}')">
-                💾 Salva Premium
-              </button>
-            </div>
-          `;
+async function salvaGiocata(num1, num2, ruota) {
+    try {
+        const res = await fetch(API_URL + "/salva_giocata", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                tipo: "ambo",
+                num1: num1,
+                num2: num2,
+                ruota: ruota,
+                stato: "attivo",
+                data_attuale: new Date().toLocaleDateString(),
+                estrazioni_passate: 0
+            })
         });
 
-        container.innerHTML += `
-          <div class="${classe}">
-            <h2>${ruota} ${ruota === ruotaForte ? "⭐ RUOTA FORTE" : ""}</h2>
-            <p>Ultima estrazione: ${stats.ultima_estrazione.join(", ")}</p>
-            <p>🔥 Caldi: ${stats.caldi.join(", ")}</p>
-            <p>❄️ Freddi: ${stats.freddi.join(", ")}</p>
-            <p>⏳ Ritardatario: ${stats.ritardatario}</p>
-            <p>🎯 DA GIOCARE: ${stats.da_giocare.join(", ")}</p>
-            <p>⚡ Indice Pressione: ${stats.indice_pressione}</p>
-            <div>${ambiHTML}</div>
-          </div>
-        `;
-      }
-    });
+        const data = await res.json();
+        alert("Giocata salvata!");
+        caricaGiocatePremium();
+
+    } catch (error) {
+        console.error("Errore salvataggio:", error);
+    }
 }
 
-function caricaGiocatePremium() {
-  fetch(API_URL + "/giocate-attive")
-    .then(res => res.json())
-    .then(data => {
+async function caricaGiocatePremium() {
+    try {
+        const res = await fetch(API_URL + "/giocate_attive");
+        const data = await res.json();
 
-      const container = document.getElementById("listaGiocate");
-      container.innerHTML = "";
+        const container = document.getElementById("listaGiocate");
+        container.innerHTML = "";
 
-      if (!data || data.length === 0) {
-        container.innerHTML = "<p>Nessuna giocata attiva</p>";
-        return;
-      }
-
-      data.forEach(g => {
-
-        let colore = "lime";
-        let statoTesto = "ATTIVO";
-
-        if (g.stato === "scaduto") {
-          colore = "red";
-          statoTesto = "SCADUTO";
+        if (!data || data.length === 0) {
+            container.innerHTML = "<p>Nessuna giocata attiva</p>";
+            return;
         }
 
-        if (g.stato === "uscito") {
-          colore = "gold";
-          statoTesto = "USCITO 💰";
-        }
+        data.forEach(g => {
+            container.innerHTML += `
+                <div style="
+                    margin-bottom:15px;
+                    padding:15px;
+                    border:2px solid lime;
+                    border-radius:8px;
+                    background:#1a1a1a;
+                ">
+                    <strong>${g.tipo.toUpperCase()} ${g.num1}-${g.num2}</strong><br>
+                    Ruota: ${g.ruota}<br>
+                    Data: ${g.data_attuale}<br>
+                    Stato: ${g.stato}
+                </div>
+            `;
+        });
 
-        container.innerHTML += `
-          <div style="
-            margin-bottom:15px;
-            padding:15px;
-            border:2px solid ${colore};
-            border-radius:8px;
-            background:#1a1a1a;
-          ">
-            <strong>${g.tipo.toUpperCase()} ${g.num1}-${g.num2}</strong><br>
-            Ruota: ${g.ruota}<br>
-            Durata: ${g.durata_attuale}<br>
-            Passate: ${g.estrazioni_passate}<br>
-            <span style="color:${colore}; font-weight:bold;">
-              Stato: ${statoTesto}
-            </span>
-          </div>
-        `;
-      });
-    });
+    } catch (error) {
+        console.error("Errore caricamento premium:", error);
+    }
 }
 
 caricaDati();
 caricaGiocatePremium();
-
 </script>
 
 </body>
