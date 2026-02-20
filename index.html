@@ -2,114 +2,136 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live Premium Evoluto</title>
+<title>Lotto Live – Premium Evoluto</title>
+
 <style>
-body { font-family: Arial; background:#111; color:white; text-align:center; }
-button { padding:10px 20px; margin:5px; font-size:16px; cursor:pointer; }
-.box { background:#1e1e1e; padding:15px; margin:15px auto; width:80%; border-radius:10px; }
-.vinta { color:#00ff88; font-weight:bold; }
-.persa { color:#ff4444; font-weight:bold; }
+body{
+    background:#111;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+button{
+    padding:10px 20px;
+    margin:10px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+#box{
+    margin-top:30px;
+    padding:20px;
+    background:#222;
+    border-radius:10px;
+    width:60%;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+#storicoBox{
+    margin-top:20px;
+    font-size:14px;
+}
 </style>
 </head>
+
 <body>
 
 <h1>🎯 Lotto Live – Premium Evoluto</h1>
 
-<button onclick="generaPrevisione()">Genera Previsione</button>
+<button onclick="generaNuovaPrevisione()">Genera Previsione</button>
 <button onclick="simulaEstrazione()">Simula Estrazione</button>
 
-<div class="box" id="previsioneBox"></div>
-
-<hr>
-
-<h2>📊 Statistiche Sistema</h2>
-<div id="percentualeBox"></div>
-<br>
-<div id="storicoBox"></div>
+<div id="box">
+    <h2>📊 Statistiche Sistema</h2>
+    <div id="percentualeBox">Percentuale Successo: 0%</div>
+    <div id="storicoBox"></div>
+</div>
 
 <script>
 
+// ===== CARICAMENTO INIZIALE =====
+document.addEventListener("DOMContentLoaded", function () {
+    mostraStorico();
+    aggiornaPercentuale();
+});
+
 // ===== GENERA PREVISIONE =====
+function generaNuovaPrevisione() {
 
-function generaPrevisione() {
-
-    let numeri = [];
-    while(numeri.length < 2){
-        let n = Math.floor(Math.random()*90)+1;
-        if(!numeri.includes(n)) numeri.push(n);
-    }
-
-    let predizione = {
-        numeri: numeri,
-        ruota: "Nazionale",
+    let previsione = {
+        numeri: [
+            Math.floor(Math.random()*90)+1,
+            Math.floor(Math.random()*90)+1
+        ],
+        ruota: "Bari",
         durata: 8,
         estrazioniRestanti: 8,
-        vinta: false,
-        dataInizio: new Date().toISOString()
+        vinta: false
     };
 
-    localStorage.setItem("predizioneLotto", JSON.stringify(predizione));
-    aggiornaUI();
+    localStorage.setItem("previsioneAttiva", JSON.stringify(previsione));
+
+    alert("Nuova previsione generata: " + previsione.numeri.join(" - "));
 }
+
 
 // ===== SIMULA ESTRAZIONE =====
+function simulaEstrazione() {
 
-function simulaEstrazione(){
+    let previsione = JSON.parse(localStorage.getItem("previsioneAttiva"));
 
-    let predizione = JSON.parse(localStorage.getItem("predizioneLotto"));
-    if(!predizione) return alert("Genera prima una previsione");
-
-    if(predizione.vinta) return alert("Già vinta");
-
-    let estratti = [];
-    while(estratti.length < 5){
-        let n = Math.floor(Math.random()*90)+1;
-        if(!estratti.includes(n)) estratti.push(n);
+    if (!previsione) {
+        alert("Genera prima una previsione!");
+        return;
     }
 
-    let colpiti = predizione.numeri.filter(n => estratti.includes(n));
+    previsione.estrazioniRestanti--;
 
-    if(colpiti.length >= 2){
-        predizione.vinta = true;
-        salvaStorico(predizione);
-        alert("🎉 AMBO VINCENTE!");
-    } else {
-        predizione.estrazioniRestanti--;
-        if(predizione.estrazioniRestanti <= 0){
-            salvaStorico(predizione);
-            evolviSistema(predizione);
-        }
+    // Probabilità vincita simulata 20%
+    if (Math.random() < 0.2) {
+        previsione.vinta = true;
+        alert("🎉 AMBO USCITO!");
+        salvaStorico(previsione);
+        localStorage.removeItem("previsioneAttiva");
     }
 
-    localStorage.setItem("predizioneLotto", JSON.stringify(predizione));
-    aggiornaUI();
+    if (!previsione.vinta && previsione.estrazioniRestanti <= 0) {
+        salvaStorico(previsione);
+        evolviSistema(previsione);
+    } else if (!previsione.vinta) {
+        localStorage.setItem("previsioneAttiva", JSON.stringify(previsione));
+    }
+
+    mostraStorico();
+    aggiornaPercentuale();
 }
 
+
 // ===== EVOLUZIONE AUTOMATICA =====
+function evolviSistema(predizione) {
 
-function evolviSistema(predizione){
-
-    if(predizione.vinta) return;
-
-    if(predizione.durata === 8){
+    if (predizione.durata === 8) {
         predizione.durata = 12;
-    } else if(predizione.durata === 12){
+    } else if (predizione.durata === 12) {
         predizione.durata = 16;
     } else {
-        generaPrevisione();
+        generaNuovaPrevisione();
         return;
     }
 
     predizione.estrazioniRestanti = predizione.durata;
-    predizione.dataInizio = new Date().toISOString();
+    predizione.vinta = false;
 
-    localStorage.setItem("predizioneLotto", JSON.stringify(predizione));
-    alert("🔄 Sistema evoluto a " + predizione.durata + " estrazioni");
+    localStorage.setItem("previsioneAttiva", JSON.stringify(predizione));
+
+    alert("Sistema evoluto a durata " + predizione.durata);
 }
 
-// ===== STORICO =====
 
-function salvaStorico(predizione){
+// ===== SALVA STORICO =====
+function salvaStorico(predizione) {
 
     let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
 
@@ -124,61 +146,49 @@ function salvaStorico(predizione){
     localStorage.setItem("storicoLotto", JSON.stringify(storico));
 }
 
-// ===== PERCENTUALE =====
-
-function calcolaPercentuale(){
-
-    let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
-    if(storico.length === 0) return 0;
-
-    let vinte = storico.filter(s => s.esito === "VINTA").length;
-    return ((vinte / storico.length) * 100).toFixed(1);
-}
-
-// ===== UI =====
-
-function aggiornaUI(){
-
-    let predizione = JSON.parse(localStorage.getItem("predizioneLotto"));
-    let box = document.getElementById("previsioneBox");
-
-    if(predizione){
-        box.innerHTML = `
-        <h3>Previsione Attiva</h3>
-        Numeri: ${predizione.numeri.join(", ")}<br>
-        Durata: ${predizione.durata} estrazioni<br>
-        Restanti: ${predizione.estrazioniRestanti}<br>
-        Stato: ${predizione.vinta ? "<span class='vinta'>VINTA</span>" : "<span class='persa'>IN CORSO</span>"}
-        `;
-    }
-
-    document.getElementById("percentualeBox").innerHTML =
-        "Percentuale Successo: " + calcolaPercentuale() + "%";
-
-    mostraStorico();
-}
 
 // ===== MOSTRA STORICO =====
-
-function mostraStorico(){
+function mostraStorico() {
 
     let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
     let box = document.getElementById("storicoBox");
 
     box.innerHTML = "<h3>Storico Sistema</h3>";
 
+    if (storico.length === 0) {
+        box.innerHTML += "<p>Nessuna giocata registrata.</p>";
+        return;
+    }
+
     storico.slice().reverse().forEach(s => {
         box.innerHTML += `
-            <div>
-                ${s.data} - ${s.ruota} - ${s.numeri.join(", ")} 
-                <strong>${s.esito}</strong>
+            <div style="margin:5px;">
+                ${s.data} | ${s.ruota} | ${s.numeri.join(", ")} 
+                <strong style="color:${s.esito==="VINTA"?"lime":"red"}">
+                ${s.esito}
+                </strong>
             </div>
         `;
     });
 }
 
-aggiornaUI();
+
+// ===== PERCENTUALE SUCCESSO =====
+function aggiornaPercentuale() {
+
+    let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
+
+    let vinte = storico.filter(s => s.esito === "VINTA").length;
+
+    let percentuale = storico.length === 0 
+        ? 0 
+        : ((vinte / storico.length) * 100).toFixed(1);
+
+    document.getElementById("percentualeBox").innerHTML =
+        "Percentuale Successo: " + percentuale + "%";
+}
 
 </script>
+
 </body>
 </html>
