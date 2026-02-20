@@ -1,157 +1,105 @@
-from flask import Flask, jsonify, request, g
-import sqlite3
+from flask import Flask, jsonify
+from flask_cors import CORS
+import json
 import os
+from collections import Counter
 
 app = Flask(__name__)
+CORS(app)
 
-DATABASE = 'lotto.db'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FILE_ESTRAZIONI = os.path.join(BASE_DIR, "estrazioni.json")
 
-# ===============================
-# DATABASE
-# ===============================
+FINESTRA_50 = 50
+FINESTRA_100 = 100
 
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-        db.row_factory = sqlite3.Row
-    return db
+def carica_dati():
+    with open(FILE_ESTRAZIONI, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+def analizza_ruota(lista_estrazioni):
 
-def init_db():
-    db = get_db()
-    db.execute("""
-        CREATE TABLE IF NOT EXISTS giocate_attive (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            tipo TEXT,
-            num1 INTEGER,
-            num2 INTEGER,
-            ruota TEXT,
-            durata_attuale INTEGER,
-            estrazioni_passate INTEGER,
-            stato TEXT,
-            data_creazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    db.commit()
+    tutte = []
+    for estrazione in lista_estrazioni:
+        tutte.extend(estrazione)
 
-@app.before_request
-def initialize():
-    init_db()
+    freq_totale = Counter(tutte)
 
-# ===============================
-# FUNZIONE DURATA DINAMICA AMBO
-# ===============================
+    ultimi_50 = tutte[-FINESTRA_50:]
+    ultimi_100 = tutte[-FINESTRA_100:]
 
-def calcola_durata_ambo(num1, num2, ruota):
-    # QUI DENTRO POI METTI LA TUA FORMULA VERA
-    indice = (num1 + num2) % 7 + 2   # placeholder intelligente
-    if indice < 2:
-        indice = 2
-    if indice > 8:
-        indice = 8
-    return indice
+    freq_50 = Counter(ultimi_50)
+    freq_100 = Counter(ultimi_100)
 
-# ===============================
-# SALVA GIOCATA
-# ===============================
+    # Caldi
+    caldi = [n for n, _ in freq_50.most_common(5)]
 
-@app.route("/salva-ambo", methods=["POST"])
-def salva_ambo():
-    data = request.json
+    # Freddi
+    freddi = [n for n, _ in freq_50.most_common()[:-6:-1]]
 
-    num1 = data["num1"]
-    num2 = data["num2"]
-    ruota = data["ruota"]
+    # Ritardatario
+    ritardi = {}
+    for numero in range(1, 91):
+        ritardo = 0
+        for estrazione in reversed(lista_estrazioni):
+            if numero in estrazione:
+                break
+            ritardo += 1
+        ritardi[numero] = ritardo
 
-    durata = calcola_durata_ambo(num1, num2, ruota)
+    ritardatario = max(ritardi, key=ritardi.get)
 
-    db = get_db()
-    db.execute("""
-        INSERT INTO giocate_attive 
-        (tipo, num1, num2, ruota, durata_attuale, estrazioni_passate, stato)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, ("ambo", num1, num2, ruota, durata, 0, "attivo"))
+    # 3 numeri da giocare
+    suggeriti = list(set(caldi[:2] + [ritardatario]))[:3]
 
-    db.commit()
+    # Sistema Ambi forti (caldo + ritardatario)
+    ambi = []
+    for caldo in caldi[:3]:
+        ambi.append((caldo, ritardatario))
 
-    return jsonify({
-        "messaggio": "Ambo salvato",
-        "durata_calcolata": durata
-    })
+    # Indice pressione
+    indice_pressione = sum(freq_50.values()) + sum(freq_100.values()) + ritardi[ritardatario]
 
-# ===============================
-# AGGIORNA GIOCATE (SIMULAZIONE)
-# ===============================
+    ultima_estrazione = lista_estrazioni[-1] if lista_estrazioni else []
 
-@app.route("/aggiorna-giocate", methods=["POST"])
-def aggiorna_giocate():
-    estrazione = request.json   # {"Roma": [12,45,33,10,88]}
+    return {
+        "caldi": caldi,
+        "freddi": freddi,
+        "ritardatario": ritardatario,
+        "da_giocare": suggeriti,
+        "ambi_forti": ambi,
+        "indice_pressione": indice_pressione,
+        "ultima_estrazione": ultima_estrazione
+    }
 
-    db = get_db()
-    giocate = db.execute(
-        "SELECT * FROM giocate_attive WHERE stato='attivo'"
-    ).fetchall()
+@app.route("/api")
+def api():
 
-    for g in giocate:
-        numeri_ruota = estrazione.get(g["ruota"], [])
+    dati = carica_dati()
+    risultato = {}
 
-        # Controllo uscita
-        if g["num1"] in numeri_ruota and g["num2"] in numeri_ruota:
-            db.execute("""
-                UPDATE giocate_attive
-                SET stato=?
-                WHERE id=?
-            """, ("uscito", g["id"]))
-            continue
+    pressione_massima = 0
+    ruota_forte = ""
 
-        # Durata dinamica
-        nuova_durata = calcola_durata_ambo(g["num1"], g["num2"], g["ruota"])
-        nuove_passate = g["estrazioni_passate"] + 1
+    for ruota, estrazioni in dati.items():
 
-        stato = "attivo"
-        if nuove_passate >= nuova_durata:
-            stato = "scaduto"
+        stats = analizza_ruota(estrazioni)
 
-        db.execute("""
-            UPDATE giocate_attive
-            SET durata_attuale=?, estrazioni_passate=?, stato=?
-            WHERE id=?
-        """, (nuova_durata, nuove_passate, stato, g["id"]))
+        risultato[ruota] = stats
 
-    db.commit()
+        if stats["indice_pressione"] > pressione_massima:
+            pressione_massima = stats["indice_pressione"]
+            ruota_forte = ruota
 
-    return jsonify({"messaggio": "Giocate aggiornate"})
+    # Segna ruota forte
+    risultato["ruota_forte"] = ruota_forte
 
-# ===============================
-# VEDI GIOCATE ATTIVE
-# ===============================
-
-@app.route("/giocate-attive")
-def giocate_attive():
-    db = get_db()
-    giocate = db.execute(
-        "SELECT * FROM giocate_attive ORDER BY id DESC"
-    ).fetchall()
-    return jsonify([dict(g) for g in giocate])
-
-# ===============================
-# TEST BASE
-# ===============================
+    return jsonify(risultato)
 
 @app.route("/")
 def home():
-    return jsonify({"status": "Backend Lotto Live attivo"})
-
-# ===============================
-# AVVIO
-# ===============================
+    return "Backend Lotto Statistiche attivo"
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
