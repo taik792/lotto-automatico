@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import json
 import os
 from datetime import datetime
 
 app = Flask(__name__)
+CORS(app)  # 🔥 Permette richieste da GitHub Pages
 
 GIOCATE_FILE = "/tmp/giocate.json"
 
@@ -25,12 +27,12 @@ def salva_giocate(data):
         json.dump(data, f, indent=4)
 
 # -------------------------
-# SALVA PREMIUM (POST)
+# SALVA PREMIUM
 # -------------------------
 @app.route("/salva-premium", methods=["POST"])
 def salva_premium():
     data = request.json
-    
+
     nuova = {
         "tipo": data["tipo"],
         "numeri": data["numeri"],
@@ -83,13 +85,13 @@ def giocate_attive():
 @app.route("/aggiorna-estrazione", methods=["POST"])
 def aggiorna_estrazione():
     estrazione = request.json  # {"ruota": "Venezia", "numeri": [10,20,30,40,50]}
-    
+
     giocate = carica_giocate()
 
     for g in giocate:
         if g["stato"] == "ATTIVO" and g["ruota"] == estrazione["ruota"]:
-            
-            # Controllo vincita (per ambo)
+
+            # Controllo vincita
             if all(num in estrazione["numeri"] for num in g["numeri"]):
                 g["stato"] = "VINCENTE"
             else:
@@ -101,7 +103,15 @@ def aggiorna_estrazione():
     return jsonify({"ok": True})
 
 # -------------------------
+# HOME
+# -------------------------
+@app.route("/")
+def home():
+    return "Backend Lotto Premium Attivo"
+
+# -------------------------
 # AVVIO
 # -------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
