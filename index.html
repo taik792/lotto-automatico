@@ -29,7 +29,7 @@ button{
 }
 
 .stat{
-    margin:5px;
+    margin:6px;
 }
 </style>
 </head>
@@ -49,33 +49,39 @@ button{
 
 <script>
 
-let estrazioniGlobali = [];
+let estrazioniGlobali = {};
 
 // ===== CARICA JSON =====
 fetch("estrazioni.json")
 .then(res => res.json())
 .then(data => {
     estrazioniGlobali = data;
+    console.log("JSON caricato correttamente");
 })
 .catch(err => {
     alert("Errore caricamento estrazioni.json");
 });
 
 
-// ===== ANALISI =====
+// ===== ANALISI RUOTA =====
 function analizzaRuota(ruota){
 
-    let ultime = estrazioniGlobali.slice(-50);
+    let datiRuota = estrazioniGlobali[ruota];
+
+    if(!datiRuota){
+        alert("Ruota non trovata");
+        return {caldi:[], freddi:[]};
+    }
+
+    let ultime = datiRuota.slice(-50);
     let conteggio = {};
 
     for(let i=1;i<=90;i++) conteggio[i]=0;
 
-    ultime.forEach(e=>{
-        if(e.ruote[ruota]){
-            e.ruote[ruota].forEach(n=>{
-                conteggio[n]++;
-            });
-        }
+    ultime.forEach(estrazione=>{
+        estrazione.forEach(numero=>{
+            conteggio[numero]++;
+        });
     });
 
     let ordinati = Object.entries(conteggio)
@@ -88,17 +94,17 @@ function analizzaRuota(ruota){
 }
 
 
-// ===== GENERA PREVISIONE AI =====
+// ===== GENERA PREVISIONE =====
 function generaPrevisione(){
 
-    if(estrazioniGlobali.length===0){
-        alert("JSON non ancora caricato");
+    let ruote = Object.keys(estrazioniGlobali);
+
+    if(ruote.length===0){
+        alert("JSON non caricato ancora");
         return;
     }
 
-    let ruote = Object.keys(estrazioniGlobali[0].ruote);
     let ruotaScelta = ruote[Math.floor(Math.random()*ruote.length)];
-
     let analisi = analizzaRuota(ruotaScelta);
 
     let numeri = [
@@ -129,10 +135,14 @@ function generaPrevisione(){
 function simulaEstrazione(){
 
     let previsione = JSON.parse(localStorage.getItem("previsioneAttiva"));
-    if(!previsione) return alert("Genera prima previsione");
+    if(!previsione){
+        alert("Genera prima una previsione");
+        return;
+    }
 
     previsione.estrazioniRestanti--;
 
+    // Simulazione vincita 25%
     if(Math.random()<0.25){
         previsione.vinta=true;
         alert("🎉 AMBO USCITO!");
@@ -143,7 +153,8 @@ function simulaEstrazione(){
     if(!previsione.vinta && previsione.estrazioniRestanti<=0){
         salvaStorico(previsione);
         evolviSistema(previsione);
-    } else if(!previsione.vinta){
+    } 
+    else if(!previsione.vinta){
         localStorage.setItem("previsioneAttiva", JSON.stringify(previsione));
     }
 
@@ -152,18 +163,21 @@ function simulaEstrazione(){
 }
 
 
-// ===== EVOLUZIONE =====
+// ===== EVOLUZIONE AUTOMATICA =====
 function evolviSistema(p){
 
     if(p.durata===8) p.durata=12;
     else if(p.durata===12) p.durata=16;
-    else return generaPrevisione();
+    else{
+        generaPrevisione();
+        return;
+    }
 
     p.estrazioniRestanti=p.durata;
     p.vinta=false;
 
     localStorage.setItem("previsioneAttiva", JSON.stringify(p));
-    alert("Sistema evoluto a "+p.durata);
+    alert("Sistema evoluto a durata "+p.durata);
 }
 
 
@@ -191,6 +205,11 @@ function mostraStorico(){
 
     box.innerHTML="<h3>Storico</h3>";
 
+    if(storico.length===0){
+        box.innerHTML+="<p>Nessuna giocata registrata.</p>";
+        return;
+    }
+
     storico.slice().reverse().forEach(s=>{
         box.innerHTML+=`
         <div>
@@ -208,6 +227,7 @@ function aggiornaPercentuale(){
 
     let storico=JSON.parse(localStorage.getItem("storicoLotto"))||[];
     let vinte=storico.filter(s=>s.esito==="VINTA").length;
+
     let perc=storico.length===0?0:
         ((vinte/storico.length)*100).toFixed(1);
 
@@ -215,6 +235,8 @@ function aggiornaPercentuale(){
         "Percentuale Successo: "+perc+"%";
 }
 
+
+// ===== CARICAMENTO INIZIALE =====
 document.addEventListener("DOMContentLoaded",()=>{
     mostraStorico();
     aggiornaPercentuale();
