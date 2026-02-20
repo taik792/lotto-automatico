@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live – Premium Evoluto</title>
+<title>Lotto Live – Premium AI</title>
 
 <style>
 body{
@@ -24,83 +24,126 @@ button{
     padding:20px;
     background:#222;
     border-radius:10px;
-    width:60%;
-    margin-left:auto;
-    margin-right:auto;
+    width:70%;
+    margin:auto;
 }
 
-#storicoBox{
-    margin-top:20px;
-    font-size:14px;
+.stat{
+    margin:5px;
 }
 </style>
 </head>
-
 <body>
 
-<h1>🎯 Lotto Live – Premium Evoluto</h1>
+<h1>🎯 Lotto Live – Premium AI</h1>
 
-<button onclick="generaNuovaPrevisione()">Genera Previsione</button>
+<button onclick="generaPrevisione()">Genera Previsione AI</button>
 <button onclick="simulaEstrazione()">Simula Estrazione</button>
 
 <div id="box">
     <h2>📊 Statistiche Sistema</h2>
     <div id="percentualeBox">Percentuale Successo: 0%</div>
+    <div id="analisiBox"></div>
     <div id="storicoBox"></div>
 </div>
 
 <script>
 
-// ===== CARICAMENTO INIZIALE =====
-document.addEventListener("DOMContentLoaded", function () {
-    mostraStorico();
-    aggiornaPercentuale();
+let estrazioniGlobali = [];
+
+// ===== CARICA JSON =====
+fetch("estrazioni.json")
+.then(res => res.json())
+.then(data => {
+    estrazioniGlobali = data;
+})
+.catch(err => {
+    alert("Errore caricamento estrazioni.json");
 });
 
-// ===== GENERA PREVISIONE =====
-function generaNuovaPrevisione() {
+
+// ===== ANALISI =====
+function analizzaRuota(ruota){
+
+    let ultime = estrazioniGlobali.slice(-50);
+    let conteggio = {};
+
+    for(let i=1;i<=90;i++) conteggio[i]=0;
+
+    ultime.forEach(e=>{
+        if(e.ruote[ruota]){
+            e.ruote[ruota].forEach(n=>{
+                conteggio[n]++;
+            });
+        }
+    });
+
+    let ordinati = Object.entries(conteggio)
+        .sort((a,b)=>b[1]-a[1]);
+
+    let caldi = ordinati.slice(0,5).map(x=>parseInt(x[0]));
+    let freddi = ordinati.slice(-5).map(x=>parseInt(x[0]));
+
+    return {caldi, freddi};
+}
+
+
+// ===== GENERA PREVISIONE AI =====
+function generaPrevisione(){
+
+    if(estrazioniGlobali.length===0){
+        alert("JSON non ancora caricato");
+        return;
+    }
+
+    let ruote = Object.keys(estrazioniGlobali[0].ruote);
+    let ruotaScelta = ruote[Math.floor(Math.random()*ruote.length)];
+
+    let analisi = analizzaRuota(ruotaScelta);
+
+    let numeri = [
+        analisi.caldi[0],
+        analisi.freddi[0]
+    ];
 
     let previsione = {
-        numeri: [
-            Math.floor(Math.random()*90)+1,
-            Math.floor(Math.random()*90)+1
-        ],
-        ruota: "Bari",
+        numeri,
+        ruota: ruotaScelta,
         durata: 8,
         estrazioniRestanti: 8,
-        vinta: false
+        vinta:false
     };
 
     localStorage.setItem("previsioneAttiva", JSON.stringify(previsione));
 
-    alert("Nuova previsione generata: " + previsione.numeri.join(" - "));
+    document.getElementById("analisiBox").innerHTML = `
+        <div class="stat">Ruota: ${ruotaScelta}</div>
+        <div class="stat">Caldi: ${analisi.caldi.join(", ")}</div>
+        <div class="stat">Freddi: ${analisi.freddi.join(", ")}</div>
+        <div class="stat"><strong>Previsione: ${numeri.join(" - ")}</strong></div>
+    `;
 }
 
 
 // ===== SIMULA ESTRAZIONE =====
-function simulaEstrazione() {
+function simulaEstrazione(){
 
     let previsione = JSON.parse(localStorage.getItem("previsioneAttiva"));
-
-    if (!previsione) {
-        alert("Genera prima una previsione!");
-        return;
-    }
+    if(!previsione) return alert("Genera prima previsione");
 
     previsione.estrazioniRestanti--;
 
-    // Probabilità vincita simulata 20%
-    if (Math.random() < 0.2) {
-        previsione.vinta = true;
+    if(Math.random()<0.25){
+        previsione.vinta=true;
         alert("🎉 AMBO USCITO!");
         salvaStorico(previsione);
         localStorage.removeItem("previsioneAttiva");
     }
 
-    if (!previsione.vinta && previsione.estrazioniRestanti <= 0) {
+    if(!previsione.vinta && previsione.estrazioniRestanti<=0){
         salvaStorico(previsione);
         evolviSistema(previsione);
-    } else if (!previsione.vinta) {
+    } else if(!previsione.vinta){
         localStorage.setItem("previsioneAttiva", JSON.stringify(previsione));
     }
 
@@ -109,84 +152,73 @@ function simulaEstrazione() {
 }
 
 
-// ===== EVOLUZIONE AUTOMATICA =====
-function evolviSistema(predizione) {
+// ===== EVOLUZIONE =====
+function evolviSistema(p){
 
-    if (predizione.durata === 8) {
-        predizione.durata = 12;
-    } else if (predizione.durata === 12) {
-        predizione.durata = 16;
-    } else {
-        generaNuovaPrevisione();
-        return;
-    }
+    if(p.durata===8) p.durata=12;
+    else if(p.durata===12) p.durata=16;
+    else return generaPrevisione();
 
-    predizione.estrazioniRestanti = predizione.durata;
-    predizione.vinta = false;
+    p.estrazioniRestanti=p.durata;
+    p.vinta=false;
 
-    localStorage.setItem("previsioneAttiva", JSON.stringify(predizione));
-
-    alert("Sistema evoluto a durata " + predizione.durata);
+    localStorage.setItem("previsioneAttiva", JSON.stringify(p));
+    alert("Sistema evoluto a "+p.durata);
 }
 
 
-// ===== SALVA STORICO =====
-function salvaStorico(predizione) {
+// ===== STORICO =====
+function salvaStorico(p){
 
-    let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
+    let storico = JSON.parse(localStorage.getItem("storicoLotto"))||[];
 
     storico.push({
-        numeri: predizione.numeri,
-        ruota: predizione.ruota,
-        durata: predizione.durata,
-        esito: predizione.vinta ? "VINTA" : "PERSA",
-        data: new Date().toLocaleString()
+        numeri:p.numeri,
+        ruota:p.ruota,
+        durata:p.durata,
+        esito:p.vinta?"VINTA":"PERSA",
+        data:new Date().toLocaleString()
     });
 
     localStorage.setItem("storicoLotto", JSON.stringify(storico));
 }
 
 
-// ===== MOSTRA STORICO =====
-function mostraStorico() {
+function mostraStorico(){
 
-    let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
-    let box = document.getElementById("storicoBox");
+    let storico = JSON.parse(localStorage.getItem("storicoLotto"))||[];
+    let box=document.getElementById("storicoBox");
 
-    box.innerHTML = "<h3>Storico Sistema</h3>";
+    box.innerHTML="<h3>Storico</h3>";
 
-    if (storico.length === 0) {
-        box.innerHTML += "<p>Nessuna giocata registrata.</p>";
-        return;
-    }
-
-    storico.slice().reverse().forEach(s => {
-        box.innerHTML += `
-            <div style="margin:5px;">
-                ${s.data} | ${s.ruota} | ${s.numeri.join(", ")} 
-                <strong style="color:${s.esito==="VINTA"?"lime":"red"}">
-                ${s.esito}
-                </strong>
-            </div>
-        `;
+    storico.slice().reverse().forEach(s=>{
+        box.innerHTML+=`
+        <div>
+        ${s.data} | ${s.ruota} | ${s.numeri.join(", ")} 
+        <strong style="color:${s.esito==="VINTA"?"lime":"red"}">
+        ${s.esito}
+        </strong>
+        </div>`;
     });
 }
 
 
-// ===== PERCENTUALE SUCCESSO =====
-function aggiornaPercentuale() {
+// ===== PERCENTUALE =====
+function aggiornaPercentuale(){
 
-    let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
+    let storico=JSON.parse(localStorage.getItem("storicoLotto"))||[];
+    let vinte=storico.filter(s=>s.esito==="VINTA").length;
+    let perc=storico.length===0?0:
+        ((vinte/storico.length)*100).toFixed(1);
 
-    let vinte = storico.filter(s => s.esito === "VINTA").length;
-
-    let percentuale = storico.length === 0 
-        ? 0 
-        : ((vinte / storico.length) * 100).toFixed(1);
-
-    document.getElementById("percentualeBox").innerHTML =
-        "Percentuale Successo: " + percentuale + "%";
+    document.getElementById("percentualeBox").innerHTML=
+        "Percentuale Successo: "+perc+"%";
 }
+
+document.addEventListener("DOMContentLoaded",()=>{
+    mostraStorico();
+    aggiornaPercentuale();
+});
 
 </script>
 
