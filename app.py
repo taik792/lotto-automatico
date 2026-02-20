@@ -25,7 +25,7 @@ def salva_giocate(data):
         json.dump(data, f, indent=4)
 
 # -------------------------
-# SALVA AMBO PREMIUM
+# SALVA PREMIUM (POST)
 # -------------------------
 @app.route("/salva-premium", methods=["POST"])
 def salva_premium():
@@ -48,6 +48,27 @@ def salva_premium():
     return jsonify({"ok": True})
 
 # -------------------------
+# TEST SALVATAGGIO VIA BROWSER
+# -------------------------
+@app.route("/test-salva")
+def test_salva():
+    nuova = {
+        "tipo": "ambo",
+        "numeri": [21, 48],
+        "ruota": "Venezia",
+        "durata": 5,
+        "estrazioni_passate": 0,
+        "stato": "ATTIVO",
+        "data_creazione": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    giocate = carica_giocate()
+    giocate.append(nuova)
+    salva_giocate(giocate)
+
+    return "Giocata salvata!"
+
+# -------------------------
 # MOSTRA GIOCATE ATTIVE
 # -------------------------
 @app.route("/giocate-attive")
@@ -68,7 +89,7 @@ def aggiorna_estrazione():
     for g in giocate:
         if g["stato"] == "ATTIVO" and g["ruota"] == estrazione["ruota"]:
             
-            # Controllo vincita
+            # Controllo vincita (per ambo)
             if all(num in estrazione["numeri"] for num in g["numeri"]):
                 g["stato"] = "VINCENTE"
             else:
