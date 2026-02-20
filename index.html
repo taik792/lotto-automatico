@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Lotto Live Statistiche</title>
+
 <style>
 body {
     margin:0;
@@ -79,10 +80,27 @@ fetch("estrazioni.json")
 });
 
 function generaRuote() {
+
+    const ordineRuote = [
+        "Bari",
+        "Cagliari",
+        "Firenze",
+        "Genova",
+        "Milano",
+        "Napoli",
+        "Palermo",
+        "Roma",
+        "Torino",
+        "Venezia",
+        "Nazionale"
+    ];
+
     const container = document.getElementById("ruote");
     container.innerHTML = "";
 
-    for (let ruota in estrazioniData) {
+    ordineRuote.forEach(ruota => {
+
+        if (!estrazioniData[ruota]) return;
 
         let ultima = estrazioniData[ruota][0];
 
@@ -98,7 +116,8 @@ function generaRuote() {
         `;
 
         container.appendChild(div);
-    }
+
+    });
 
     mostraGiocate();
 }
