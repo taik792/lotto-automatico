@@ -3,52 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <title>Lotto Live Statistiche</title>
-
 <style>
 body {
-    background: #0f172a;
-    color: white;
-    font-family: Arial, sans-serif;
-    margin: 20px;
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(to bottom,#0f2027,#203a43,#2c5364);
+    color:white;
 }
 
 h1 {
-    color: orange;
-    text-align: center;
+    text-align:center;
+    padding:20px;
+    color:orange;
 }
 
-.card {
-    background: #1e293b;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    border: 2px solid #334155;
+.container {
+    width:90%;
+    margin:auto;
 }
 
-.ruota-forte {
-    border: 2px solid gold;
+.ruota {
+    border:2px solid orange;
+    border-radius:10px;
+    padding:15px;
+    margin:15px 0;
+    background:rgba(0,0,0,0.4);
 }
 
 button {
-    background: orange;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 5px;
-}
-
-button:hover {
-    background: gold;
+    background:orange;
+    border:none;
+    padding:5px 10px;
+    cursor:pointer;
+    border-radius:5px;
+    margin-top:5px;
 }
 
 .premium-box {
-    background: #111;
-    padding: 20px;
-    border-radius: 12px;
-    border: 2px solid gold;
-    margin-top: 30px;
+    border:2px solid gold;
+    padding:15px;
+    margin:20px 0;
+    border-radius:10px;
+    background:rgba(0,0,0,0.6);
 }
 </style>
 </head>
@@ -57,127 +53,103 @@ button:hover {
 
 <h1>🔥 Lotto Live Statistiche 🔥</h1>
 
-<div id="contenuto"></div>
-
-<hr style="margin:40px 0; border:2px solid orange;">
+<div class="container">
 
 <div class="premium-box">
-    <h2 style="color:gold;">🎯 Giocate Attive Premium</h2>
-    <div id="listaGiocate"></div>
+<h2>🎯 Giocate Attive Premium</h2>
+<div id="giocatePremium"></div>
+</div>
+
+<div id="ruote"></div>
+
 </div>
 
 <script>
 
-const API_URL = "https://lotto-statistiche.onrender.com";
+let estrazioniData = {};
 
-function caricaDati() {
-    fetch(API_URL + "/api")
-    .then(res => res.json())
-    .then(data => {
+fetch("estrazioni.json")
+.then(response => response.json())
+.then(data => {
+    estrazioniData = data;
+    generaRuote();
+})
+.catch(error => {
+    console.error("Errore caricamento JSON:", error);
+});
 
-        const container = document.getElementById("contenuto");
-        container.innerHTML = "";
+function generaRuote() {
+    const container = document.getElementById("ruote");
+    container.innerHTML = "";
 
-        const ruotaForte = data.ruota_forte;
+    for (let ruota in estrazioniData) {
 
-        for (let ruota in data) {
+        let ultima = estrazioniData[ruota][0];
 
-            if (ruota === "ruota_forte") continue;
+        let div = document.createElement("div");
+        div.className = "ruota";
 
-            const stats = data[ruota];
+        div.innerHTML = `
+            <h3>${ruota}</h3>
+            <p>Ultima estrazione: ${ultima.join(" - ")}</p>
+            <button onclick="salvaGiocata('${ruota}', ${ultima[0]}, ${ultima[1]})">
+                Salva ambo ${ultima[0]} - ${ultima[1]}
+            </button>
+        `;
 
-            let classe = "card";
-            if (ruota === ruotaForte) classe += " ruota-forte";
+        container.appendChild(div);
+    }
 
-            let ambiHTML = "";
+    mostraGiocate();
+}
 
-            stats.ambi_forti.forEach(ambo => {
-                ambiHTML += `
-                    <div>
-                        ${ambo[0]} - ${ambo[1]}
-                        <button onclick="salvaGiocata(${ambo[0]}, ${ambo[1]}, '${ruota}')">
-                            💾 Salva Premium
-                        </button>
-                    </div>
-                `;
-            });
+function salvaGiocata(ruota, n1, n2) {
 
-            container.innerHTML += `
-                <div class="${classe}">
-                    <h2>${ruota}</h2>
-                    <p><b>Ultima:</b> ${stats.ultima_estrazione.join(", ")}</p>
-                    <p><b>Caldi:</b> ${stats.caldi.join(", ")}</p>
-                    <p><b>Freddi:</b> ${stats.freddi.join(", ")}</p>
-                    <div>${ambiHTML}</div>
-                </div>
-            `;
-        }
-    })
-    .catch(error => {
-        console.error("Errore API:", error);
+    let giocate = JSON.parse(localStorage.getItem("giocate")) || [];
+
+    giocate.push({
+        ruota: ruota,
+        num1: n1,
+        num2: n2
+    });
+
+    localStorage.setItem("giocate", JSON.stringify(giocate));
+
+    mostraGiocate();
+}
+
+function mostraGiocate() {
+
+    let box = document.getElementById("giocatePremium");
+    let giocate = JSON.parse(localStorage.getItem("giocate")) || [];
+
+    if (giocate.length === 0) {
+        box.innerHTML = "Nessuna giocata attiva";
+        return;
+    }
+
+    box.innerHTML = "";
+
+    giocate.forEach((g, index) => {
+        box.innerHTML += `
+            <div>
+                ${g.ruota} → ${g.num1} - ${g.num2}
+                <button onclick="rimuoviGiocata(${index})">X</button>
+            </div>
+        `;
     });
 }
 
-function salvaGiocata(num1, num2, ruota) {
-    fetch(API_URL + "/salva_giocata", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            num1: num1,
-            num2: num2,
-            ruota: ruota
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert("Giocata salvata!");
-        caricaGiocatePremium();
-    })
-    .catch(error => {
-        console.error("Errore salvataggio:", error);
-    });
+function rimuoviGiocata(index) {
+
+    let giocate = JSON.parse(localStorage.getItem("giocate")) || [];
+
+    giocate.splice(index, 1);
+
+    localStorage.setItem("giocate", JSON.stringify(giocate));
+
+    mostraGiocate();
 }
-
-function caricaGiocatePremium() {
-    fetch(API_URL + "/giocate_attive")
-    .then(res => res.json())
-    .then(data => {
-
-        const container = document.getElementById("listaGiocate");
-        container.innerHTML = "";
-
-        if (!data || data.length === 0) {
-            container.innerHTML = "<p>Nessuna giocata attiva</p>";
-            return;
-        }
-
-        data.forEach(g => {
-
-            container.innerHTML += `
-                <div style="
-                    margin-bottom:15px;
-                    padding:15px;
-                    border:2px solid lime;
-                    border-radius:8px;
-                    background:#1a1a1a;
-                ">
-                    <strong>${g.ruota}</strong><br>
-                    Ambo: ${g.num1} - ${g.num2}<br>
-                    Stato: ${g.stato}
-                </div>
-            `;
-        });
-
-    })
-    .catch(error => {
-        console.error("Errore giocate:", error);
-    });
-}
-
-caricaDati();
-caricaGiocatePremium();
 
 </script>
 
