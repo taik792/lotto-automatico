@@ -1,266 +1,183 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live Evoluzione Premium</title>
-
+<title>Lotto Live Premium Evoluto</title>
 <style>
-body{
-background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-font-family:Arial;
-color:white;
-margin:0;
-padding:20px;
-}
-
-h1{
-text-align:center;
-color:orange;
-}
-
-.box{
-border:2px solid orange;
-border-radius:10px;
-padding:15px;
-margin:15px 0;
-background:rgba(0,0,0,0.4);
-}
-
-button{
-background:orange;
-border:none;
-padding:6px 10px;
-border-radius:5px;
-cursor:pointer;
-font-weight:bold;
-}
-
-#giocatePremium{
-border:2px solid gold;
-padding:15px;
-border-radius:10px;
-margin-bottom:20px;
-background:rgba(0,0,0,0.6);
-}
+body { font-family: Arial; background:#111; color:white; text-align:center; }
+button { padding:10px 20px; margin:5px; font-size:16px; cursor:pointer; }
+.box { background:#1e1e1e; padding:15px; margin:15px auto; width:80%; border-radius:10px; }
+.vinta { color:#00ff88; font-weight:bold; }
+.persa { color:#ff4444; font-weight:bold; }
 </style>
 </head>
-
 <body>
 
-<h1>🔥 Lotto Live Evoluzione Premium 🔥</h1>
+<h1>🎯 Lotto Live – Premium Evoluto</h1>
 
-<div id="giocatePremium">
-<h2>🎯 Giocate Attive Premium</h2>
-<div id="listaGiocate">Caricamento...</div>
-</div>
+<button onclick="generaPrevisione()">Genera Previsione</button>
+<button onclick="simulaEstrazione()">Simula Estrazione</button>
 
-<div id="contenuto"></div>
+<div class="box" id="previsioneBox"></div>
+
+<hr>
+
+<h2>📊 Statistiche Sistema</h2>
+<div id="percentualeBox"></div>
+<br>
+<div id="storicoBox"></div>
 
 <script>
 
-let estrazioniData = {};
+// ===== GENERA PREVISIONE =====
 
-fetch("estrazioni.json")
-.then(res=>res.json())
-.then(data=>{
-estrazioniData = data;
-avviaSistema();
-});
+function generaPrevisione() {
 
-// -------------------------
-// AVVIO
-// -------------------------
+    let numeri = [];
+    while(numeri.length < 2){
+        let n = Math.floor(Math.random()*90)+1;
+        if(!numeri.includes(n)) numeri.push(n);
+    }
 
-function avviaSistema(){
-controllaGiocate();
-mostraGiocate();
-mostraRuote();
+    let predizione = {
+        numeri: numeri,
+        ruota: "Nazionale",
+        durata: 8,
+        estrazioniRestanti: 8,
+        vinta: false,
+        dataInizio: new Date().toISOString()
+    };
+
+    localStorage.setItem("predizioneLotto", JSON.stringify(predizione));
+    aggiornaUI();
 }
 
-// -------------------------
-// ANALISI RUOTA
-// -------------------------
+// ===== SIMULA ESTRAZIONE =====
 
-function analizzaRuota(nome,estrazioni){
+function simulaEstrazione(){
 
-let ultime = estrazioni[0];
+    let predizione = JSON.parse(localStorage.getItem("predizioneLotto"));
+    if(!predizione) return alert("Genera prima una previsione");
 
-let conteggio = {};
-estrazioni.forEach(e=>{
-e.forEach(n=>{
-conteggio[n]=(conteggio[n]||0)+1;
-});
-});
+    if(predizione.vinta) return alert("Già vinta");
 
-let caldi = Object.entries(conteggio)
-.sort((a,b)=>b[1]-a[1])
-.slice(0,3)
-.map(x=>parseInt(x[0]));
+    let estratti = [];
+    while(estratti.length < 5){
+        let n = Math.floor(Math.random()*90)+1;
+        if(!estratti.includes(n)) estratti.push(n);
+    }
 
-let freddi = Object.entries(conteggio)
-.sort((a,b)=>a[1]-b[1])
-.slice(0,3)
-.map(x=>parseInt(x[0]));
+    let colpiti = predizione.numeri.filter(n => estratti.includes(n));
 
-let amboForte = [caldi[0],caldi[1]];
+    if(colpiti.length >= 2){
+        predizione.vinta = true;
+        salvaStorico(predizione);
+        alert("🎉 AMBO VINCENTE!");
+    } else {
+        predizione.estrazioniRestanti--;
+        if(predizione.estrazioniRestanti <= 0){
+            salvaStorico(predizione);
+            evolviSistema(predizione);
+        }
+    }
 
-return {ultime,caldi,freddi,amboForte};
+    localStorage.setItem("predizioneLotto", JSON.stringify(predizione));
+    aggiornaUI();
 }
 
-// -------------------------
-// MOSTRA RUOTE
-// -------------------------
+// ===== EVOLUZIONE AUTOMATICA =====
 
-function mostraRuote(){
+function evolviSistema(predizione){
 
-let div = document.getElementById("contenuto");
-div.innerHTML="";
+    if(predizione.vinta) return;
 
-let ruoteOrdinate = Object.keys(estrazioniData).sort();
+    if(predizione.durata === 8){
+        predizione.durata = 12;
+    } else if(predizione.durata === 12){
+        predizione.durata = 16;
+    } else {
+        generaPrevisione();
+        return;
+    }
 
-ruoteOrdinate.forEach(nome=>{
+    predizione.estrazioniRestanti = predizione.durata;
+    predizione.dataInizio = new Date().toISOString();
 
-let stats = analizzaRuota(nome,estrazioniData[nome]);
-
-div.innerHTML+=`
-<div class="box">
-<h2>${nome}</h2>
-<p>Ultima: ${stats.ultime.join(" - ")}</p>
-<p>🔥 Caldi: ${stats.caldi.join(", ")}</p>
-<p>❄ Freddi: ${stats.freddi.join(", ")}</p>
-<p>🎯 Ambo forte: ${stats.amboForte[0]} - ${stats.amboForte[1]}</p>
-<button onclick="salvaGiocata('${nome}',${stats.amboForte[0]},${stats.amboForte[1]})">
-Salva ambo forte (Auto)
-</button>
-</div>
-`;
-
-});
+    localStorage.setItem("predizioneLotto", JSON.stringify(predizione));
+    alert("🔄 Sistema evoluto a " + predizione.durata + " estrazioni");
 }
 
-// -------------------------
-// MODELLO EVOLUTIVO SEMI-AI
-// -------------------------
+// ===== STORICO =====
 
-function salvaGiocata(ruota,n1,n2){
+function salvaStorico(predizione){
 
-let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
-let estrazioni = estrazioniData[ruota];
+    let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
 
-// Frequenza ultime 100
-let freq=0;
-estrazioni.slice(0,100).forEach(e=>{
-if(e.includes(n1)) freq++;
-if(e.includes(n2)) freq++;
-});
+    storico.push({
+        numeri: predizione.numeri,
+        ruota: predizione.ruota,
+        durata: predizione.durata,
+        esito: predizione.vinta ? "VINTA" : "PERSA",
+        data: new Date().toLocaleString()
+    });
 
-// Ritardo reale
-function calcolaRitardo(numero){
-for(let i=0;i<estrazioni.length;i++){
-if(estrazioni[i].includes(numero)){
-return i;
-}
-}
-return estrazioni.length;
+    localStorage.setItem("storicoLotto", JSON.stringify(storico));
 }
 
-let rit1 = calcolaRitardo(n1);
-let rit2 = calcolaRitardo(n2);
-let ritardo = Math.max(rit1,rit2);
+// ===== PERCENTUALE =====
 
-// Indice evolutivo
-let indiceForza = (ritardo * 0.6) + ((30 - freq) * 0.4);
+function calcolaPercentuale(){
 
-// Traduzione in durata
-let durata;
+    let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
+    if(storico.length === 0) return 0;
 
-if(indiceForza > 20){
-durata = 8;
-}else if(indiceForza > 12){
-durata = 12;
-}else{
-durata = 16;
+    let vinte = storico.filter(s => s.esito === "VINTA").length;
+    return ((vinte / storico.length) * 100).toFixed(1);
 }
 
-giocate.push({
-ruota:ruota,
-num1:n1,
-num2:n2,
-durata:durata
-});
+// ===== UI =====
 
-localStorage.setItem("giocate",JSON.stringify(giocate));
+function aggiornaUI(){
 
-controllaGiocate();
-mostraGiocate();
+    let predizione = JSON.parse(localStorage.getItem("predizioneLotto"));
+    let box = document.getElementById("previsioneBox");
+
+    if(predizione){
+        box.innerHTML = `
+        <h3>Previsione Attiva</h3>
+        Numeri: ${predizione.numeri.join(", ")}<br>
+        Durata: ${predizione.durata} estrazioni<br>
+        Restanti: ${predizione.estrazioniRestanti}<br>
+        Stato: ${predizione.vinta ? "<span class='vinta'>VINTA</span>" : "<span class='persa'>IN CORSO</span>"}
+        `;
+    }
+
+    document.getElementById("percentualeBox").innerHTML =
+        "Percentuale Successo: " + calcolaPercentuale() + "%";
+
+    mostraStorico();
 }
 
-// -------------------------
-// CONTROLLO AUTOMATICO
-// -------------------------
+// ===== MOSTRA STORICO =====
 
-function controllaGiocate(){
+function mostraStorico(){
 
-let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
-let nuove=[];
+    let storico = JSON.parse(localStorage.getItem("storicoLotto")) || [];
+    let box = document.getElementById("storicoBox");
 
-giocate.forEach(g=>{
+    box.innerHTML = "<h3>Storico Sistema</h3>";
 
-let estrazioni = estrazioniData[g.ruota];
-let controllo = estrazioni.slice(0,g.durata);
-
-let vinta=false;
-
-controllo.forEach(e=>{
-if(e.includes(g.num1) && e.includes(g.num2)){
-vinta=true;
-}
-});
-
-if(!vinta){
-nuove.push(g);
+    storico.slice().reverse().forEach(s => {
+        box.innerHTML += `
+            <div>
+                ${s.data} - ${s.ruota} - ${s.numeri.join(", ")} 
+                <strong>${s.esito}</strong>
+            </div>
+        `;
+    });
 }
 
-});
-
-localStorage.setItem("giocate",JSON.stringify(nuove));
-}
-
-// -------------------------
-// MOSTRA GIOCATE
-// -------------------------
-
-function mostraGiocate(){
-
-let div = document.getElementById("listaGiocate");
-let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
-
-if(giocate.length===0){
-div.innerHTML="Nessuna giocata attiva";
-return;
-}
-
-div.innerHTML="";
-
-giocate.forEach((g,i)=>{
-
-div.innerHTML+=`
-<div>
-${g.ruota} → ${g.num1}-${g.num2}
-(ancora ${g.durata} estr.)
-<button onclick="rimuovi(${i})">X</button>
-</div>
-`;
-
-});
-}
-
-function rimuovi(i){
-let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
-giocate.splice(i,1);
-localStorage.setItem("giocate",JSON.stringify(giocate));
-mostraGiocate();
-}
+aggiornaUI();
 
 </script>
 </body>
