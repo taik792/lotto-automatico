@@ -2,40 +2,36 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live Evolution PRO REAL</title>
+<title>Lotto Evolution LIVE AI PRO</title>
 
 <style>
-body{
-    background:#0f1720;
-    color:white;
-    font-family:Arial;
-}
+body{background:#0f1720;color:white;font-family:Arial;}
 h1{text-align:center;}
 button{
-    padding:6px 12px;
-    margin-top:6px;
-    background:#ff9800;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
+padding:6px 12px;
+margin-top:6px;
+background:#ff9800;
+border:none;
+border-radius:6px;
+cursor:pointer;
 }
 .container{width:90%;margin:auto;}
 .box{
-    border:2px solid orange;
-    border-radius:10px;
-    padding:15px;
-    margin:15px 0;
-    background:#1a2530;
+border:2px solid orange;
+border-radius:10px;
+padding:15px;
+margin:15px 0;
+background:#1a2530;
 }
 .migliore{
-    border:3px solid gold;
-    background:#222b36;
+border:3px solid gold;
+background:#222b36;
 }
 #giocateAttive{
-    border:2px solid gold;
-    padding:10px;
-    border-radius:10px;
-    margin-bottom:20px;
+border:2px solid gold;
+padding:10px;
+border-radius:10px;
+margin-bottom:20px;
 }
 .stat{margin:4px 0;}
 </style>
@@ -43,24 +39,21 @@ button{
 
 <body>
 
-<h1>🔥 Lotto Live Evolution PRO REAL</h1>
+<h1>🔥 Lotto Evolution LIVE AI PRO</h1>
 
 <div class="container">
 
 <div id="giocateAttive"></div>
 <div id="ruoteContainer"></div>
 
-<h3>📊 Statistiche Sistema</h3>
-<div id="percentualeBox">Percentuale Successo: 0%</div>
+<h3>📊 Percentuale Sistema</h3>
+<div id="percentualeBox">0%</div>
 
 </div>
 
 <script>
 
 let estrazioni = {};
-let migliorRuotaGlobale = null;
-
-// ORDINE UFFICIALE LOTTO
 let ordineRuote = [
 "Bari","Cagliari","Firenze","Genova","Milano",
 "Napoli","Palermo","Roma","Torino","Venezia"
@@ -69,201 +62,229 @@ let ordineRuote = [
 fetch("estrazioni.json")
 .then(r=>r.json())
 .then(data=>{
-    estrazioni = data;
-    generaDashboard();
+estrazioni=data;
+generaDashboard();
 })
 .catch(()=>alert("Errore caricamento JSON"));
 
 
-// ===== ANALISI RUOTA =====
+// ===== ANALISI =====
 function analizzaRuota(nome){
 
-    let dati = estrazioni[nome];
-    let ultime = dati.slice(-50);
+let dati=estrazioni[nome];
+let ultime=dati.slice(-50);
 
-    let conteggio={};
-    for(let i=1;i<=90;i++) conteggio[i]=0;
+let conteggio={};
+for(let i=1;i<=90;i++) conteggio[i]=0;
 
-    ultime.forEach(estr=>{
-        estr.forEach(n=>conteggio[n]++);
-    });
+ultime.forEach(e=>{
+e.forEach(n=>conteggio[n]++);
+});
 
-    let ordinati = Object.entries(conteggio)
-        .sort((a,b)=>b[1]-a[1]);
+let ordinati=Object.entries(conteggio)
+.sort((a,b)=>b[1]-a[1]);
 
-    let caldi = ordinati.slice(0,3).map(x=>parseInt(x[0]));
-    let freddi = ordinati.slice(-3).map(x=>parseInt(x[0]));
-
-    return {
-        caldi,
-        freddi,
-        topFreq: ordinati[0][1],
-        ultima: dati[dati.length-1]
-    };
+return{
+caldi:ordinati.slice(0,3).map(x=>parseInt(x[0])),
+freddi:ordinati.slice(-3).map(x=>parseInt(x[0])),
+topFreq:ordinati[0][1],
+ultima:dati[dati.length-1]
+};
 }
 
 
-// ===== GENERA DASHBOARD =====
+// ===== CLASSIFICA RUOTE =====
+function classificaRuote(){
+
+let classifica=[];
+
+ordineRuote.forEach(r=>{
+if(!estrazioni[r]) return;
+let a=analizzaRuota(r);
+classifica.push({ruota:r,freq:a.topFreq});
+});
+
+return classifica.sort((a,b)=>b.freq-a.freq);
+}
+
+
+// ===== DASHBOARD =====
 function generaDashboard(){
 
-    let container = document.getElementById("ruoteContainer");
-    container.innerHTML="";
-    let migliorFreq=-1;
+let container=document.getElementById("ruoteContainer");
+container.innerHTML="";
 
-    // calcolo ruota migliore
-    ordineRuote.forEach(ruota=>{
-        if(!estrazioni[ruota]) return;
-        let a = analizzaRuota(ruota);
-        if(a.topFreq>migliorFreq){
-            migliorFreq=a.topFreq;
-            migliorRuotaGlobale=ruota;
-        }
-    });
+let classifica=classificaRuote();
+let migliore=classifica[0].ruota;
 
-    ordineRuote.forEach(ruota=>{
+ordineRuote.forEach(ruota=>{
 
-        if(!estrazioni[ruota]) return;
+if(!estrazioni[ruota]) return;
 
-        let a = analizzaRuota(ruota);
+let a=analizzaRuota(ruota);
 
-        let box=document.createElement("div");
-        box.className="box";
-        if(ruota===migliorRuotaGlobale) box.classList.add("migliore");
+let box=document.createElement("div");
+box.className="box";
+if(ruota===migliore) box.classList.add("migliore");
 
-        box.innerHTML=`
-            <h3>${ruota} ${ruota===migliorRuotaGlobale?"⭐":""}</h3>
-            <div class="stat">Ultima: ${a.ultima.join(" - ")}</div>
-            <div class="stat">🔥 Caldi: ${a.caldi.join(", ")}</div>
-            <div class="stat">❄ Freddi: ${a.freddi.join(", ")}</div>
-            <div class="stat">📊 Frequenza Top: ${a.topFreq}</div>
-            <div class="stat">🎯 Ambo Forte: ${a.caldi[0]} - ${a.freddi[0]}</div>
-            <button onclick="salvaPrevisione('${ruota}',${a.caldi[0]},${a.freddi[0]})">
-                Salva ambo forte
-            </button>
-        `;
+box.innerHTML=`
+<h3>${ruota} ${ruota===migliore?"⭐":""}</h3>
+<div class="stat">Ultima: ${a.ultima.join(" - ")}</div>
+<div class="stat">🔥 Caldi: ${a.caldi.join(", ")}</div>
+<div class="stat">❄ Freddi: ${a.freddi.join(", ")}</div>
+<div class="stat">🎯 Ambo Forte: ${a.caldi[0]} - ${a.freddi[0]}</div>
+<button onclick="salvaPrevisione('${ruota}')">
+Salva ambo forte
+</button>
+`;
 
-        container.appendChild(box);
-    });
+container.appendChild(box);
 
-    aggiornaGiocateAttive();
+});
+
+aggiornaGiocateAttive();
 }
 
 
-// ===== SALVA PREVISIONE =====
-function salvaPrevisione(ruota,n1,n2){
+// ===== CREA PREVISIONE =====
+function salvaPrevisione(ruota){
 
-    let previsione={
-        ruota,
-        numeri:[n1,n2],
-        durata:8,
-        restanti:8,
-        vinta:false,
-        indice: 0   // parte dalla prima estrazione disponibile
-    };
+let a=analizzaRuota(ruota);
 
-    localStorage.setItem("previsioneAttiva",JSON.stringify(previsione));
-    aggiornaGiocateAttive();
+let previsione={
+ruota,
+durata:8,
+restanti:8,
+indice:estrazioni[ruota].length-1,
+perdite:0,
+strategia:0,
+numeri:[a.caldi[0],a.freddi[0]]
+};
+
+localStorage.setItem("previsioneAttiva",JSON.stringify(previsione));
+aggiornaGiocateAttive();
 }
 
 
-// ===== MOSTRA GIOCATA ATTIVA =====
+// ===== GIOCATA ATTIVA =====
 function aggiornaGiocateAttive(){
 
-    let box=document.getElementById("giocateAttive");
-    let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
+let box=document.getElementById("giocateAttive");
+let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
 
-    if(!p){
-        box.innerHTML="<strong>🎯 Nessuna giocata attiva</strong>";
-        return;
-    }
+if(!p){
+box.innerHTML="<strong>Nessuna giocata attiva</strong>";
+return;
+}
 
-    box.innerHTML=`
-        <strong>🎯 Giocata Attiva Premium</strong><br>
-        ${p.ruota} → ${p.numeri.join("-")} 
-        (ancora ${p.restanti} estr.)
-        <button onclick="simulaEstrazione()">Simula Estrazione</button>
-    `;
+box.innerHTML=`
+<strong>🎯 Giocata Attiva</strong><br>
+${p.ruota} → ${p.numeri.join("-")}
+(ancora ${p.restanti})
+<button onclick="simulaEstrazione()">Simula</button>
+`;
 }
 
 
-// ===== SIMULA ESTRAZIONE REALISTICA =====
+// ===== SIMULA LIVE =====
 function simulaEstrazione(){
 
-    let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
-    if(!p) return;
+let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
+if(!p) return;
 
-    let lista = estrazioni[p.ruota];
+let lista=estrazioni[p.ruota];
 
-    if(p.indice >= lista.length){
-        alert("Fine estrazioni disponibili nel JSON");
-        return;
-    }
+if(p.indice>=lista.length-1){
+alert("Aggiorna il JSON con nuova estrazione");
+return;
+}
 
-    let estrCorrente = lista[p.indice];
+p.indice++;
 
-    let vinta = p.numeri.every(n => estrCorrente.includes(n));
+let estrCorrente=lista[p.indice];
 
-    p.restanti--;
-    p.indice++;
+let vinta=p.numeri.every(n=>estrCorrente.includes(n));
 
-    if(vinta){
-        alert("🎉 AMBO USCITO ALLA ESTRAZIONE " + p.indice);
-        salvaStorico(p,true);
-        localStorage.removeItem("previsioneAttiva");
-    }
-    else if(p.restanti<=0){
-        salvaStorico(p,false);
-        evolvi(p);
-    }
-    else{
-        localStorage.setItem("previsioneAttiva",JSON.stringify(p));
-    }
+p.restanti--;
 
-    aggiornaGiocateAttive();
-    aggiornaPercentuale();
+if(vinta){
+alert("🎉 AMBO USCITO!");
+salvaStorico(true);
+localStorage.removeItem("previsioneAttiva");
+}
+else if(p.restanti<=0){
+evolviSistema(p);
+}
+else{
+localStorage.setItem("previsioneAttiva",JSON.stringify(p));
+}
+
+aggiornaGiocateAttive();
+aggiornaPercentuale();
 }
 
 
-// ===== EVOLUZIONE =====
-function evolvi(p){
+// ===== EVOLUZIONE AI =====
+function evolviSistema(p){
 
-    if(p.durata===8)p.durata=12;
-    else if(p.durata===12)p.durata=16;
-    else{
-        localStorage.removeItem("previsioneAttiva");
-        return;
-    }
+p.perdite++;
+p.strategia++;
 
-    p.restanti=p.durata;
-    localStorage.setItem("previsioneAttiva",JSON.stringify(p));
+if(p.strategia>2){
+
+let classifica=classificaRuote();
+let nuovaRuota=classifica[1].ruota;
+
+alert("⚠ Strategia fallita. Cambio automatico su "+nuovaRuota);
+
+let a=analizzaRuota(nuovaRuota);
+
+p.ruota=nuovaRuota;
+p.strategia=0;
+p.perdite=0;
+p.durata=8;
+p.restanti=8;
+p.indice=estrazioni[nuovaRuota].length-1;
+p.numeri=[a.caldi[0],a.freddi[0]];
+
+}
+else{
+
+if(p.strategia===1){
+let a=analizzaRuota(p.ruota);
+p.numeri=[a.caldi[0],a.caldi[1]];
+p.durata=12;
+p.restanti=12;
+}
+else if(p.strategia===2){
+let a=analizzaRuota(p.ruota);
+p.numeri=[a.freddi[0],a.freddi[1]];
+p.durata=16;
+p.restanti=16;
+}
+
+}
+
+localStorage.setItem("previsioneAttiva",JSON.stringify(p));
 }
 
 
 // ===== STORICO =====
-function salvaStorico(p,vinta){
+function salvaStorico(vinta){
 
-    let storico=JSON.parse(localStorage.getItem("storico"))||[];
-
-    storico.push({
-        ruota:p.ruota,
-        numeri:p.numeri,
-        esito:vinta?"VINTA":"PERSA",
-        data:new Date().toLocaleString()
-    });
-
-    localStorage.setItem("storico",JSON.stringify(storico));
+let storico=JSON.parse(localStorage.getItem("storico"))||[];
+storico.push({esito:vinta?"VINTA":"PERSA"});
+localStorage.setItem("storico",JSON.stringify(storico));
 }
 
 
 // ===== PERCENTUALE =====
 function aggiornaPercentuale(){
 
-    let storico=JSON.parse(localStorage.getItem("storico"))||[];
-    let vinte=storico.filter(s=>s.esito==="VINTA").length;
-    let perc=storico.length?((vinte/storico.length)*100).toFixed(1):0;
-
-    document.getElementById("percentualeBox").innerText=
-        "Percentuale Successo: "+perc+"%";
+let storico=JSON.parse(localStorage.getItem("storico"))||[];
+let vinte=storico.filter(s=>s.esito==="VINTA").length;
+let perc=storico.length?((vinte/storico.length)*100).toFixed(1):0;
+document.getElementById("percentualeBox").innerText=perc+"%";
 }
 
 aggiornaPercentuale();
