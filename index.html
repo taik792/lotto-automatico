@@ -1,139 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>Lotto Live Statistiche</title>
+  <meta charset="UTF-8">
+  <title>Lotto Live Statistiche</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
 
-<style>
-body {
-    background: #111827;
-    color: white;
-    font-family: Arial;
-    margin: 0;
-    padding: 20px;
-}
+    h1 {
+      color: orange;
+      text-align: center;
+    }
 
-h1 {
-    text-align: center;
-    color: orange;
-}
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      border: 2px solid #334155;
+    }
 
-/* CARD */
-.card {
-    background: #1f2937;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-}
+    .ruota-forte {
+      border: 2px solid gold;
+    }
 
-.ruota-forte {
-    border: 3px solid gold;
-}
-
-/* COLORI */
-.caldi { color: red; }
-.freddi { color: cyan; }
-.ritardo { color: orange; }
-.giocare { color: lime; }
-.ambi { color: pink; }
-
-/* LOADER */
-.loader-container {
-    text-align: center;
-    margin-top: 60px;
-}
-
-.spinner {
-    margin: 20px auto;
-    width: 50px;
-    height: 50px;
-    border: 6px solid #333;
-    border-top: 6px solid orange;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.pressione-bar {
-    height: 8px;
-    background: linear-gradient(to right, red, orange);
-    border-radius: 5px;
-    margin-top: 10px;
-}
-</style>
+    .premium-box {
+      background: #111;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid gold;
+    }
+  </style>
 </head>
-
 <body>
 
 <h1>🔥 Lotto Live Statistiche 🔥</h1>
 
-<div id="loader" class="loader-container">
-    <div class="spinner"></div>
-    <p>📡 Connessione al server...<br>⚡ Analisi in corso...</p>
-</div>
+<div id="contenuto"></div>
 
-<div id="contenuto" style="display:none;"></div>
+<hr style="margin:40px 0; border:2px solid orange;">
+
+<div class="premium-box">
+  <h2 style="color:gold;">🎯 Giocate Attive Premium</h2>
+  <div id="listaGiocate"></div>
+</div>
 
 <script>
 
-fetch("https://lotto-statistiche.onrender.com/api")
-.then(res => res.json())
-.then(data => {
+const API_URL = "https://lotto-statistiche.onrender.com";
 
-    // Nasconde loader
-    document.getElementById("loader").style.display = "none";
-    document.getElementById("contenuto").style.display = "block";
+function caricaDati() {
+  fetch(API_URL + "/api")
+    .then(res => res.json())
+    .then(data => {
 
-    const container = document.getElementById("contenuto");
-    container.innerHTML = "";
+      const container = document.getElementById("contenuto");
+      container.innerHTML = "";
 
-    const ruotaForte = data.ruota_forte;
+      const ruotaForte = data.ruota_forte;
 
-    for (let ruota in data) {
+      for (let ruota in data) {
 
         if (ruota === "ruota_forte") continue;
 
-        const info = data[ruota];
+        const stats = data[ruota];
 
-        const div = document.createElement("div");
-        div.className = "card";
-
+        let classe = "card";
         if (ruota === ruotaForte) {
-            div.classList.add("ruota-forte");
+          classe += " ruota-forte";
         }
 
-        div.innerHTML = `
+        container.innerHTML += `
+          <div class="${classe}">
             <h2>${ruota} ${ruota === ruotaForte ? "⭐ RUOTA FORTE" : ""}</h2>
-
-            <p>📋 Ultima estrazione: ${info.ultima_estrazione.join(", ")}</p>
-
-            <p class="caldi">🔥 Caldi: ${info.caldi.join(", ")}</p>
-            <p class="freddi">❄ Freddi: ${info.freddi.join(", ")}</p>
-            <p class="ritardo">⏳ Ritardatario: ${info.ritardatario}</p>
-
-            <p class="giocare">🎯 DA GIOCARE: ${info.da_giocare.join(", ")}</p>
-
-            <p class="ambi">💎 AMBI FORTI: 
-                ${info.ambi_forti.map(a => a[0] + "-" + a[1]).join(" | ")}
-            </p>
-
-            <p>⚡ Indice di Pressione: ${info.indice_pressione}</p>
-            <div class="pressione-bar"></div>
+            <p>Ultima estrazione: ${stats.ultima_estrazione.join(", ")}</p>
+            <p>🔥 Caldi: ${stats.caldi.join(", ")}</p>
+            <p>❄️ Freddi: ${stats.freddi.join(", ")}</p>
+            <p>⏳ Ritardatario: ${stats.ritardatario}</p>
+            <p>🎯 DA GIOCARE: ${stats.da_giocare.join(", ")}</p>
+            <p>💎 AMBI FORTI: ${stats.ambi_forti.map(a => a.join("-")).join(" | ")}</p>
+            <p>⚡ Indice Pressione: ${stats.indice_pressione}</p>
+          </div>
         `;
+      }
 
-        container.appendChild(div);
-    }
+    });
+}
 
-})
-.catch(err => {
-    document.getElementById("loader").innerHTML = 
-        "<p>❌ Errore di connessione. Riprova tra qualche secondo.</p>";
-});
+function caricaGiocatePremium() {
+
+  fetch(API_URL + "/giocate-attive")
+    .then(res => res.json())
+    .then(data => {
+
+      const container = document.getElementById("listaGiocate");
+      container.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        container.innerHTML = "<p>Nessuna giocata attiva</p>";
+        return;
+      }
+
+      data.forEach(g => {
+
+        let colore = "lime";
+        let statoTesto = "ATTIVO";
+
+        if (g.stato === "scaduto") {
+          colore = "red";
+          statoTesto = "SCADUTO";
+        }
+
+        if (g.stato === "uscito") {
+          colore = "gold";
+          statoTesto = "USCITO 💰";
+        }
+
+        container.innerHTML += `
+          <div style="
+            margin-bottom:15px;
+            padding:15px;
+            border:2px solid ${colore};
+            border-radius:8px;
+            background:#1a1a1a;
+          ">
+            <strong>${g.tipo.toUpperCase()} ${g.num1}-${g.num2}</strong><br>
+            Ruota: ${g.ruota}<br>
+            Durata: ${g.durata_attuale}<br>
+            Passate: ${g.estrazioni_passate}<br>
+            <span style="color:${colore}; font-weight:bold;">
+              Stato: ${statoTesto}
+            </span>
+          </div>
+        `;
+      });
+
+    });
+}
+
+caricaDati();
+caricaGiocatePremium();
 
 </script>
 
