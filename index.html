@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live – Premium AI</title>
+<title>Lotto Live – Premium AI PRO</title>
 
 <style>
 body{
@@ -24,7 +24,7 @@ button{
     padding:20px;
     background:#222;
     border-radius:10px;
-    width:70%;
+    width:75%;
     margin:auto;
 }
 
@@ -35,7 +35,7 @@ button{
 </head>
 <body>
 
-<h1>🎯 Lotto Live – Premium AI</h1>
+<h1>🎯 Lotto Live – Premium AI PRO</h1>
 
 <button onclick="generaPrevisione()">Genera Previsione AI</button>
 <button onclick="simulaEstrazione()">Simula Estrazione</button>
@@ -56,7 +56,7 @@ fetch("estrazioni.json")
 .then(res => res.json())
 .then(data => {
     estrazioniGlobali = data;
-    console.log("JSON caricato correttamente");
+    console.log("JSON caricato");
 })
 .catch(err => {
     alert("Errore caricamento estrazioni.json");
@@ -67,11 +67,7 @@ fetch("estrazioni.json")
 function analizzaRuota(ruota){
 
     let datiRuota = estrazioniGlobali[ruota];
-
-    if(!datiRuota){
-        alert("Ruota non trovata");
-        return {caldi:[], freddi:[]};
-    }
+    if(!datiRuota) return {caldi:[], freddi:[]};
 
     let ultime = datiRuota.slice(-50);
     let conteggio = {};
@@ -94,27 +90,47 @@ function analizzaRuota(ruota){
 }
 
 
-// ===== GENERA PREVISIONE =====
+// ===== GENERA PREVISIONE CON RUOTA MIGLIORE =====
 function generaPrevisione(){
 
     let ruote = Object.keys(estrazioniGlobali);
-
     if(ruote.length===0){
         alert("JSON non caricato ancora");
         return;
     }
 
-    let ruotaScelta = ruote[Math.floor(Math.random()*ruote.length)];
-    let analisi = analizzaRuota(ruotaScelta);
+    let migliorRuota = null;
+    let migliorFrequenza = -1;
+    let migliorAnalisi = null;
 
-    let numeri = [
-        analisi.caldi[0],
-        analisi.freddi[0]
-    ];
+    ruote.forEach(ruota => {
+
+        let analisi = analizzaRuota(ruota);
+        let datiRuota = estrazioniGlobali[ruota].slice(-50);
+        let count = 0;
+
+        datiRuota.forEach(estrazione => {
+            if(estrazione.includes(analisi.caldi[0])){
+                count++;
+            }
+        });
+
+        if(count > migliorFrequenza){
+            migliorFrequenza = count;
+            migliorRuota = ruota;
+            migliorAnalisi = analisi;
+        }
+
+    });
+
+    let caldoRandom = migliorAnalisi.caldi[Math.floor(Math.random()*3)];
+    let freddoRandom = migliorAnalisi.freddi[Math.floor(Math.random()*3)];
+
+    let numeri = [caldoRandom, freddoRandom];
 
     let previsione = {
         numeri,
-        ruota: ruotaScelta,
+        ruota: migliorRuota,
         durata: 8,
         estrazioniRestanti: 8,
         vinta:false
@@ -123,9 +139,10 @@ function generaPrevisione(){
     localStorage.setItem("previsioneAttiva", JSON.stringify(previsione));
 
     document.getElementById("analisiBox").innerHTML = `
-        <div class="stat">Ruota: ${ruotaScelta}</div>
-        <div class="stat">Caldi: ${analisi.caldi.join(", ")}</div>
-        <div class="stat">Freddi: ${analisi.freddi.join(", ")}</div>
+        <div class="stat">Ruota Migliore: ${migliorRuota}</div>
+        <div class="stat">Frequenza Top Numero: ${migliorFrequenza} su 50</div>
+        <div class="stat">Caldi: ${migliorAnalisi.caldi.join(", ")}</div>
+        <div class="stat">Freddi: ${migliorAnalisi.freddi.join(", ")}</div>
         <div class="stat"><strong>Previsione: ${numeri.join(" - ")}</strong></div>
     `;
 }
