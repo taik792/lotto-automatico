@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live – Premium AI PRO</title>
+<title>Lotto Live – Premium AI PRO+</title>
 
 <style>
 body{
@@ -24,18 +24,30 @@ button{
     padding:20px;
     background:#222;
     border-radius:10px;
-    width:75%;
+    width:85%;
     margin:auto;
 }
 
+.ruotaBox{
+    border:1px solid #444;
+    padding:10px;
+    margin:10px;
+    border-radius:8px;
+}
+
+.migliore{
+    border:2px solid gold;
+    background:#2a2a2a;
+}
+
 .stat{
-    margin:6px;
+    margin:4px;
 }
 </style>
 </head>
 <body>
 
-<h1>🎯 Lotto Live – Premium AI PRO</h1>
+<h1>🎯 Lotto Live – Premium AI PRO+</h1>
 
 <button onclick="generaPrevisione()">Genera Previsione AI</button>
 <button onclick="simulaEstrazione()">Simula Estrazione</button>
@@ -51,12 +63,10 @@ button{
 
 let estrazioniGlobali = {};
 
-// ===== CARICA JSON =====
 fetch("estrazioni.json")
 .then(res => res.json())
 .then(data => {
     estrazioniGlobali = data;
-    console.log("JSON caricato");
 })
 .catch(err => {
     alert("Errore caricamento estrazioni.json");
@@ -67,8 +77,6 @@ fetch("estrazioni.json")
 function analizzaRuota(ruota){
 
     let datiRuota = estrazioniGlobali[ruota];
-    if(!datiRuota) return {caldi:[], freddi:[]};
-
     let ultime = datiRuota.slice(-50);
     let conteggio = {};
 
@@ -86,45 +94,56 @@ function analizzaRuota(ruota){
     let caldi = ordinati.slice(0,5).map(x=>parseInt(x[0]));
     let freddi = ordinati.slice(-5).map(x=>parseInt(x[0]));
 
-    return {caldi, freddi};
+    return {caldi, freddi, topFreq: ordinati[0][1]};
 }
 
 
-// ===== GENERA PREVISIONE CON RUOTA MIGLIORE =====
+// ===== GENERA PREVISIONE =====
 function generaPrevisione(){
 
     let ruote = Object.keys(estrazioniGlobali);
     if(ruote.length===0){
-        alert("JSON non caricato ancora");
+        alert("JSON non caricato");
         return;
     }
 
     let migliorRuota = null;
-    let migliorFrequenza = -1;
-    let migliorAnalisi = null;
+    let migliorFreq = -1;
+    let analisiTotale = {};
 
-    ruote.forEach(ruota => {
+    let html = "<h3>Analisi Ruote</h3>";
+
+    ruote.forEach(ruota=>{
 
         let analisi = analizzaRuota(ruota);
-        let datiRuota = estrazioniGlobali[ruota].slice(-50);
-        let count = 0;
+        analisiTotale[ruota] = analisi;
 
-        datiRuota.forEach(estrazione => {
-            if(estrazione.includes(analisi.caldi[0])){
-                count++;
-            }
-        });
-
-        if(count > migliorFrequenza){
-            migliorFrequenza = count;
+        if(analisi.topFreq > migliorFreq){
+            migliorFreq = analisi.topFreq;
             migliorRuota = ruota;
-            migliorAnalisi = analisi;
         }
-
     });
 
-    let caldoRandom = migliorAnalisi.caldi[Math.floor(Math.random()*3)];
-    let freddoRandom = migliorAnalisi.freddi[Math.floor(Math.random()*3)];
+    ruote.forEach(ruota=>{
+
+        let a = analisiTotale[ruota];
+        let classe = ruota===migliorRuota ? "ruotaBox migliore" : "ruotaBox";
+
+        html += `
+        <div class="${classe}">
+            <div><strong>${ruota} ${ruota===migliorRuota?"⭐":" "}</strong></div>
+            <div class="stat">Frequenza Top: ${a.topFreq} su 50</div>
+            <div class="stat">Caldi: ${a.caldi.join(", ")}</div>
+            <div class="stat">Freddi: ${a.freddi.join(", ")}</div>
+        </div>
+        `;
+    });
+
+    // PREVISIONE SULLA MIGLIORE
+    let miglioreAnalisi = analisiTotale[migliorRuota];
+
+    let caldoRandom = miglioreAnalisi.caldi[Math.floor(Math.random()*3)];
+    let freddoRandom = miglioreAnalisi.freddi[Math.floor(Math.random()*3)];
 
     let numeri = [caldoRandom, freddoRandom];
 
@@ -138,28 +157,27 @@ function generaPrevisione(){
 
     localStorage.setItem("previsioneAttiva", JSON.stringify(previsione));
 
-    document.getElementById("analisiBox").innerHTML = `
-        <div class="stat">Ruota Migliore: ${migliorRuota}</div>
-        <div class="stat">Frequenza Top Numero: ${migliorFrequenza} su 50</div>
-        <div class="stat">Caldi: ${migliorAnalisi.caldi.join(", ")}</div>
-        <div class="stat">Freddi: ${migliorAnalisi.freddi.join(", ")}</div>
-        <div class="stat"><strong>Previsione: ${numeri.join(" - ")}</strong></div>
+    html += `
+        <h3>🎯 Previsione Generata</h3>
+        <div><strong>Ruota: ${migliorRuota}</strong></div>
+        <div><strong>Numeri: ${numeri.join(" - ")}</strong></div>
     `;
+
+    document.getElementById("analisiBox").innerHTML = html;
 }
 
 
-// ===== SIMULA ESTRAZIONE =====
+// ===== SIMULAZIONE =====
 function simulaEstrazione(){
 
     let previsione = JSON.parse(localStorage.getItem("previsioneAttiva"));
     if(!previsione){
-        alert("Genera prima una previsione");
+        alert("Genera prima previsione");
         return;
     }
 
     previsione.estrazioniRestanti--;
 
-    // Simulazione vincita 25%
     if(Math.random()<0.25){
         previsione.vinta=true;
         alert("🎉 AMBO USCITO!");
@@ -170,8 +188,7 @@ function simulaEstrazione(){
     if(!previsione.vinta && previsione.estrazioniRestanti<=0){
         salvaStorico(previsione);
         evolviSistema(previsione);
-    } 
-    else if(!previsione.vinta){
+    } else if(!previsione.vinta){
         localStorage.setItem("previsioneAttiva", JSON.stringify(previsione));
     }
 
@@ -180,7 +197,7 @@ function simulaEstrazione(){
 }
 
 
-// ===== EVOLUZIONE AUTOMATICA =====
+// ===== EVOLUZIONE =====
 function evolviSistema(p){
 
     if(p.durata===8) p.durata=12;
@@ -252,8 +269,6 @@ function aggiornaPercentuale(){
         "Percentuale Successo: "+perc+"%";
 }
 
-
-// ===== CARICAMENTO INIZIALE =====
 document.addEventListener("DOMContentLoaded",()=>{
     mostraStorico();
     aggiornaPercentuale();
