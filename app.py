@@ -2,76 +2,81 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import json
 import os
-from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
+# ===============================
+# CARICA ESTRIZIONI UNA SOLA VOLTA
+# ===============================
+
+with open("estrazioni.json") as f:
+    ESTRAZIONI = json.load(f)
+
+# ===============================
+# API LEGGERA (solo ultime 5)
+# ===============================
+
+@app.route("/api")
+def api():
+    risposta = {}
+
+    for ruota, estrazioni in ESTRAZIONI.items():
+        risposta[ruota] = estrazioni[:5]  # solo ultime 5
+
+    return jsonify(risposta)
+
+# ===============================
+# SALVA GIOCATA PREMIUM
+# ===============================
+
 FILE_GIOCATE = "/tmp/giocate.json"
-FILE_ESTRAZIONI = "estrazioni.json"
 
-# -------------------------
-# CARICA ESTRAZIONI
-# -------------------------
-
-def carica_estrazioni():
-    if not os.path.exists(FILE_ESTRAZIONI):
-        return {}
-
-    with open(FILE_ESTRAZIONI, "r", encoding="utf-8") as f:
+def carica_giocate():
+    if not os.path.exists(FILE_GIOCATE):
+        return []
+    with open(FILE_GIOCATE, "r") as f:
         return json.load(f)
 
-# -------------------------
-# API PRINCIPALE
-# -------------------------
-
-@app.route("/api", methods=["GET"])
-def api():
-    dati = carica_estrazioni()
-
-    if not dati:
-        return jsonify({"errore": "Nessun dato disponibile"})
-
-    return jsonify(dati)
-
-# -------------------------
-# SALVA GIOCATA PREMIUM
-# -------------------------
+def salva_giocate(lista):
+    with open(FILE_GIOCATE, "w") as f:
+        json.dump(lista, f)
 
 @app.route("/salva_giocata", methods=["POST"])
 def salva_giocata():
-    nuova = request.json
+    dati = request.get_json()
 
-    if not os.path.exists(FILE_GIOCATE):
-        with open(FILE_GIOCATE, "w") as f:
-            json.dump([], f)
+    num1 = dati.get("num1")
+    num2 = dati.get("num2")
+    ruota = dati.get("ruota")
 
-    with open(FILE_GIOCATE, "r") as f:
-        giocate = json.load(f)
+    giocate = carica_giocate()
 
-    nuova["data_attuale"] = datetime.now().strftime("%d/%m/%Y")
+    nuova = {
+        "num1": num1,
+        "num2": num2,
+        "ruota": ruota,
+        "stato": "attivo"
+    }
+
     giocate.append(nuova)
+    salva_giocate(giocate)
 
-    with open(FILE_GIOCATE, "w") as f:
-        json.dump(giocate, f)
+    return jsonify({"status": "ok"})
 
-    return jsonify({"messaggio": "Giocata salvata"})
+# ===============================
+# LISTA GIOCATE ATTIVE
+# ===============================
 
-# -------------------------
-# MOSTRA GIOCATE ATTIVE
-# -------------------------
-
-@app.route("/giocate_attive", methods=["GET"])
+@app.route("/giocate_attive")
 def giocate_attive():
-    if not os.path.exists(FILE_GIOCATE):
-        return jsonify([])
-
-    with open(FILE_GIOCATE, "r") as f:
-        giocate = json.load(f)
-
+    giocate = carica_giocate()
     return jsonify(giocate)
 
-# -------------------------
+# ===============================
+# AVVIO SERVER RENDER
+# ===============================
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
