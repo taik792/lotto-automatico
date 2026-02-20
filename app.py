@@ -44,6 +44,7 @@ def init_db():
             durata_attuale INTEGER,
             estrazioni_passate INTEGER,
             stato TEXT,
+            ultima_estrazione_usata TEXT,
             data_creazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -54,6 +55,62 @@ def initialize():
     init_db()
 
 # ==================================================
+# FUNZIONE DURATA DINAMICA
+# ==================================================
+
+def calcola_durata_ambo(num1, num2, ruota):
+    durata = ((num1 + num2) % 6) + 2
+    return max(2, min(durata, 8))
+
+# ==================================================
+# AGGIORNAMENTO AUTOMATICO
+# ==================================================
+
+def aggiorna_giocate_con_estrazioni(dati):
+
+    db = get_db()
+    giocate = db.execute(
+        "SELECT * FROM giocate_attive WHERE stato='attivo'"
+    ).fetchall()
+
+    for g in giocate:
+
+        ruota = g["ruota"]
+        if ruota not in dati:
+            continue
+
+        ultima_estrazione = dati[ruota][-1]
+        ultima_str = ",".join(map(str, ultima_estrazione))
+
+        # Evita aggiornamenti multipli sulla stessa estrazione
+        if g["ultima_estrazione_usata"] == ultima_str:
+            continue
+
+        # Controllo uscita
+        if g["num1"] in ultima_estrazione and g["num2"] in ultima_estrazione:
+            db.execute("""
+                UPDATE giocate_attive
+                SET stato=?, ultima_estrazione_usata=?
+                WHERE id=?
+            """, ("uscito", ultima_str, g["id"]))
+            continue
+
+        nuove_passate = g["estrazioni_passate"] + 1
+        nuova_durata = calcola_durata_ambo(g["num1"], g["num2"], ruota)
+
+        stato = "attivo"
+        if nuove_passate >= nuova_durata:
+            stato = "scaduto"
+
+        db.execute("""
+            UPDATE giocate_attive
+            SET durata_attuale=?, estrazioni_passate=?, stato=?, ultima_estrazione_usata=?
+            WHERE id=?
+        """, (nuova_durata, nuove_passate, stato, ultima_str, g["id"]))
+
+    db.commit()
+
+# ==================================================
 # DATI LOTTO
 # ==================================================
 
@@ -61,22 +118,11 @@ def carica_dati():
     with open(FILE_ESTRAZIONI, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def calcola_durata_ambo(num1, num2, ruota):
-    # QUI POI METTEREMO LA FORMULA PREMIUM VERA
-    durata = ((num1 + num2) % 6) + 2
-    if durata < 2:
-        durata = 2
-    if durata > 8:
-        durata = 8
-    return durata
-
 def analizza_ruota(lista_estrazioni):
 
     tutte = []
     for estrazione in lista_estrazioni:
         tutte.extend(estrazione)
-
-    freq_totale = Counter(tutte)
 
     ultimi_50 = tutte[-FINESTRA_50:]
     ultimi_100 = tutte[-FINESTRA_100:]
@@ -97,7 +143,6 @@ def analizza_ruota(lista_estrazioni):
         ritardi[numero] = ritardo
 
     ritardatario = max(ritardi, key=ritardi.get)
-
     suggeriti = list(set(caldi[:2] + [ritardatario]))[:3]
 
     ambi = []
@@ -118,15 +163,17 @@ def analizza_ruota(lista_estrazioni):
     }
 
 # ==================================================
-# API STATISTICHE
+# API PRINCIPALE
 # ==================================================
 
 @app.route("/api")
 def api():
 
     dati = carica_dati()
-    risultato = {}
 
+    aggiorna_giocate_con_estrazioni(dati)
+
+    risultato = {}
     pressione_massima = 0
     ruota_forte = ""
 
@@ -140,16 +187,17 @@ def api():
             ruota_forte = ruota
 
     risultato["ruota_forte"] = ruota_forte
+
     return jsonify(risultato)
 
 # ==================================================
-# SALVA AMBO PREMIUM
+# SALVA AMBO
 # ==================================================
 
 @app.route("/salva-ambo", methods=["POST"])
 def salva_ambo():
-    data = request.json
 
+    data = request.json
     num1 = data["num1"]
     num2 = data["num2"]
     ruota = data["ruota"]
@@ -157,11 +205,12 @@ def salva_ambo():
     durata = calcola_durata_ambo(num1, num2, ruota)
 
     db = get_db()
+
     db.execute("""
         INSERT INTO giocate_attive 
-        (tipo, num1, num2, ruota, durata_attuale, estrazioni_passate, stato)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, ("ambo", num1, num2, ruota, durata, 0, "attivo"))
+        (tipo, num1, num2, ruota, durata_attuale, estrazioni_passate, stato, ultima_estrazione_usata)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, ("ambo", num1, num2, ruota, durata, 0, "attivo", ""))
 
     db.commit()
 
@@ -169,50 +218,6 @@ def salva_ambo():
         "messaggio": "Ambo salvato",
         "durata_calcolata": durata
     })
-
-# ==================================================
-# AGGIORNA GIOCATE
-# ==================================================
-
-@app.route("/aggiorna-giocate", methods=["POST"])
-def aggiorna_giocate():
-
-    estrazione = request.json  # {"Roma":[12,45,33,10,88]}
-
-    db = get_db()
-    giocate = db.execute(
-        "SELECT * FROM giocate_attive WHERE stato='attivo'"
-    ).fetchall()
-
-    for g in giocate:
-
-        numeri_ruota = estrazione.get(g["ruota"], [])
-
-        # Se esce l'ambo → chiude
-        if g["num1"] in numeri_ruota and g["num2"] in numeri_ruota:
-            db.execute("""
-                UPDATE giocate_attive
-                SET stato=?
-                WHERE id=?
-            """, ("uscito", g["id"]))
-            continue
-
-        nuova_durata = calcola_durata_ambo(g["num1"], g["num2"], g["ruota"])
-        nuove_passate = g["estrazioni_passate"] + 1
-
-        stato = "attivo"
-        if nuove_passate >= nuova_durata:
-            stato = "scaduto"
-
-        db.execute("""
-            UPDATE giocate_attive
-            SET durata_attuale=?, estrazioni_passate=?, stato=?
-            WHERE id=?
-        """, (nuova_durata, nuove_passate, stato, g["id"]))
-
-    db.commit()
-
-    return jsonify({"messaggio": "Giocate aggiornate"})
 
 # ==================================================
 # VEDI GIOCATE
@@ -230,7 +235,7 @@ def giocate_attive():
 
 @app.route("/")
 def home():
-    return "Backend Lotto Statistiche attivo"
+    return "Backend Lotto Live attivo"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
