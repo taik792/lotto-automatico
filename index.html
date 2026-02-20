@@ -67,6 +67,10 @@ estrazioniData = data;
 avviaSistema();
 });
 
+// -------------------------
+// AVVIO
+// -------------------------
+
 function avviaSistema(){
 controllaGiocate();
 mostraGiocate();
@@ -74,7 +78,7 @@ mostraRuote();
 }
 
 // -------------------------
-// CALCOLO STATISTICHE
+// ANALISI RUOTA
 // -------------------------
 
 function analizzaRuota(nome,estrazioni){
@@ -82,11 +86,11 @@ function analizzaRuota(nome,estrazioni){
 let ultime = estrazioni[0];
 
 let conteggio = {};
-for(let i=0;i<estrazioni.length;i++){
-estrazioni[i].forEach(n=>{
+estrazioni.forEach(e=>{
+e.forEach(n=>{
 conteggio[n]=(conteggio[n]||0)+1;
 });
-}
+});
 
 let caldi = Object.entries(conteggio)
 .sort((a,b)=>b[1]-a[1])
@@ -100,12 +104,7 @@ let freddi = Object.entries(conteggio)
 
 let amboForte = [caldi[0],caldi[1]];
 
-return {
-ultime,
-caldi,
-freddi,
-amboForte
-};
+return {ultime,caldi,freddi,amboForte};
 }
 
 // -------------------------
@@ -140,36 +139,53 @@ Salva ambo forte (Auto)
 }
 
 // -------------------------
-// SALVA GIOCATA INTELLIGENTE
+// MODELLO EVOLUTIVO SEMI-AI
 // -------------------------
 
 function salvaGiocata(ruota,n1,n2){
 
 let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
+let estrazioni = estrazioniData[ruota];
 
-let stats = analizzaRuota(ruota,estrazioniData[ruota]);
-
-let freq = 0;
-estrazioniData[ruota].slice(0,100).forEach(e=>{
+// Frequenza ultime 100
+let freq=0;
+estrazioni.slice(0,100).forEach(e=>{
 if(e.includes(n1)) freq++;
 if(e.includes(n2)) freq++;
 });
 
+// Ritardo reale
+function calcolaRitardo(numero){
+for(let i=0;i<estrazioni.length;i++){
+if(estrazioni[i].includes(numero)){
+return i;
+}
+}
+return estrazioni.length;
+}
+
+let rit1 = calcolaRitardo(n1);
+let rit2 = calcolaRitardo(n2);
+let ritardo = Math.max(rit1,rit2);
+
+// Indice evolutivo
+let indiceForza = (ritardo * 0.6) + ((30 - freq) * 0.4);
+
+// Traduzione in durata
 let durata;
 
-if(freq>30){
-durata=8;
-}else if(freq>20){
-durata=12;
+if(indiceForza > 20){
+durata = 8;
+}else if(indiceForza > 12){
+durata = 12;
 }else{
-durata=16;
+durata = 16;
 }
 
 giocate.push({
 ruota:ruota,
 num1:n1,
 num2:n2,
-inizio:0,
 durata:durata
 });
 
@@ -191,7 +207,6 @@ let nuove=[];
 giocate.forEach(g=>{
 
 let estrazioni = estrazioniData[g.ruota];
-
 let controllo = estrazioni.slice(0,g.durata);
 
 let vinta=false;
@@ -202,7 +217,7 @@ vinta=true;
 }
 });
 
-if(!vinta && controllo.length===g.durata){
+if(!vinta){
 nuove.push(g);
 }
 
@@ -229,12 +244,10 @@ div.innerHTML="";
 
 giocate.forEach((g,i)=>{
 
-let restanti = g.durata;
-
 div.innerHTML+=`
 <div>
 ${g.ruota} → ${g.num1}-${g.num2}
-(ancora ${restanti} estr.)
+(ancora ${g.durata} estr.)
 <button onclick="rimuovi(${i})">X</button>
 </div>
 `;
