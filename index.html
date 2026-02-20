@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live Evolution PRO+</title>
+<title>Lotto Live Evolution PRO REAL</title>
 
 <style>
 body{
@@ -10,11 +10,7 @@ body{
     color:white;
     font-family:Arial;
 }
-
-h1{
-    text-align:center;
-}
-
+h1{text-align:center;}
 button{
     padding:6px 12px;
     margin-top:6px;
@@ -23,12 +19,7 @@ button{
     border-radius:6px;
     cursor:pointer;
 }
-
-.container{
-    width:90%;
-    margin:auto;
-}
-
+.container{width:90%;margin:auto;}
 .box{
     border:2px solid orange;
     border-radius:10px;
@@ -36,32 +27,23 @@ button{
     margin:15px 0;
     background:#1a2530;
 }
-
 .migliore{
     border:3px solid gold;
     background:#222b36;
 }
-
-.attiva{
-    border:2px solid #00e676;
-}
-
-.stat{
-    margin:4px 0;
-}
-
 #giocateAttive{
     border:2px solid gold;
     padding:10px;
     border-radius:10px;
     margin-bottom:20px;
 }
+.stat{margin:4px 0;}
 </style>
 </head>
 
 <body>
 
-<h1>🔥 Lotto Live Evolution PRO+</h1>
+<h1>🔥 Lotto Live Evolution PRO REAL</h1>
 
 <div class="container">
 
@@ -69,11 +51,9 @@ button{
 
 <div id="ruoteContainer"></div>
 
-<div>
 <h3>📊 Statistiche Sistema</h3>
 <div id="percentualeBox">Percentuale Successo: 0%</div>
 <div id="storicoBox"></div>
-</div>
 
 </div>
 
@@ -119,15 +99,13 @@ function analizzaRuota(nome){
 }
 
 
-// ===== GENERA DASHBOARD COMPLETA =====
+// ===== GENERA DASHBOARD =====
 function generaDashboard(){
 
     let container = document.getElementById("ruoteContainer");
     container.innerHTML="";
-
     let migliorFreq=-1;
 
-    // Trova migliore
     Object.keys(estrazioni).forEach(ruota=>{
         let a = analizzaRuota(ruota);
         if(a.topFreq>migliorFreq){
@@ -136,16 +114,12 @@ function generaDashboard(){
         }
     });
 
-    // Disegna box
     Object.keys(estrazioni).forEach(ruota=>{
         let a = analizzaRuota(ruota);
 
         let box=document.createElement("div");
         box.className="box";
-
-        if(ruota===migliorRuotaGlobale){
-            box.classList.add("migliore");
-        }
+        if(ruota===migliorRuotaGlobale) box.classList.add("migliore");
 
         box.innerHTML=`
             <h3>${ruota} ${ruota===migliorRuotaGlobale?"⭐":""}</h3>
@@ -174,7 +148,8 @@ function salvaPrevisione(ruota,n1,n2){
         numeri:[n1,n2],
         durata:8,
         restanti:8,
-        vinta:false
+        vinta:false,
+        indice: Math.max(estrazioni[ruota].length - 50, 0)
     };
 
     localStorage.setItem("previsioneAttiva",JSON.stringify(previsione));
@@ -182,7 +157,7 @@ function salvaPrevisione(ruota,n1,n2){
 }
 
 
-// ===== MOSTRA GIOCATE ATTIVE =====
+// ===== MOSTRA GIOCATA ATTIVA =====
 function aggiornaGiocateAttive(){
 
     let box=document.getElementById("giocateAttive");
@@ -202,26 +177,36 @@ function aggiornaGiocateAttive(){
 }
 
 
-// ===== SIMULA ESTRAZIONE REALE =====
+// ===== SIMULA ESTRAZIONE REALISTICA =====
 function simulaEstrazione(){
 
     let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
     if(!p) return;
 
-    let ultima=estrazioni[p.ruota].slice(-1)[0];
+    let lista = estrazioni[p.ruota];
 
-    let vinta=p.numeri.every(n=>ultima.includes(n));
+    if(p.indice >= lista.length){
+        alert("Fine estrazioni disponibili nel JSON");
+        return;
+    }
+
+    let estrCorrente = lista[p.indice];
+
+    let vinta = p.numeri.every(n => estrCorrente.includes(n));
 
     p.restanti--;
+    p.indice++;
 
     if(vinta){
-        alert("🎉 AMBO USCITO REALMENTE!");
+        alert("🎉 AMBO USCITO ALLA ESTRAZIONE " + p.indice);
         salvaStorico(p,true);
         localStorage.removeItem("previsioneAttiva");
-    } else if(p.restanti<=0){
+    }
+    else if(p.restanti<=0){
         salvaStorico(p,false);
         evolvi(p);
-    } else{
+    }
+    else{
         localStorage.setItem("previsioneAttiva",JSON.stringify(p));
     }
 
