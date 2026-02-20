@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Live Statistiche Premium</title>
+<title>Lotto Live Evoluzione Premium</title>
 
 <style>
 body{
@@ -48,15 +48,17 @@ border-radius:5px;
 margin-top:5px;
 }
 
-select{
-margin-top:5px;
+.vinta{
+color:lime;
+font-weight:bold;
 }
+
 </style>
 </head>
 
 <body>
 
-<h1>🔥 Lotto Live Statistiche Premium 🔥</h1>
+<h1>🔥 Lotto Live Evoluzione Premium 🔥</h1>
 
 <div class="container">
 
@@ -108,17 +110,8 @@ div.innerHTML=`
 <p><b>⏳ Ritardo max:</b> ${stats.ritardo}</p>
 <p><b>🎯 Ambo forte:</b> ${stats.ambo[0]} - ${stats.ambo[1]}</p>
 
-<select id="estrazioni_${ruota}">
-<option value="5">5 estrazioni</option>
-<option value="10">10 estrazioni</option>
-<option value="15">15 estrazioni</option>
-<option value="20">20 estrazioni</option>
-</select>
-
-<br>
-
 <button onclick="salvaGiocata('${ruota}',${stats.ambo[0]},${stats.ambo[1]})">
-Salva ambo forte
+Salva ambo forte (Auto)
 </button>
 `;
 
@@ -162,8 +155,24 @@ function salvaGiocata(ruota,n1,n2){
 
 let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
 
-let selettore = document.getElementById("estrazioni_"+ruota);
-let durata = parseInt(selettore.value);
+// Calcolo durata intelligente
+let frequenza = 0;
+let lista = estrazioniData[ruota].slice(0,100);
+
+lista.forEach(e=>{
+if(e.includes(n1)) frequenza++;
+if(e.includes(n2)) frequenza++;
+});
+
+let durata;
+
+if(frequenza > 30){
+durata = 8;
+}else if(frequenza > 20){
+durata = 12;
+}else{
+durata = 16;
+}
 
 giocate.push({
 ruota:ruota,
@@ -187,9 +196,34 @@ box.innerHTML="Nessuna giocata attiva";
 return;
 }
 
+let nuoveGiocate = [];
 box.innerHTML="";
 
 giocate.forEach((g,i)=>{
+
+let estrazioni = estrazioniData[g.ruota];
+let vinte = false;
+
+let controllo = estrazioni.slice(0,g.restanti);
+
+controllo.forEach(e=>{
+if(e.includes(g.num1) && e.includes(g.num2)){
+vinte = true;
+}
+});
+
+if(vinte){
+
+box.innerHTML+=`
+<div class="vinta">
+🏆 ${g.ruota} → ${g.num1}-${g.num2} VINTA!
+</div>
+`;
+
+}else{
+
+nuoveGiocate.push(g);
+
 box.innerHTML+=`
 <div>
 ${g.ruota} → ${g.num1}-${g.num2} 
@@ -197,7 +231,12 @@ ${g.ruota} → ${g.num1}-${g.num2}
 <button onclick="rimuoviGiocata(${i})">X</button>
 </div>
 `;
+
+}
+
 });
+
+localStorage.setItem("giocate",JSON.stringify(nuoveGiocate));
 }
 
 function rimuoviGiocata(i){
