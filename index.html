@@ -1,29 +1,24 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Lotto Live Evoluzione Premium</title>
 
 <style>
 body{
-margin:0;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
 font-family:Arial;
-background:linear-gradient(to bottom,#0f2027,#203a43,#2c5364);
 color:white;
+margin:0;
+padding:20px;
 }
 
 h1{
 text-align:center;
-padding:20px;
 color:orange;
 }
 
-.container{
-width:90%;
-margin:auto;
-}
-
-.ruota{
+.box{
 border:2px solid orange;
 border-radius:10px;
 padding:15px;
@@ -31,28 +26,22 @@ margin:15px 0;
 background:rgba(0,0,0,0.4);
 }
 
-.premium-box{
-border:2px solid gold;
-padding:15px;
-margin:20px 0;
-border-radius:10px;
-background:rgba(0,0,0,0.6);
-}
-
 button{
 background:orange;
 border:none;
-padding:5px 10px;
-cursor:pointer;
+padding:6px 10px;
 border-radius:5px;
-margin-top:5px;
-}
-
-.vinta{
-color:lime;
+cursor:pointer;
 font-weight:bold;
 }
 
+#giocatePremium{
+border:2px solid gold;
+padding:15px;
+border-radius:10px;
+margin-bottom:20px;
+background:rgba(0,0,0,0.6);
+}
 </style>
 </head>
 
@@ -60,186 +49,200 @@ font-weight:bold;
 
 <h1>🔥 Lotto Live Evoluzione Premium 🔥</h1>
 
-<div class="container">
-
-<div class="premium-box">
+<div id="giocatePremium">
 <h2>🎯 Giocate Attive Premium</h2>
-<div id="giocatePremium"></div>
+<div id="listaGiocate">Caricamento...</div>
 </div>
 
-<div id="ruote"></div>
-
-</div>
+<div id="contenuto"></div>
 
 <script>
 
 let estrazioniData = {};
 
 fetch("estrazioni.json")
-.then(res => res.json())
-.then(data => {
+.then(res=>res.json())
+.then(data=>{
 estrazioniData = data;
-generaRuote();
+avviaSistema();
 });
 
-function generaRuote(){
-
-const ordine = ["Bari","Cagliari","Firenze","Genova","Milano","Napoli","Palermo","Roma","Torino","Venezia","Nazionale"];
-
-const container = document.getElementById("ruote");
-container.innerHTML="";
-
-ordine.forEach(ruota=>{
-
-if(!estrazioniData[ruota]) return;
-
-let estrazioni = estrazioniData[ruota];
-let ultima = estrazioni[0];
-
-let stats = calcolaStatistiche(estrazioni);
-
-let div = document.createElement("div");
-div.className="ruota";
-
-div.innerHTML=`
-<h3>${ruota}</h3>
-<p><b>Ultima:</b> ${ultima.join(" - ")}</p>
-
-<p><b>🔥 Caldi:</b> ${stats.caldi.join(", ")}</p>
-<p><b>❄ Freddi:</b> ${stats.freddi.join(", ")}</p>
-<p><b>⏳ Ritardo max:</b> ${stats.ritardo}</p>
-<p><b>🎯 Ambo forte:</b> ${stats.ambo[0]} - ${stats.ambo[1]}</p>
-
-<button onclick="salvaGiocata('${ruota}',${stats.ambo[0]},${stats.ambo[1]})">
-Salva ambo forte (Auto)
-</button>
-`;
-
-container.appendChild(div);
-
-});
-
+function avviaSistema(){
+controllaGiocate();
 mostraGiocate();
+mostraRuote();
 }
 
-function calcolaStatistiche(lista){
+// -------------------------
+// CALCOLO STATISTICHE
+// -------------------------
 
-let freq = {};
-let ultimi100 = lista.slice(0,100);
+function analizzaRuota(nome,estrazioni){
 
-ultimi100.forEach(estr=>{
-estr.forEach(n=>{
-freq[n]=(freq[n]||0)+1;
+let ultime = estrazioni[0];
+
+let conteggio = {};
+for(let i=0;i<estrazioni.length;i++){
+estrazioni[i].forEach(n=>{
+conteggio[n]=(conteggio[n]||0)+1;
 });
-});
+}
 
-let numeri = Object.keys(freq).map(n=>({n:parseInt(n),f:freq[n]}));
+let caldi = Object.entries(conteggio)
+.sort((a,b)=>b[1]-a[1])
+.slice(0,3)
+.map(x=>parseInt(x[0]));
 
-numeri.sort((a,b)=>b.f-a.f);
-let caldi = numeri.slice(0,3).map(x=>x.n);
+let freddi = Object.entries(conteggio)
+.sort((a,b)=>a[1]-b[1])
+.slice(0,3)
+.map(x=>parseInt(x[0]));
 
-numeri.sort((a,b)=>a.f-b.f);
-let freddi = numeri.slice(0,3).map(x=>x.n);
+let amboForte = [caldi[0],caldi[1]];
 
-let ritardo = freddi[0];
-
-return{
-caldi:caldi,
-freddi:freddi,
-ritardo:ritardo,
-ambo:[caldi[0],caldi[1]]
+return {
+ultime,
+caldi,
+freddi,
+amboForte
 };
 }
+
+// -------------------------
+// MOSTRA RUOTE
+// -------------------------
+
+function mostraRuote(){
+
+let div = document.getElementById("contenuto");
+div.innerHTML="";
+
+let ruoteOrdinate = Object.keys(estrazioniData).sort();
+
+ruoteOrdinate.forEach(nome=>{
+
+let stats = analizzaRuota(nome,estrazioniData[nome]);
+
+div.innerHTML+=`
+<div class="box">
+<h2>${nome}</h2>
+<p>Ultima: ${stats.ultime.join(" - ")}</p>
+<p>🔥 Caldi: ${stats.caldi.join(", ")}</p>
+<p>❄ Freddi: ${stats.freddi.join(", ")}</p>
+<p>🎯 Ambo forte: ${stats.amboForte[0]} - ${stats.amboForte[1]}</p>
+<button onclick="salvaGiocata('${nome}',${stats.amboForte[0]},${stats.amboForte[1]})">
+Salva ambo forte (Auto)
+</button>
+</div>
+`;
+
+});
+}
+
+// -------------------------
+// SALVA GIOCATA INTELLIGENTE
+// -------------------------
 
 function salvaGiocata(ruota,n1,n2){
 
 let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
 
-// Calcolo durata intelligente
-let frequenza = 0;
-let lista = estrazioniData[ruota].slice(0,100);
+let stats = analizzaRuota(ruota,estrazioniData[ruota]);
 
-lista.forEach(e=>{
-if(e.includes(n1)) frequenza++;
-if(e.includes(n2)) frequenza++;
+let freq = 0;
+estrazioniData[ruota].slice(0,100).forEach(e=>{
+if(e.includes(n1)) freq++;
+if(e.includes(n2)) freq++;
 });
 
 let durata;
 
-if(frequenza > 30){
-durata = 8;
-}else if(frequenza > 20){
-durata = 12;
+if(freq>30){
+durata=8;
+}else if(freq>20){
+durata=12;
 }else{
-durata = 16;
+durata=16;
 }
 
 giocate.push({
 ruota:ruota,
 num1:n1,
 num2:n2,
-restanti:durata
+inizio:0,
+durata:durata
 });
 
 localStorage.setItem("giocate",JSON.stringify(giocate));
 
+controllaGiocate();
 mostraGiocate();
 }
 
-function mostraGiocate(){
+// -------------------------
+// CONTROLLO AUTOMATICO
+// -------------------------
 
-let box = document.getElementById("giocatePremium");
+function controllaGiocate(){
+
 let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
+let nuove=[];
 
-if(giocate.length===0){
-box.innerHTML="Nessuna giocata attiva";
-return;
-}
-
-let nuoveGiocate = [];
-box.innerHTML="";
-
-giocate.forEach((g,i)=>{
+giocate.forEach(g=>{
 
 let estrazioni = estrazioniData[g.ruota];
-let vinte = false;
 
-let controllo = estrazioni.slice(0,g.restanti);
+let controllo = estrazioni.slice(0,g.durata);
+
+let vinta=false;
 
 controllo.forEach(e=>{
 if(e.includes(g.num1) && e.includes(g.num2)){
-vinte = true;
+vinta=true;
 }
 });
 
-if(vinte){
+if(!vinta && controllo.length===g.durata){
+nuove.push(g);
+}
 
-box.innerHTML+=`
-<div class="vinta">
-🏆 ${g.ruota} → ${g.num1}-${g.num2} VINTA!
-</div>
-`;
+});
 
-}else{
+localStorage.setItem("giocate",JSON.stringify(nuove));
+}
 
-nuoveGiocate.push(g);
+// -------------------------
+// MOSTRA GIOCATE
+// -------------------------
 
-box.innerHTML+=`
+function mostraGiocate(){
+
+let div = document.getElementById("listaGiocate");
+let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
+
+if(giocate.length===0){
+div.innerHTML="Nessuna giocata attiva";
+return;
+}
+
+div.innerHTML="";
+
+giocate.forEach((g,i)=>{
+
+let restanti = g.durata;
+
+div.innerHTML+=`
 <div>
-${g.ruota} → ${g.num1}-${g.num2} 
-(ancora ${g.restanti} estr.)
-<button onclick="rimuoviGiocata(${i})">X</button>
+${g.ruota} → ${g.num1}-${g.num2}
+(ancora ${restanti} estr.)
+<button onclick="rimuovi(${i})">X</button>
 </div>
 `;
 
-}
-
 });
-
-localStorage.setItem("giocate",JSON.stringify(nuoveGiocate));
 }
 
-function rimuoviGiocata(i){
+function rimuovi(i){
 let giocate = JSON.parse(localStorage.getItem("giocate"))||[];
 giocate.splice(i,1);
 localStorage.setItem("giocate",JSON.stringify(giocate));
@@ -247,6 +250,5 @@ mostraGiocate();
 }
 
 </script>
-
 </body>
 </html>
