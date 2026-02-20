@@ -75,7 +75,7 @@ generaDashboard();
 .catch(()=>alert("Errore caricamento JSON"));
 
 
-// ===== ANALISI BASE =====
+// ===== ANALISI =====
 function analizzaRuota(nome){
 
 let dati=estrazioni[nome];
@@ -102,17 +102,14 @@ ultima:dati[dati.length-1]
 }
 
 
-// ===== CALCOLO MACHINE SCORE =====
+// ===== MACHINE SCORE =====
 function calcolaScore(ruota){
 
 let a = analizzaRuota(ruota);
 
 if(!scoreData[ruota]) scoreData[ruota]={win:0,lose:0};
 
-let base =
-(a.topFreq * 2)
-+ a.mediaTop3;
-
+let base = (a.topFreq * 2) + a.mediaTop3;
 let bonus = scoreData[ruota].win * 20;
 let penalita = scoreData[ruota].lose * 12;
 
@@ -137,7 +134,7 @@ return lista.sort((a,b)=>b.score-a.score);
 }
 
 
-// ===== DASHBOARD =====
+// ===== DASHBOARD (ORDINE UFFICIALE) =====
 function generaDashboard(){
 
 let container=document.getElementById("ruoteContainer");
@@ -146,9 +143,10 @@ container.innerHTML="";
 let classifica=classificaRuote();
 let migliore=classifica[0]?.ruota;
 
-classifica.forEach(item=>{
+ordineRuote.forEach(r=>{
 
-let r=item.ruota;
+if(!estrazioni[r]) return;
+
 let a=analizzaRuota(r);
 
 if(!scoreData[r]) scoreData[r]={win:0,lose:0};
@@ -159,7 +157,7 @@ if(r===migliore) box.classList.add("migliore");
 
 box.innerHTML=`
 <h3>${r} ${r===migliore?"⭐":""}</h3>
-<div class="score">Score: ${item.score}</div>
+<div class="score">Score: ${calcolaScore(r)}</div>
 <div class="stat">Vittorie: ${scoreData[r].win}</div>
 <div class="stat">Perdite: ${scoreData[r].lose}</div>
 <div class="stat">Ultima: ${a.ultima.join(" - ")}</div>
@@ -303,7 +301,7 @@ localStorage.setItem("previsioneAttiva",JSON.stringify(p));
 }
 
 
-// ===== STORICO GENERALE =====
+// ===== STORICO =====
 function salvaStorico(vinta){
 
 let storico=JSON.parse(localStorage.getItem("storico"))||[];
