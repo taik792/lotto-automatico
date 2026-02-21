@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Evolution PRO MAX</title>
+<title>Lotto Evolution PRO MAX Backup</title>
 
 <style>
 body{background:#0f1720;color:white;font-family:Arial;}
@@ -45,6 +45,9 @@ color:#00e5ff;
 <body>
 
 <h1>🔥 Lotto Evolution PRO MAX</h1>
+
+<button onclick="ripristinaStato()">Ripristina Stato Sistema</button>
+<input type="file" id="fileInput" style="display:none" onchange="caricaBackup(event)">
 
 <div class="container">
 
@@ -134,7 +137,7 @@ return lista.sort((a,b)=>b.score-a.score);
 }
 
 
-// ===== DASHBOARD (ORDINE UFFICIALE) =====
+// ===== DASHBOARD =====
 function generaDashboard(){
 
 let container=document.getElementById("ruoteContainer");
@@ -177,7 +180,7 @@ aggiornaGiocateAttive();
 }
 
 
-// ===== CREA PREVISIONE LIVE =====
+// ===== CREA PREVISIONE =====
 function salvaPrevisione(ruota){
 
 let a=analizzaRuota(ruota);
@@ -216,7 +219,7 @@ ${p.ruota} → ${p.numeri.join("-")}
 }
 
 
-// ===== SIMULAZIONE LIVE =====
+// ===== SIMULAZIONE =====
 function simulaEstrazione(){
 
 let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
@@ -239,12 +242,13 @@ p.restanti--;
 if(vinta){
 alert("🎉 AMBO USCITO!");
 scoreData[p.ruota].win++;
-salvaStorico(true);
+salvaBackupAutomatico();
 localStorage.removeItem("previsioneAttiva");
 }
 else if(p.restanti<=0){
 scoreData[p.ruota].lose++;
 evolviSistema(p);
+salvaBackupAutomatico();
 }
 else{
 localStorage.setItem("previsioneAttiva",JSON.stringify(p));
@@ -258,7 +262,7 @@ generaDashboard();
 }
 
 
-// ===== EVOLUZIONE + CAMBIO RUOTA =====
+// ===== EVOLUZIONE =====
 function evolviSistema(p){
 
 p.strategia++;
@@ -301,12 +305,61 @@ localStorage.setItem("previsioneAttiva",JSON.stringify(p));
 }
 
 
-// ===== STORICO =====
-function salvaStorico(vinta){
+// ===== BACKUP =====
+function salvaBackupAutomatico(){
 
-let storico=JSON.parse(localStorage.getItem("storico"))||[];
-storico.push({esito:vinta?"VINTA":"PERSA"});
-localStorage.setItem("storico",JSON.stringify(storico));
+let backup = {
+previsioneAttiva: JSON.parse(localStorage.getItem("previsioneAttiva")),
+scoreData: JSON.parse(localStorage.getItem("scoreData")),
+storico: JSON.parse(localStorage.getItem("storico"))
+};
+
+let blob = new Blob([JSON.stringify(backup,null,2)], {type:"application/json"});
+let url = URL.createObjectURL(blob);
+
+let a = document.createElement("a");
+a.href = url;
+a.download = "backup_sistema.json";
+a.click();
+
+URL.revokeObjectURL(url);
+}
+
+
+// ===== RIPRISTINO =====
+function ripristinaStato(){
+document.getElementById("fileInput").click();
+}
+
+function caricaBackup(event){
+
+let file = event.target.files[0];
+if(!file) return;
+
+let reader = new FileReader();
+
+reader.onload = function(e){
+
+let dati = JSON.parse(e.target.result);
+
+if(dati.previsioneAttiva)
+localStorage.setItem("previsioneAttiva", JSON.stringify(dati.previsioneAttiva));
+
+if(dati.scoreData)
+localStorage.setItem("scoreData", JSON.stringify(dati.scoreData));
+
+if(dati.storico)
+localStorage.setItem("storico", JSON.stringify(dati.storico));
+
+scoreData = dati.scoreData || {};
+alert("Stato sistema ripristinato!");
+
+aggiornaGiocateAttive();
+aggiornaPercentuale();
+generaDashboard();
+};
+
+reader.readAsText(file);
 }
 
 
