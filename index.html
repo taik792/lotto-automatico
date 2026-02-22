@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Evolution PRO MAX Backup</title>
+<title>Lotto Evolution PRO MAX</title>
 
 <style>
 body{background:#0f1720;color:white;font-family:Arial;}
@@ -33,7 +33,6 @@ padding:10px;
 border-radius:10px;
 margin-bottom:20px;
 }
-.stat{margin:4px 0;}
 .score{
 font-size:18px;
 font-weight:bold;
@@ -77,10 +76,7 @@ generaDashboard();
 })
 .catch(()=>alert("Errore caricamento JSON"));
 
-
-// ===== ANALISI =====
 function analizzaRuota(nome){
-
 let dati=estrazioni[nome];
 let ultime=dati.slice(-50);
 
@@ -104,12 +100,8 @@ ultima:dati[dati.length-1]
 };
 }
 
-
-// ===== MACHINE SCORE =====
 function calcolaScore(ruota){
-
 let a = analizzaRuota(ruota);
-
 if(!scoreData[ruota]) scoreData[ruota]={win:0,lose:0};
 
 let base = (a.topFreq * 2) + a.mediaTop3;
@@ -119,39 +111,24 @@ let penalita = scoreData[ruota].lose * 12;
 return Math.round(base + bonus - penalita);
 }
 
-
-// ===== CLASSIFICA =====
 function classificaRuote(){
-
 let lista=[];
-
 ordineRuote.forEach(r=>{
 if(!estrazioni[r]) return;
-lista.push({
-ruota:r,
-score:calcolaScore(r)
+lista.push({ruota:r,score:calcolaScore(r)});
 });
-});
-
 return lista.sort((a,b)=>b.score-a.score);
 }
 
-
-// ===== DASHBOARD =====
 function generaDashboard(){
-
 let container=document.getElementById("ruoteContainer");
 container.innerHTML="";
-
 let classifica=classificaRuote();
 let migliore=classifica[0]?.ruota;
 
 ordineRuote.forEach(r=>{
-
 if(!estrazioni[r]) return;
-
 let a=analizzaRuota(r);
-
 if(!scoreData[r]) scoreData[r]={win:0,lose:0};
 
 let box=document.createElement("div");
@@ -161,30 +138,21 @@ if(r===migliore) box.classList.add("migliore");
 box.innerHTML=`
 <h3>${r} ${r===migliore?"⭐":""}</h3>
 <div class="score">Score: ${calcolaScore(r)}</div>
-<div class="stat">Vittorie: ${scoreData[r].win}</div>
-<div class="stat">Perdite: ${scoreData[r].lose}</div>
-<div class="stat">Ultima: ${a.ultima.join(" - ")}</div>
-<div class="stat">🔥 Caldi: ${a.caldi.join(", ")}</div>
-<div class="stat">❄ Freddi: ${a.freddi.join(", ")}</div>
-<div class="stat">🎯 Ambo Forte: ${a.caldi[0]} - ${a.freddi[0]}</div>
-<button onclick="salvaPrevisione('${r}')">
-Salva ambo forte
-</button>
+<div>Vittorie: ${scoreData[r].win}</div>
+<div>Perdite: ${scoreData[r].lose}</div>
+<div>Ultima: ${a.ultima.join(" - ")}</div>
+<div>🔥 Caldi: ${a.caldi.join(", ")}</div>
+<div>❄ Freddi: ${a.freddi.join(", ")}</div>
+<div>🎯 Ambo Forte: ${a.caldi[0]} - ${a.freddi[0]}</div>
+<button onclick="salvaPrevisione('${r}')">Salva ambo forte</button>
 `;
-
 container.appendChild(box);
-
 });
-
 aggiornaGiocateAttive();
 }
 
-
-// ===== CREA PREVISIONE =====
 function salvaPrevisione(ruota){
-
 let a=analizzaRuota(ruota);
-
 let previsione={
 ruota,
 durata:8,
@@ -193,50 +161,32 @@ indice:estrazioni[ruota].length-1,
 strategia:0,
 numeri:[a.caldi[0],a.freddi[0]]
 };
-
 localStorage.setItem("previsioneAttiva",JSON.stringify(previsione));
 aggiornaGiocateAttive();
 }
 
-
-// ===== GIOCATA ATTIVA =====
 function aggiornaGiocateAttive(){
-
 let box=document.getElementById("giocateAttive");
 let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
-
-if(!p){
-box.innerHTML="<strong>Nessuna giocata attiva</strong>";
-return;
-}
-
+if(!p){ box.innerHTML="<strong>Nessuna giocata attiva</strong>"; return;}
 box.innerHTML=`
 <strong>🎯 Giocata Attiva</strong><br>
-${p.ruota} → ${p.numeri.join("-")}
-(ancora ${p.restanti})
+${p.ruota} → ${p.numeri.join("-")} (ancora ${p.restanti})
 <button onclick="simulaEstrazione()">Simula</button>
 `;
 }
 
-
-// ===== SIMULAZIONE =====
 function simulaEstrazione(){
-
 let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
 if(!p) return;
-
 let lista=estrazioni[p.ruota];
-
 if(p.indice>=lista.length-1){
 alert("Aggiorna il JSON con nuova estrazione");
 return;
 }
-
 p.indice++;
 let estrCorrente=lista[p.indice];
-
 let vinta=p.numeri.every(n=>estrCorrente.includes(n));
-
 p.restanti--;
 
 if(vinta){
@@ -255,39 +205,40 @@ localStorage.setItem("previsioneAttiva",JSON.stringify(p));
 }
 
 localStorage.setItem("scoreData",JSON.stringify(scoreData));
-
 aggiornaGiocateAttive();
 aggiornaPercentuale();
 generaDashboard();
 }
 
-
-// ===== EVOLUZIONE =====
 function evolviSistema(p){
-
 p.strategia++;
 
 if(p.strategia>2){
 
-let classifica=classificaRuote();
-let nuova=classifica[1]?.ruota;
+let classifica = classificaRuote();
+let attualeScore = calcolaScore(p.ruota);
+let seconda = classifica[1];
+let nuova = p.ruota;
 
-alert("⚠ Strategia fallita. Cambio automatico su "+nuova);
+if(seconda){
+let differenza = seconda.score - attualeScore;
+if(differenza >= 3){
+nuova = seconda.ruota;
+alert("⚠ Cambio ruota: differenza " + differenza);
+}
+}
 
-let a=analizzaRuota(nuova);
-
-p.ruota=nuova;
-p.strategia=0;
-p.durata=8;
-p.restanti=8;
-p.indice=estrazioni[nuova].length-1;
-p.numeri=[a.caldi[0],a.freddi[0]];
+let a = analizzaRuota(nuova);
+p.ruota = nuova;
+p.strategia = 0;
+p.durata = 8;
+p.restanti = 8;
+p.indice = estrazioni[nuova].length - 1;
+p.numeri = [a.caldi[0],a.freddi[0]];
 
 }
 else{
-
 let a=analizzaRuota(p.ruota);
-
 if(p.strategia===1){
 p.numeri=[a.caldi[0],a.caldi[1]];
 p.durata=12;
@@ -298,83 +249,49 @@ p.numeri=[a.freddi[0],a.freddi[1]];
 p.durata=16;
 p.restanti=16;
 }
-
 }
 
 localStorage.setItem("previsioneAttiva",JSON.stringify(p));
 }
 
-
-// ===== BACKUP =====
 function salvaBackupAutomatico(){
-
-let backup = {
-previsioneAttiva: JSON.parse(localStorage.getItem("previsioneAttiva")),
-scoreData: JSON.parse(localStorage.getItem("scoreData")),
-storico: JSON.parse(localStorage.getItem("storico"))
+let backup={
+previsioneAttiva:JSON.parse(localStorage.getItem("previsioneAttiva")),
+scoreData:JSON.parse(localStorage.getItem("scoreData"))
 };
-
-let blob = new Blob([JSON.stringify(backup,null,2)], {type:"application/json"});
-let url = URL.createObjectURL(blob);
-
-let a = document.createElement("a");
-a.href = url;
-a.download = "backup_sistema.json";
+let blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
+let url=URL.createObjectURL(blob);
+let a=document.createElement("a");
+a.href=url;
+a.download="backup_sistema.json";
 a.click();
-
 URL.revokeObjectURL(url);
 }
 
-
-// ===== RIPRISTINO =====
-function ripristinaStato(){
-document.getElementById("fileInput").click();
-}
+function ripristinaStato(){ document.getElementById("fileInput").click(); }
 
 function caricaBackup(event){
-
-let file = event.target.files[0];
+let file=event.target.files[0];
 if(!file) return;
-
-let reader = new FileReader();
-
-reader.onload = function(e){
-
-let dati = JSON.parse(e.target.result);
-
+let reader=new FileReader();
+reader.onload=function(e){
+let dati=JSON.parse(e.target.result);
 if(dati.previsioneAttiva)
-localStorage.setItem("previsioneAttiva", JSON.stringify(dati.previsioneAttiva));
-
+localStorage.setItem("previsioneAttiva",JSON.stringify(dati.previsioneAttiva));
 if(dati.scoreData)
-localStorage.setItem("scoreData", JSON.stringify(dati.scoreData));
-
-if(dati.storico)
-localStorage.setItem("storico", JSON.stringify(dati.storico));
-
-scoreData = dati.scoreData || {};
-alert("Stato sistema ripristinato!");
-
+localStorage.setItem("scoreData",JSON.stringify(dati.scoreData));
+scoreData=dati.scoreData||{};
+alert("Stato ripristinato");
 aggiornaGiocateAttive();
-aggiornaPercentuale();
 generaDashboard();
 };
-
 reader.readAsText(file);
 }
 
-
-// ===== PERCENTUALE =====
 function aggiornaPercentuale(){
-
-let storico=JSON.parse(localStorage.getItem("storico"))||[];
-let vinte=storico.filter(s=>s.esito==="VINTA").length;
-let perc=storico.length?((vinte/storico.length)*100).toFixed(1):0;
-document.getElementById("percentualeBox").innerText=perc+"%";
+document.getElementById("percentualeBox").innerText="Test in corso";
 }
 
-aggiornaPercentuale();
-
 </script>
-
 </body>
 </html>
