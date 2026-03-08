@@ -2,85 +2,106 @@ import json
 from collections import Counter
 from itertools import combinations
 
-# -----------------------------
+# -----------------------
 # PARAMETRI
-# -----------------------------
+# -----------------------
 
 NUMERI_RUOTA = 5
 MAX_NUMERO = 90
+
 ULTIME_ESTRAZIONI = 24
 TOP_NUMERI = 4
 NUMERI_FINALI = 2
 
-# -----------------------------
-# CARICA DATI JSON
-# -----------------------------
+
+# -----------------------
+# CARICA DATI
+# -----------------------
 
 with open("estrazioni.json", "r") as f:
     data = json.load(f)
 
 ruote = data.keys()
 
-# -----------------------------
-# FUNZIONE CALCOLO FREQUENZA
-# -----------------------------
+
+# -----------------------
+# FREQUENZA NUMERI
+# -----------------------
 
 def calcola_frequenza(estrazioni):
+
     freq = Counter()
+
     for estr in estrazioni[-ULTIME_ESTRAZIONI:]:
         for n in estr:
             freq[n] += 1
+
     return freq
 
-# -----------------------------
-# CALCOLO RITARDO
-# -----------------------------
+
+# -----------------------
+# RITARDO NUMERI
+# -----------------------
 
 def calcola_ritardo(estrazioni):
+
     ritardi = {}
+
+    ultime = estrazioni[-ULTIME_ESTRAZIONI:]
+
     for numero in range(1, MAX_NUMERO + 1):
+
         ritardo = 0
-        for estr in reversed(estrazioni):
+
+        for estr in reversed(ultime):
+
             if numero in estr:
                 break
+
             ritardo += 1
+
         ritardi[numero] = ritardo
+
     return ritardi
 
-# -----------------------------
+
+# -----------------------
 # SCORE NUMERI
-# -----------------------------
+# -----------------------
 
 def score_numeri(freq, ritardi):
 
     score = {}
 
-    for n in range(1, MAX_NUMERO + 1):
+    for numero in range(1, MAX_NUMERO + 1):
 
-        f = freq.get(n, 0)
-        r = ritardi.get(n, 0)
+        frequenza = freq.get(numero, 0)
+        ritardo = ritardi.get(numero, 0)
 
-        score[n] = (f * 2) + r
+        score[numero] = frequenza + ritardo
 
     return score
 
-# -----------------------------
-# FILTRO CONVERGENZA
-# -----------------------------
+
+# -----------------------
+# CONVERGENZA COPPIE
+# -----------------------
 
 def convergenza(estrazioni):
 
     coppie = Counter()
 
     for estr in estrazioni[-ULTIME_ESTRAZIONI:]:
-        for c in combinations(estr, 2):
-            coppie[tuple(sorted(c))] += 1
+
+        for c in combinations(sorted(estr), 2):
+            coppie[c] += 1
 
     return coppie
 
-# -----------------------------
+
+# -----------------------
 # ANALISI RUOTE
-# -----------------------------
+# -----------------------
 
 risultati = []
 
@@ -97,23 +118,23 @@ for ruota in ruote:
 
     top_numeri = [n[0] for n in top]
 
-    # convergenza
     coppie = convergenza(estrazioni)
 
     migliori_coppie = []
 
     for c in combinations(top_numeri, 2):
-    key = tuple(sorted(c))
-    
-    # forza base della convergenza
-    forza = coppie.get(key, 0)
-    
-    # bonus se entrambi i numeri hanno score alto
-    bonus = score.get(c[0], 0) + score.get(c[1], 0)
-    
-    forza_totale = forza * 2 + bonus
 
-    migliori_coppie.append((c, forza_totale))
+        key = tuple(sorted(c))
+
+        forza = coppie.get(key, 0)
+
+        bonus = score.get(c[0], 0) + score.get(c[1], 0)
+
+        forza_totale = forza * 2 + bonus
+
+        migliori_coppie.append((c, forza_totale))
+
+    migliori_coppie.sort(key=lambda x: x[1], reverse=True)
 
     numeri_finali = top_numeri[:NUMERI_FINALI]
 
@@ -123,19 +144,9 @@ for ruota in ruote:
         "ambi_forti": migliori_coppie[:3]
     })
 
-# -----------------------------
-# ORDINA MIGLIORI RUOTE
-# -----------------------------
 
-print("\nPREVISIONI LOTTO EVOLUTION PRO MAX 2.0\n")
+# -----------------------
+# OUTPUT
+# -----------------------
 
-for r in risultati:
-
-    print("Ruota:", r["ruota"])
-    print("Numeri:", r["numeri"])
-
-    print("Ambi forti:")
-    for a in r["ambi_forti"]:
-        print(" ", a)
-
-    print("-" * 40)
+print(json.dumps(risultati, indent=2))
