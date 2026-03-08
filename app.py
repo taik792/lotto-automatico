@@ -11,6 +11,7 @@ with open("estrazioni.json","r") as f:
 
 ruote = list(data.keys())
 
+
 def frequenza(estrazioni):
 
     freq = Counter()
@@ -69,11 +70,22 @@ def convergenza_ruota(estrazioni):
     return coppie
 
 
+def saturazione_ruota(rit):
+
+    valori=list(rit.values())
+
+    media=sum(valori)/len(valori)
+
+    return media
+
+
 risultati=[]
 
 tutte_coppie=Counter()
 
 score_ruote={}
+
+saturazione={}
 
 for ruota in ruote:
 
@@ -86,6 +98,10 @@ for ruota in ruote:
     rit=ritardi(estrazioni)
 
     score=score_numeri(freq,rit)
+
+    sat=saturazione_ruota(rit)
+
+    saturazione[ruota]=sat
 
     top=sorted(score.items(), key=lambda x:x[1], reverse=True)[:TOP_NUMERI]
 
@@ -116,9 +132,14 @@ for ruota in ruote:
     risultati.append({
 
         "ruota":ruota,
+
         "ultima_estrazione":ultima,
+
         "numeri_caldi":top_numeri[:NUMERI_FINALI],
-        "ambo_forte":migliori[0][0]
+
+        "ambo_forte":migliori[0][0],
+
+        "saturazione":round(sat,2)
 
     })
 
@@ -133,7 +154,12 @@ convergenze=sorted(tutte_coppie.items(), key=lambda x:x[1], reverse=True)[:5]
 ruota_top=max(score_ruote, key=score_ruote.get)
 
 
-# ambi ciclici (ritardo alto)
+# ruota più satura
+
+ruota_satura=max(saturazione, key=saturazione.get)
+
+
+# ambi ciclici
 
 ritardo_ambi=[]
 
@@ -153,6 +179,8 @@ output={
     "convergenza_ruote":convergenze,
 
     "ruota_top_settimana":ruota_top,
+
+    "ruota_piu_satura":ruota_satura,
 
     "ambi_ciclici":ambi_ciclici
 
