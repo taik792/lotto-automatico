@@ -12,11 +12,16 @@ with open("estrazioni.json","r") as f:
 ruote = list(data.keys())
 
 def frequenza(estrazioni):
+
     freq = Counter()
+
     for estr in estrazioni[-ULTIME_ESTRAZIONI:]:
+
         for n in estr:
             freq[n]+=1
+
     return freq
+
 
 def ritardi(estrazioni):
 
@@ -39,6 +44,7 @@ def ritardi(estrazioni):
 
     return rit
 
+
 def score_numeri(freq,rit):
 
     score={}
@@ -48,6 +54,7 @@ def score_numeri(freq,rit):
         score[n]=freq.get(n,0)+rit.get(n,0)
 
     return score
+
 
 def convergenza_ruota(estrazioni):
 
@@ -65,6 +72,8 @@ def convergenza_ruota(estrazioni):
 risultati=[]
 
 tutte_coppie=Counter()
+
+score_ruote={}
 
 for ruota in ruote:
 
@@ -102,14 +111,13 @@ for ruota in ruote:
 
     migliori.sort(key=lambda x:x[1],reverse=True)
 
+    score_ruote[ruota]=migliori[0][1]
+
     risultati.append({
 
         "ruota":ruota,
-
         "ultima_estrazione":ultima,
-
         "numeri_caldi":top_numeri[:NUMERI_FINALI],
-
         "ambo_forte":migliori[0][0]
 
     })
@@ -119,16 +127,41 @@ for ruota in ruote:
 
 convergenze=sorted(tutte_coppie.items(), key=lambda x:x[1], reverse=True)[:5]
 
+
+# ruota più forte
+
+ruota_top=max(score_ruote, key=score_ruote.get)
+
+
+# ambi ciclici (ritardo alto)
+
+ritardo_ambi=[]
+
+for coppia,val in tutte_coppie.items():
+
+    ritardo_ambi.append((coppia,val))
+
+ritardo_ambi.sort(key=lambda x:x[1], reverse=True)
+
+ambi_ciclici=ritardo_ambi[:5]
+
+
 output={
 
     "ruote":risultati,
 
-    "convergenza_ruote":convergenze
+    "convergenza_ruote":convergenze,
+
+    "ruota_top_settimana":ruota_top,
+
+    "ambi_ciclici":ambi_ciclici
 
 }
+
 
 with open("risultati.json","w") as f:
 
     json.dump(output,f,indent=2)
+
 
 print("Aggiornamento completato")
