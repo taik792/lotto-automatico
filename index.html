@@ -11,7 +11,7 @@
 body{
 font-family:Arial;
 background:#111;
-color:#fff;
+color:white;
 text-align:center;
 }
 
@@ -48,6 +48,8 @@ border-radius:10px;
 <div id="ruote"></div>
 
 <div class="global" id="global"></div>
+
+<div class="global" id="consigli"></div>
 
 <script>
 
@@ -107,6 +109,33 @@ global.innerHTML=`
 
 <p><b>Convergenza ruote</b></p>
 <p>${data.convergenza_ruote.map(a=>a[0].join("-")).join(" , ")}</p>
+
+`
+
+
+const consigli=document.getElementById("consigli")
+
+let ruota=data.ruota_piu_satura
+
+let ruotaData=data.ruote.find(r=>r.ruota===ruota)
+
+let ambo=ruotaData.ambo_forte
+
+consigli.innerHTML=`
+
+<h2>Giocata Consigliata</h2>
+
+<p><b>Ruota:</b> ${ruota}</p>
+
+<p><b>Ambo:</b> ${ambo.join(" - ")}</p>
+
+<p>Motivo:</p>
+
+<p>
+• Ruota più satura<br>
+• Analisi statistica<br>
+• Convergenza algoritmo
+</p>
 
 `
 
