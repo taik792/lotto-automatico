@@ -8,9 +8,9 @@ from itertools import combinations
 
 NUMERI_RUOTA = 5
 MAX_NUMERO = 90
-ULTIME_ESTRAZIONI = 30
-TOP_NUMERI = 6
-NUMERI_FINALI = 3
+ULTIME_ESTRAZIONI = 24
+TOP_NUMERI = 4
+NUMERI_FINALI = 2
 
 # -----------------------------
 # CARICA DATI JSON
