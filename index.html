@@ -37,6 +37,14 @@ margin:20px;
 border-radius:10px;
 }
 
+table{
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+}
+
 </style>
 
 </head>
@@ -50,6 +58,48 @@ border-radius:10px;
 <div class="global" id="global"></div>
 
 <div class="global" id="consigli"></div>
+
+<div class="global">
+
+<h2>Test Settimanale</h2>
+
+<table border="1" style="margin:auto">
+
+<tr>
+<th>Estr.</th>
+<th>Ruota</th>
+<th>Ambo</th>
+<th>Usciti</th>
+<th>Risultato</th>
+</tr>
+
+<tr>
+<td>Martedì</td>
+<td id="ruotaM"></td>
+<td id="amboM"></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td>Giovedì</td>
+<td id="ruotaG"></td>
+<td id="amboG"></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<td>Sabato</td>
+<td id="ruotaS"></td>
+<td id="amboS"></td>
+<td></td>
+<td></td>
+</tr>
+
+</table>
+
+</div>
 
 <script>
 
@@ -91,7 +141,6 @@ container.appendChild(card)
 
 })
 
-
 const global=document.getElementById("global")
 
 global.innerHTML=`
@@ -111,7 +160,6 @@ global.innerHTML=`
 <p>${data.convergenza_ruote.map(a=>a[0].join("-")).join(" , ")}</p>
 
 `
-
 
 const consigli=document.getElementById("consigli")
 
@@ -138,6 +186,17 @@ consigli.innerHTML=`
 </p>
 
 `
+
+// riempie tabella test
+
+document.getElementById("ruotaM").innerText=ruota
+document.getElementById("amboM").innerText=ambo.join("-")
+
+document.getElementById("ruotaG").innerText=ruota
+document.getElementById("amboG").innerText=ambo.join("-")
+
+document.getElementById("ruotaS").innerText=ruota
+document.getElementById("amboS").innerText=ambo.join("-")
 
 })
 
