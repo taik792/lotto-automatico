@@ -2,33 +2,19 @@ import json
 from collections import Counter
 from itertools import combinations
 
-# -------------------------
-# PARAMETRI
-# -------------------------
-
-NUMERI_RUOTA = 5
-MAX_NUMERO = 90
-
 ULTIME_ESTRAZIONI = 24
 TOP_NUMERI = 4
 NUMERI_FINALI = 2
+MAX_NUMERO = 90
 
 
-# -------------------------
-# CARICA DATI
-# -------------------------
-
-with open("estrazioni.json", "r") as f:
+with open("estrazioni.json") as f:
     data = json.load(f)
 
 ruote = data.keys()
 
 
-# -------------------------
-# FREQUENZA NUMERI
-# -------------------------
-
-def calcola_frequenza(estrazioni):
+def frequenza(estrazioni):
 
     freq = Counter()
 
@@ -39,53 +25,36 @@ def calcola_frequenza(estrazioni):
     return freq
 
 
-# -------------------------
-# RITARDO NUMERI
-# -------------------------
+def ritardi(estrazioni):
 
-def calcola_ritardo(estrazioni):
+    rit = {}
 
-    ritardi = {}
+    for n in range(1, MAX_NUMERO + 1):
 
-    ultime = estrazioni[-ULTIME_ESTRAZIONI:]
+        r = 0
 
-    for numero in range(1, MAX_NUMERO + 1):
+        for estr in reversed(estrazioni):
 
-        ritardo = 0
-
-        for estr in reversed(ultime):
-
-            if numero in estr:
+            if n in estr:
                 break
 
-            ritardo += 1
+            r += 1
 
-        ritardi[numero] = ritardo
+        rit[n] = r
 
-    return ritardi
+    return rit
 
 
-# -------------------------
-# SCORE NUMERI
-# -------------------------
-
-def score_numeri(freq, ritardi):
+def score_numeri(freq, rit):
 
     score = {}
 
-    for numero in range(1, MAX_NUMERO + 1):
+    for n in range(1, MAX_NUMERO + 1):
 
-        frequenza = freq.get(numero, 0)
-        ritardo = ritardi.get(numero, 0)
-
-        score[numero] = frequenza + ritardo
+        score[n] = freq.get(n, 0) + rit.get(n, 0)
 
     return score
 
-
-# -------------------------
-# CONVERGENZA COPPIE
-# -------------------------
 
 def convergenza(estrazioni):
 
@@ -99,28 +68,24 @@ def convergenza(estrazioni):
     return coppie
 
 
-# -------------------------
-# ANALISI RUOTE
-# -------------------------
-
 risultati = []
 
 for ruota in ruote:
 
     estrazioni = data[ruota]
 
-    freq = calcola_frequenza(estrazioni)
-    ritardi = calcola_ritardo(estrazioni)
+    freq = frequenza(estrazioni)
+    rit = ritardi(estrazioni)
 
-    score = score_numeri(freq, ritardi)
+    score = score_numeri(freq, rit)
 
     top = sorted(score.items(), key=lambda x: x[1], reverse=True)[:TOP_NUMERI]
 
-    top_numeri = [n[0] for n in top]
+    top_numeri = [x[0] for x in top]
 
     coppie = convergenza(estrazioni)
 
-    migliori_coppie = []
+    ambi = []
 
     for c in combinations(top_numeri, 2):
 
@@ -128,29 +93,22 @@ for ruota in ruote:
 
         forza = coppie.get(key, 0)
 
-        bonus = score.get(c[0], 0) + score.get(c[1], 0)
+        bonus = score[c[0]] + score[c[1]]
 
-        forza_totale = forza * 2 + bonus
+        totale = forza * 2 + bonus
 
-        migliori_coppie.append((c, forza_totale))
+        ambi.append((c, totale))
 
-    migliori_coppie.sort(key=lambda x: x[1], reverse=True)
-
-    numeri_finali = top_numeri[:NUMERI_FINALI]
+    ambi.sort(key=lambda x: x[1], reverse=True)
 
     risultati.append({
         "ruota": ruota,
-        "numeri": numeri_finali,
-        "ambi_forti": migliori_coppie[:3]
+        "numeri": top_numeri[:NUMERI_FINALI],
+        "ambi": ambi[:3]
     })
 
 
-# -------------------------
-# SALVA RISULTATI
-# -------------------------
-
 with open("risultati.json", "w") as f:
     json.dump(risultati, f, indent=2)
-
 
 print("Aggiornamento completato")
