@@ -1,20 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
+
 <head>
+
+<meta charset="UTF-8">
 <title>Lotto Evolution PRO MAX</title>
 
 <style>
 
 body{
-background:#111;
-color:white;
 font-family:Arial;
+background:#111;
+color:#fff;
+text-align:center;
+}
+
+h1{
+margin-top:20px;
 }
 
 .card{
-border:2px solid orange;
-padding:15px;
-margin:15px;
+background:#1e1e1e;
+margin:20px;
+padding:20px;
+border-radius:10px;
+}
+
+.card h2{
+color:#00ff9c;
+}
+
+.global{
+background:#222;
+padding:20px;
+margin:20px;
 border-radius:10px;
 }
 
@@ -24,37 +43,74 @@ border-radius:10px;
 
 <body>
 
-<h1>🔥 Lotto Evolution PRO MAX</h1>
+<h1>Lotto Evolution PRO MAX</h1>
 
-<div id="risultati"></div>
+<div id="ruote"></div>
+
+<div class="global" id="global"></div>
 
 <script>
 
 fetch("risultati.json")
-.then(r=>r.json())
-.then(data=>{
 
-let html="";
+.then(response => response.json())
 
-data.forEach(r=>{
+.then(data => {
 
-html+=`
-<div class="card">
+const container=document.getElementById("ruote")
+
+container.innerHTML=""
+
+data.ruote.forEach(r=>{
+
+const card=document.createElement("div")
+
+card.className="card"
+
+card.innerHTML=`
 
 <h2>${r.ruota}</h2>
 
-<p>Numeri caldi: ${r.numeri.join(", ")}</p>
+<p><b>Ultima estrazione</b></p>
+<p>${r.ultima_estrazione.join(" - ")}</p>
 
-<p>Ambo forte: ${r.ambi[0][0].join(" - ")}</p>
+<p><b>Numeri caldi</b></p>
+<p>${r.numeri_caldi.join(" , ")}</p>
 
-</div>
-`;
+<p><b>Ambo forte</b></p>
+<p>${r.ambo_forte.join(" - ")}</p>
 
-});
+<p><b>Saturazione ruota</b></p>
+<p>${r.saturazione}</p>
 
-document.getElementById("risultati").innerHTML=html;
+`
 
-});
+container.appendChild(card)
+
+})
+
+
+const global=document.getElementById("global")
+
+global.innerHTML=`
+
+<h2>Analisi Globale</h2>
+
+<p><b>Ruota più forte settimana</b></p>
+<p>${data.ruota_top_settimana}</p>
+
+<p><b>Ruota più satura</b></p>
+<p>${data.ruota_piu_satura}</p>
+
+<p><b>Ambi ciclici</b></p>
+<p>${data.ambi_ciclici.map(a=>a[0].join("-")).join(" , ")}</p>
+
+<p><b>Convergenza ruote</b></p>
+<p>${data.convergenza_ruote.map(a=>a[0].join("-")).join(" , ")}</p>
+
+`
+
+})
 
 </script>
 
