@@ -1,82 +1,137 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
 import json
-import os
+from collections import Counter
+from itertools import combinations
 
-app = Flask(__name__)
-CORS(app)
+# -----------------------------
+# PARAMETRI
+# -----------------------------
 
-# ===============================
-# CARICA ESTRIZIONI UNA SOLA VOLTA
-# ===============================
+NUMERI_RUOTA = 5
+MAX_NUMERO = 90
+ULTIME_ESTRAZIONI = 30
+TOP_NUMERI = 6
+NUMERI_FINALI = 3
 
-with open("estrazioni.json") as f:
-    ESTRAZIONI = json.load(f)
+# -----------------------------
+# CARICA DATI JSON
+# -----------------------------
 
-# ===============================
-# API LEGGERA (solo ultime 5)
-# ===============================
+with open("estrazioni.json", "r") as f:
+    data = json.load(f)
 
-@app.route("/api")
-def api():
-    risposta = {}
+ruote = data.keys()
 
-    for ruota, estrazioni in ESTRAZIONI.items():
-        risposta[ruota] = estrazioni[:5]  # solo ultime 5
+# -----------------------------
+# FUNZIONE CALCOLO FREQUENZA
+# -----------------------------
 
-    return jsonify(risposta)
+def calcola_frequenza(estrazioni):
+    freq = Counter()
+    for estr in estrazioni[-ULTIME_ESTRAZIONI:]:
+        for n in estr:
+            freq[n] += 1
+    return freq
 
-# ===============================
-# SALVA GIOCATA PREMIUM
-# ===============================
+# -----------------------------
+# CALCOLO RITARDO
+# -----------------------------
 
-FILE_GIOCATE = "/tmp/giocate.json"
+def calcola_ritardo(estrazioni):
+    ritardi = {}
+    for numero in range(1, MAX_NUMERO + 1):
+        ritardo = 0
+        for estr in reversed(estrazioni):
+            if numero in estr:
+                break
+            ritardo += 1
+        ritardi[numero] = ritardo
+    return ritardi
 
-def carica_giocate():
-    if not os.path.exists(FILE_GIOCATE):
-        return []
-    with open(FILE_GIOCATE, "r") as f:
-        return json.load(f)
+# -----------------------------
+# SCORE NUMERI
+# -----------------------------
 
-def salva_giocate(lista):
-    with open(FILE_GIOCATE, "w") as f:
-        json.dump(lista, f)
+def score_numeri(freq, ritardi):
 
-@app.route("/salva_giocata", methods=["POST"])
-def salva_giocata():
-    dati = request.get_json()
+    score = {}
 
-    num1 = dati.get("num1")
-    num2 = dati.get("num2")
-    ruota = dati.get("ruota")
+    for n in range(1, MAX_NUMERO + 1):
 
-    giocate = carica_giocate()
+        f = freq.get(n, 0)
+        r = ritardi.get(n, 0)
 
-    nuova = {
-        "num1": num1,
-        "num2": num2,
+        score[n] = (f * 2) + r
+
+    return score
+
+# -----------------------------
+# FILTRO CONVERGENZA
+# -----------------------------
+
+def convergenza(estrazioni):
+
+    coppie = Counter()
+
+    for estr in estrazioni[-ULTIME_ESTRAZIONI:]:
+        for c in combinations(estr, 2):
+            coppie[tuple(sorted(c))] += 1
+
+    return coppie
+
+# -----------------------------
+# ANALISI RUOTE
+# -----------------------------
+
+risultati = []
+
+for ruota in ruote:
+
+    estrazioni = data[ruota]
+
+    freq = calcola_frequenza(estrazioni)
+    ritardi = calcola_ritardo(estrazioni)
+
+    score = score_numeri(freq, ritardi)
+
+    top = sorted(score.items(), key=lambda x: x[1], reverse=True)[:TOP_NUMERI]
+
+    top_numeri = [n[0] for n in top]
+
+    # convergenza
+    coppie = convergenza(estrazioni)
+
+    migliori_coppie = []
+
+    for c in combinations(top_numeri, 2):
+
+        key = tuple(sorted(c))
+        forza = coppie.get(key, 0)
+
+        migliori_coppie.append((c, forza))
+
+    migliori_coppie.sort(key=lambda x: x[1], reverse=True)
+
+    numeri_finali = top_numeri[:NUMERI_FINALI]
+
+    risultati.append({
         "ruota": ruota,
-        "stato": "attivo"
-    }
+        "numeri": numeri_finali,
+        "ambi_forti": migliori_coppie[:3]
+    })
 
-    giocate.append(nuova)
-    salva_giocate(giocate)
+# -----------------------------
+# ORDINA MIGLIORI RUOTE
+# -----------------------------
 
-    return jsonify({"status": "ok"})
+print("\nPREVISIONI LOTTO EVOLUTION PRO MAX 2.0\n")
 
-# ===============================
-# LISTA GIOCATE ATTIVE
-# ===============================
+for r in risultati:
 
-@app.route("/giocate_attive")
-def giocate_attive():
-    giocate = carica_giocate()
-    return jsonify(giocate)
+    print("Ruota:", r["ruota"])
+    print("Numeri:", r["numeri"])
 
-# ===============================
-# AVVIO SERVER RENDER
-# ===============================
+    print("Ambi forti:")
+    for a in r["ambi_forti"]:
+        print(" ", a)
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    print("-" * 40)
