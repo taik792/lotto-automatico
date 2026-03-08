@@ -2,9 +2,9 @@ import json
 from collections import Counter
 from itertools import combinations
 
-# -----------------------
+# -------------------------
 # PARAMETRI
-# -----------------------
+# -------------------------
 
 NUMERI_RUOTA = 5
 MAX_NUMERO = 90
@@ -14,9 +14,9 @@ TOP_NUMERI = 4
 NUMERI_FINALI = 2
 
 
-# -----------------------
+# -------------------------
 # CARICA DATI
-# -----------------------
+# -------------------------
 
 with open("estrazioni.json", "r") as f:
     data = json.load(f)
@@ -24,9 +24,9 @@ with open("estrazioni.json", "r") as f:
 ruote = data.keys()
 
 
-# -----------------------
+# -------------------------
 # FREQUENZA NUMERI
-# -----------------------
+# -------------------------
 
 def calcola_frequenza(estrazioni):
 
@@ -39,9 +39,9 @@ def calcola_frequenza(estrazioni):
     return freq
 
 
-# -----------------------
+# -------------------------
 # RITARDO NUMERI
-# -----------------------
+# -------------------------
 
 def calcola_ritardo(estrazioni):
 
@@ -65,9 +65,9 @@ def calcola_ritardo(estrazioni):
     return ritardi
 
 
-# -----------------------
+# -------------------------
 # SCORE NUMERI
-# -----------------------
+# -------------------------
 
 def score_numeri(freq, ritardi):
 
@@ -83,9 +83,9 @@ def score_numeri(freq, ritardi):
     return score
 
 
-# -----------------------
+# -------------------------
 # CONVERGENZA COPPIE
-# -----------------------
+# -------------------------
 
 def convergenza(estrazioni):
 
@@ -99,9 +99,9 @@ def convergenza(estrazioni):
     return coppie
 
 
-# -----------------------
+# -------------------------
 # ANALISI RUOTE
-# -----------------------
+# -------------------------
 
 risultati = []
 
@@ -145,8 +145,12 @@ for ruota in ruote:
     })
 
 
-# -----------------------
-# OUTPUT
-# -----------------------
+# -------------------------
+# SALVA RISULTATI
+# -------------------------
 
-print(json.dumps(risultati, indent=2))
+with open("risultati.json", "w") as f:
+    json.dump(risultati, f, indent=2)
+
+
+print("Aggiornamento completato")
