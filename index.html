@@ -1,297 +1,62 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-<meta charset="UTF-8">
 <title>Lotto Evolution PRO MAX</title>
 
 <style>
-body{background:#0f1720;color:white;font-family:Arial;}
-h1{text-align:center;}
-button{
-padding:6px 12px;
-margin-top:6px;
-background:#ff9800;
-border:none;
-border-radius:6px;
-cursor:pointer;
+
+body{
+background:#111;
+color:white;
+font-family:Arial;
 }
-.container{width:90%;margin:auto;}
-.box{
+
+.card{
 border:2px solid orange;
-border-radius:10px;
 padding:15px;
-margin:15px 0;
-background:#1a2530;
-}
-.migliore{
-border:3px solid gold;
-background:#222b36;
-}
-#giocateAttive{
-border:2px solid gold;
-padding:10px;
+margin:15px;
 border-radius:10px;
-margin-bottom:20px;
 }
-.score{
-font-size:18px;
-font-weight:bold;
-color:#00e5ff;
-}
+
 </style>
+
 </head>
 
 <body>
 
 <h1>🔥 Lotto Evolution PRO MAX</h1>
 
-<button onclick="ripristinaStato()">Ripristina Stato Sistema</button>
-<input type="file" id="fileInput" style="display:none" onchange="caricaBackup(event)">
-
-<div class="container">
-
-<div id="giocateAttive"></div>
-<div id="ruoteContainer"></div>
-
-<h3>📊 Percentuale Sistema</h3>
-<div id="percentualeBox">0%</div>
-
-</div>
+<div id="risultati"></div>
 
 <script>
 
-let estrazioni = {};
-let ordineRuote = [
-"Bari","Cagliari","Firenze","Genova","Milano",
-"Napoli","Palermo","Roma","Torino","Venezia"
-];
-
-let scoreData = JSON.parse(localStorage.getItem("scoreData")) || {};
-
-fetch("estrazioni.json")
+fetch("risultati.json")
 .then(r=>r.json())
 .then(data=>{
-estrazioni=data;
-generaDashboard();
-})
-.catch(()=>alert("Errore caricamento JSON"));
 
-function analizzaRuota(nome){
-let dati=estrazioni[nome];
-let ultime=dati.slice(-50);
+let html="";
 
-let conteggio={};
-for(let i=1;i<=90;i++) conteggio[i]=0;
+data.forEach(r=>{
 
-ultime.forEach(e=>e.forEach(n=>conteggio[n]++));
+html+=`
+<div class="card">
 
-let ordinati=Object.entries(conteggio)
-.sort((a,b)=>b[1]-a[1]);
+<h2>${r.ruota}</h2>
 
-let top3 = ordinati.slice(0,3).map(x=>parseInt(x[0]));
-let mediaTop3 = (ordinati[0][1]+ordinati[1][1]+ordinati[2][1])/3;
+<p>Numeri caldi: ${r.numeri.join(", ")}</p>
 
-return{
-caldi:top3,
-freddi:ordinati.slice(-3).map(x=>parseInt(x[0])),
-topFreq:ordinati[0][1],
-mediaTop3,
-ultima:dati[dati.length-1]
-};
-}
+<p>Ambo forte: ${r.ambi[0][0].join(" - ")}</p>
 
-function calcolaScore(ruota){
-let a = analizzaRuota(ruota);
-if(!scoreData[ruota]) scoreData[ruota]={win:0,lose:0};
-
-let base = (a.topFreq * 2) + a.mediaTop3;
-let bonus = scoreData[ruota].win * 20;
-let penalita = scoreData[ruota].lose * 12;
-
-return Math.round(base + bonus - penalita);
-}
-
-function classificaRuote(){
-let lista=[];
-ordineRuote.forEach(r=>{
-if(!estrazioni[r]) return;
-lista.push({ruota:r,score:calcolaScore(r)});
-});
-return lista.sort((a,b)=>b.score-a.score);
-}
-
-function generaDashboard(){
-let container=document.getElementById("ruoteContainer");
-container.innerHTML="";
-let classifica=classificaRuote();
-let migliore=classifica[0]?.ruota;
-
-ordineRuote.forEach(r=>{
-if(!estrazioni[r]) return;
-let a=analizzaRuota(r);
-if(!scoreData[r]) scoreData[r]={win:0,lose:0};
-
-let box=document.createElement("div");
-box.className="box";
-if(r===migliore) box.classList.add("migliore");
-
-box.innerHTML=`
-<h3>${r} ${r===migliore?"⭐":""}</h3>
-<div class="score">Score: ${calcolaScore(r)}</div>
-<div>Vittorie: ${scoreData[r].win}</div>
-<div>Perdite: ${scoreData[r].lose}</div>
-<div>Ultima: ${a.ultima.join(" - ")}</div>
-<div>🔥 Caldi: ${a.caldi.join(", ")}</div>
-<div>❄ Freddi: ${a.freddi.join(", ")}</div>
-<div>🎯 Ambo Forte: ${a.caldi[0]} - ${a.freddi[0]}</div>
-<button onclick="salvaPrevisione('${r}')">Salva ambo forte</button>
+</div>
 `;
-container.appendChild(box);
+
 });
-aggiornaGiocateAttive();
-}
 
-function salvaPrevisione(ruota){
-let a=analizzaRuota(ruota);
-let previsione={
-ruota,
-durata:8,
-restanti:8,
-indice:estrazioni[ruota].length-1,
-strategia:0,
-numeri:[a.caldi[0],a.freddi[0]]
-};
-localStorage.setItem("previsioneAttiva",JSON.stringify(previsione));
-aggiornaGiocateAttive();
-}
+document.getElementById("risultati").innerHTML=html;
 
-function aggiornaGiocateAttive(){
-let box=document.getElementById("giocateAttive");
-let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
-if(!p){ box.innerHTML="<strong>Nessuna giocata attiva</strong>"; return;}
-box.innerHTML=`
-<strong>🎯 Giocata Attiva</strong><br>
-${p.ruota} → ${p.numeri.join("-")} (ancora ${p.restanti})
-<button onclick="simulaEstrazione()">Simula</button>
-`;
-}
-
-function simulaEstrazione(){
-let p=JSON.parse(localStorage.getItem("previsioneAttiva"));
-if(!p) return;
-let lista=estrazioni[p.ruota];
-if(p.indice>=lista.length-1){
-alert("Aggiorna il JSON con nuova estrazione");
-return;
-}
-p.indice++;
-let estrCorrente=lista[p.indice];
-let vinta=p.numeri.every(n=>estrCorrente.includes(n));
-p.restanti--;
-
-if(vinta){
-alert("🎉 AMBO USCITO!");
-scoreData[p.ruota].win++;
-salvaBackupAutomatico();
-localStorage.removeItem("previsioneAttiva");
-}
-else if(p.restanti<=0){
-scoreData[p.ruota].lose++;
-evolviSistema(p);
-salvaBackupAutomatico();
-}
-else{
-localStorage.setItem("previsioneAttiva",JSON.stringify(p));
-}
-
-localStorage.setItem("scoreData",JSON.stringify(scoreData));
-aggiornaGiocateAttive();
-aggiornaPercentuale();
-generaDashboard();
-}
-
-function evolviSistema(p){
-p.strategia++;
-
-if(p.strategia>2){
-
-let classifica = classificaRuote();
-let attualeScore = calcolaScore(p.ruota);
-let seconda = classifica[1];
-let nuova = p.ruota;
-
-if(seconda){
-let differenza = seconda.score - attualeScore;
-if(differenza >= 3){
-nuova = seconda.ruota;
-alert("⚠ Cambio ruota: differenza " + differenza);
-}
-}
-
-let a = analizzaRuota(nuova);
-p.ruota = nuova;
-p.strategia = 0;
-p.durata = 8;
-p.restanti = 8;
-p.indice = estrazioni[nuova].length - 1;
-p.numeri = [a.caldi[0],a.freddi[0]];
-
-}
-else{
-let a=analizzaRuota(p.ruota);
-if(p.strategia===1){
-p.numeri=[a.caldi[0],a.caldi[1]];
-p.durata=12;
-p.restanti=12;
-}
-else if(p.strategia===2){
-p.numeri=[a.freddi[0],a.freddi[1]];
-p.durata=16;
-p.restanti=16;
-}
-}
-
-localStorage.setItem("previsioneAttiva",JSON.stringify(p));
-}
-
-function salvaBackupAutomatico(){
-let backup={
-previsioneAttiva:JSON.parse(localStorage.getItem("previsioneAttiva")),
-scoreData:JSON.parse(localStorage.getItem("scoreData"))
-};
-let blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
-let url=URL.createObjectURL(blob);
-let a=document.createElement("a");
-a.href=url;
-a.download="backup_sistema.json";
-a.click();
-URL.revokeObjectURL(url);
-}
-
-function ripristinaStato(){ document.getElementById("fileInput").click(); }
-
-function caricaBackup(event){
-let file=event.target.files[0];
-if(!file) return;
-let reader=new FileReader();
-reader.onload=function(e){
-let dati=JSON.parse(e.target.result);
-if(dati.previsioneAttiva)
-localStorage.setItem("previsioneAttiva",JSON.stringify(dati.previsioneAttiva));
-if(dati.scoreData)
-localStorage.setItem("scoreData",JSON.stringify(dati.scoreData));
-scoreData=dati.scoreData||{};
-alert("Stato ripristinato");
-aggiornaGiocateAttive();
-generaDashboard();
-};
-reader.readAsText(file);
-}
-
-function aggiornaPercentuale(){
-document.getElementById("percentualeBox").innerText="Test in corso";
-}
+});
 
 </script>
+
 </body>
 </html>
