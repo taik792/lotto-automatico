@@ -103,13 +103,17 @@ for ruota in ruote:
     migliori_coppie = []
 
     for c in combinations(top_numeri, 2):
+    key = tuple(sorted(c))
+    
+    # forza base della convergenza
+    forza = coppie.get(key, 0)
+    
+    # bonus se entrambi i numeri hanno score alto
+    bonus = score.get(c[0], 0) + score.get(c[1], 0)
+    
+    forza_totale = forza * 2 + bonus
 
-        key = tuple(sorted(c))
-        forza = coppie.get(key, 0)
-
-        migliori_coppie.append((c, forza))
-
-    migliori_coppie.sort(key=lambda x: x[1], reverse=True)
+    migliori_coppie.append((c, forza_totale))
 
     numeri_finali = top_numeri[:NUMERI_FINALI]
 
