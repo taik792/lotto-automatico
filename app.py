@@ -5,110 +5,130 @@ from itertools import combinations
 ULTIME_ESTRAZIONI = 24
 TOP_NUMERI = 4
 NUMERI_FINALI = 2
-MAX_NUMERO = 90
 
-
-with open("estrazioni.json") as f:
+with open("estrazioni.json","r") as f:
     data = json.load(f)
 
-ruote = data.keys()
-
+ruote = list(data.keys())
 
 def frequenza(estrazioni):
-
     freq = Counter()
-
     for estr in estrazioni[-ULTIME_ESTRAZIONI:]:
         for n in estr:
-            freq[n] += 1
-
+            freq[n]+=1
     return freq
-
 
 def ritardi(estrazioni):
 
     rit = {}
 
-    for n in range(1, MAX_NUMERO + 1):
+    ultime = estrazioni[-ULTIME_ESTRAZIONI:]
 
-        r = 0
+    for n in range(1,91):
 
-        for estr in reversed(estrazioni):
+        r=0
+
+        for estr in reversed(ultime):
 
             if n in estr:
                 break
 
-            r += 1
+            r+=1
 
-        rit[n] = r
+        rit[n]=r
 
     return rit
 
+def score_numeri(freq,rit):
 
-def score_numeri(freq, rit):
+    score={}
 
-    score = {}
+    for n in range(1,91):
 
-    for n in range(1, MAX_NUMERO + 1):
-
-        score[n] = freq.get(n, 0) + rit.get(n, 0)
+        score[n]=freq.get(n,0)+rit.get(n,0)
 
     return score
 
+def convergenza_ruota(estrazioni):
 
-def convergenza(estrazioni):
-
-    coppie = Counter()
+    coppie=Counter()
 
     for estr in estrazioni[-ULTIME_ESTRAZIONI:]:
 
-        for c in combinations(sorted(estr), 2):
-            coppie[c] += 1
+        for c in combinations(sorted(estr),2):
+
+            coppie[c]+=1
 
     return coppie
 
 
-risultati = []
+risultati=[]
+
+tutte_coppie=Counter()
 
 for ruota in ruote:
 
-    estrazioni = data[ruota]
+    estrazioni=data[ruota]
 
-    freq = frequenza(estrazioni)
-    rit = ritardi(estrazioni)
+    ultima=estrazioni[-1]
 
-    score = score_numeri(freq, rit)
+    freq=frequenza(estrazioni)
 
-    top = sorted(score.items(), key=lambda x: x[1], reverse=True)[:TOP_NUMERI]
+    rit=ritardi(estrazioni)
 
-    top_numeri = [x[0] for x in top]
+    score=score_numeri(freq,rit)
 
-    coppie = convergenza(estrazioni)
+    top=sorted(score.items(), key=lambda x:x[1], reverse=True)[:TOP_NUMERI]
 
-    ambi = []
+    top_numeri=[n[0] for n in top]
 
-    for c in combinations(top_numeri, 2):
+    coppie=convergenza_ruota(estrazioni)
 
-        key = tuple(sorted(c))
+    migliori=[]
 
-        forza = coppie.get(key, 0)
+    for c in combinations(top_numeri,2):
 
-        bonus = score[c[0]] + score[c[1]]
+        key=tuple(sorted(c))
 
-        totale = forza * 2 + bonus
+        forza=coppie.get(key,0)
 
-        ambi.append((c, totale))
+        bonus=score[c[0]]+score[c[1]]
 
-    ambi.sort(key=lambda x: x[1], reverse=True)
+        totale=forza*2+bonus
+
+        migliori.append((key,totale))
+
+        tutte_coppie[key]+=totale
+
+    migliori.sort(key=lambda x:x[1],reverse=True)
 
     risultati.append({
-        "ruota": ruota,
-        "numeri": top_numeri[:NUMERI_FINALI],
-        "ambi": ambi[:3]
+
+        "ruota":ruota,
+
+        "ultima_estrazione":ultima,
+
+        "numeri_caldi":top_numeri[:NUMERI_FINALI],
+
+        "ambo_forte":migliori[0][0]
+
     })
 
 
-with open("risultati.json", "w") as f:
-    json.dump(risultati, f, indent=2)
+# convergenza tra ruote
+
+convergenze=sorted(tutte_coppie.items(), key=lambda x:x[1], reverse=True)[:5]
+
+output={
+
+    "ruote":risultati,
+
+    "convergenza_ruote":convergenze
+
+}
+
+with open("risultati.json","w") as f:
+
+    json.dump(output,f,indent=2)
 
 print("Aggiornamento completato")
