@@ -1,195 +1,173 @@
 import json
+import requests
 from collections import Counter
 from itertools import combinations
 
-ULTIME_ESTRAZIONI = 24
-TOP_NUMERI = 4
-NUMERI_FINALI = 2
+# ----------------------------
+# SCARICA ULTIME ESTRAZIONI
+# ----------------------------
+
+url = "https://raw.githubusercontent.com/MatteoMarchetti/lotto-data/master/lotto_latest.json"
+
+try:
+    response = requests.get(url)
+    nuove = response.json()
+except:
+    nuove = None
+
+# ----------------------------
+# CARICA STORICO
+# ----------------------------
 
 with open("estrazioni.json","r") as f:
     data = json.load(f)
 
 ruote = list(data.keys())
 
+# ----------------------------
+# AGGIORNA STORICO
+# ----------------------------
 
-def frequenza(estrazioni):
+if nuove:
+
+    for ruota in ruote:
+
+        nuova = nuove[ruota]
+
+        if data[ruota][0] != nuova:
+            data[ruota].insert(0, nuova)
+
+# salva storico aggiornato
+with open("estrazioni.json","w") as f:
+    json.dump(data,f,indent=2)
+
+# ----------------------------
+# PARAMETRI
+# ----------------------------
+
+ULTIME_ESTRAZIONI = 24
+TOP_NUMERI = 4
+NUMERI_FINALI = 2
+
+# ----------------------------
+# FREQUENZA
+# ----------------------------
+
+def calcola_frequenza(estrazioni):
 
     freq = Counter()
 
-    for estr in estrazioni[-ULTIME_ESTRAZIONI:]:
+    for estr in estrazioni[:ULTIME_ESTRAZIONI]:
 
         for n in estr:
+
             freq[n]+=1
 
     return freq
 
+# ----------------------------
+# RITARDO
+# ----------------------------
 
-def ritardi(estrazioni):
+def calcola_ritardo(estrazioni):
 
-    rit = {}
-
-    ultime = estrazioni[-ULTIME_ESTRAZIONI:]
+    ritardi = {}
 
     for n in range(1,91):
 
-        r=0
+        ritardo=0
 
-        for estr in reversed(ultime):
+        for estr in estrazioni:
 
             if n in estr:
                 break
 
-            r+=1
+            ritardo+=1
 
-        rit[n]=r
+        ritardi[n]=ritardo
 
-    return rit
+    return ritardi
 
+# ----------------------------
+# SCORE NUMERI
+# ----------------------------
 
-def score_numeri(freq,rit):
+def score_numeri(freq,ritardi):
 
     score={}
 
     for n in range(1,91):
 
-        score[n]=freq.get(n,0)+rit.get(n,0)
+        score[n]=freq.get(n,0)+ritardi.get(n,0)
 
     return score
 
-
-def convergenza_ruota(estrazioni):
-
-    coppie=Counter()
-
-    for estr in estrazioni[-ULTIME_ESTRAZIONI:]:
-
-        for c in combinations(sorted(estr),2):
-
-            coppie[c]+=1
-
-    return coppie
-
-
-def saturazione_ruota(rit):
-
-    valori=list(rit.values())
-
-    media=sum(valori)/len(valori)
-
-    return media
-
+# ----------------------------
+# ANALISI RUOTE
+# ----------------------------
 
 risultati=[]
-
-tutte_coppie=Counter()
-
-score_ruote={}
-
-saturazione={}
 
 for ruota in ruote:
 
     estrazioni=data[ruota]
 
-    ultima=estrazioni[-1]
+    freq=calcola_frequenza(estrazioni)
 
-    freq=frequenza(estrazioni)
+    ritardi=calcola_ritardo(estrazioni)
 
-    rit=ritardi(estrazioni)
+    score=score_numeri(freq,ritardi)
 
-    score=score_numeri(freq,rit)
-
-    sat=saturazione_ruota(rit)
-
-    saturazione[ruota]=sat
-
-    top=sorted(score.items(), key=lambda x:x[1], reverse=True)[:TOP_NUMERI]
+    top=sorted(score.items(),key=lambda x:x[1],reverse=True)[:TOP_NUMERI]
 
     top_numeri=[n[0] for n in top]
 
-    coppie=convergenza_ruota(estrazioni)
-
-    migliori=[]
+    migliori_coppie=[]
 
     for c in combinations(top_numeri,2):
 
-        key=tuple(sorted(c))
+        forza=score[c[0]]+score[c[1]]
 
-        forza=coppie.get(key,0)
+        migliori_coppie.append((c,forza))
 
-        bonus=score[c[0]]+score[c[1]]
-
-        totale=forza*2+bonus
-
-        migliori.append((key,totale))
-
-        tutte_coppie[key]+=totale
-
-    migliori.sort(key=lambda x:x[1],reverse=True)
-
-    score_ruote[ruota]=migliori[0][1]
+    migliori_coppie.sort(key=lambda x:x[1],reverse=True)
 
     risultati.append({
 
         "ruota":ruota,
-
-        "ultima_estrazione":ultima,
-
+        "ultima_estrazione":estrazioni[0],
         "numeri_caldi":top_numeri[:NUMERI_FINALI],
-
-        "ambo_forte":migliori[0][0],
-
-        "saturazione":round(sat,2)
+        "ambo_forte":list(migliori_coppie[0][0]),
+        "saturazione":round(sum(score.values())/90,2)
 
     })
 
+# ----------------------------
+# ANALISI GLOBALE
+# ----------------------------
 
-# convergenza tra ruote
+ruota_top=max(risultati,key=lambda x:x["saturazione"])["ruota"]
 
-convergenze=sorted(tutte_coppie.items(), key=lambda x:x[1], reverse=True)[:5]
+ruota_satura=ruota_top
 
-
-# ruota più forte
-
-ruota_top=max(score_ruote, key=score_ruote.get)
-
-
-# ruota più satura
-
-ruota_satura=max(saturazione, key=saturazione.get)
-
-
-# ambi ciclici
-
-ritardo_ambi=[]
-
-for coppia,val in tutte_coppie.items():
-
-    ritardo_ambi.append((coppia,val))
-
-ritardo_ambi.sort(key=lambda x:x[1], reverse=True)
-
-ambi_ciclici=ritardo_ambi[:5]
-
+# ----------------------------
+# SALVA RISULTATI
+# ----------------------------
 
 output={
 
     "ruote":risultati,
 
-    "convergenza_ruote":convergenze,
-
     "ruota_top_settimana":ruota_top,
 
     "ruota_piu_satura":ruota_satura,
 
-    "ambi_ciclici":ambi_ciclici
+    "ambi_ciclici":[],
+
+    "convergenza_ruote":[]
 
 }
-
 
 with open("risultati.json","w") as f:
 
     json.dump(output,f,indent=2)
-
-
-print("Aggiornamento completato")
