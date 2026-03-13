@@ -1,219 +1,38 @@
-<!DOCTYPE html>
-<html lang="it">
-
-<head>
-
-<meta charset="UTF-8">
-<title>Lotto Evolution PRO MAX</title>
-
-<style>
-
-body{
-font-family:Arial;
-background:#111;
-color:white;
-text-align:center;
-}
-
-h1{
-margin-top:20px;
-}
-
-/* griglia ruote */
-
-#ruote{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:20px;
-padding:20px;
-}
-
-/* card ruota */
-
-.card{
-background:#1e1e1e;
-padding:20px;
-border-radius:10px;
-}
-
-.card h2{
-color:#00ff9c;
-}
-
-/* sezioni globali */
-
-.global{
-background:#222;
-padding:20px;
-margin:20px;
-border-radius:10px;
-}
-
-table{
-border-collapse:collapse;
-margin:auto;
-}
-
-th,td{
-padding:10px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<h1>Lotto Evolution PRO MAX</h1>
-
-<div id="ruote"></div>
-
-<div class="global" id="global"></div>
-
-<div class="global" id="consigli"></div>
-
-<div class="global">
-
-<h2>Test Settimanale</h2>
-
-<table border="1">
-
-<tr>
-<th>Estr.</th>
-<th>Ruota</th>
-<th>Ambo</th>
-<th>Usciti</th>
-<th>Risultato</th>
-</tr>
-
-<tr>
-<td>Martedì</td>
-<td id="ruotaM"></td>
-<td id="amboM"></td>
-<td></td>
-<td></td>
-</tr>
-
-<tr>
-<td>Giovedì</td>
-<td id="ruotaG"></td>
-<td id="amboG"></td>
-<td></td>
-<td></td>
-</tr>
-
-<tr>
-<td>Sabato</td>
-<td id="ruotaS"></td>
-<td id="amboS"></td>
-<td></td>
-<td></td>
-</tr>
-
-</table>
-
-</div>
-
 <script>
 
 fetch("risultati.json")
-
 .then(response => response.json())
-
 .then(data => {
 
-const container=document.getElementById("ruote")
+    const container = document.getElementById("risultati");
 
-container.innerHTML=""
+    container.innerHTML = "";
 
-data.ruote.forEach(r=>{
+    data.forEach(r => {
 
-const card=document.createElement("div")
+        const card = document.createElement("div");
+        card.className = "card";
 
-card.className="card"
+        card.innerHTML = `
+        <h2>${r.ruota}</h2>
 
-card.innerHTML=`
+        <p><b>Ultima estrazione</b><br>
+        ${r.ultima.join(" - ")}</p>
 
-<h2>${r.ruota}</h2>
+        <p><b>Numeri caldi</b><br>
+        ${r.numeri_caldi.join(" , ")}</p>
 
-<p><b>Ultima estrazione</b></p>
-<p>${r.ultima_estrazione.join(" - ")}</p>
+        <p><b>Ambo forte</b><br>
+        ${r.ambo_forte}</p>
 
-<p><b>Numeri caldi</b></p>
-<p>${r.numeri_caldi.join(" , ")}</p>
+        <p><b>Saturazione ruota</b><br>
+        ${r.saturazione}</p>
+        `;
 
-<p><b>Ambo forte</b></p>
-<p>${r.ambo_forte.join(" - ")}</p>
+        container.appendChild(card);
 
-<p><b>Saturazione ruota</b></p>
-<p>${r.saturazione}</p>
+    });
 
-`
-
-container.appendChild(card)
-
-})
-
-const global=document.getElementById("global")
-
-global.innerHTML=`
-
-<h2>Analisi Globale</h2>
-
-<p><b>Ruota più forte settimana</b></p>
-<p>${data.ruota_top_settimana}</p>
-
-<p><b>Ruota più satura</b></p>
-<p>${data.ruota_piu_satura}</p>
-
-<p><b>Ambi ciclici</b></p>
-<p>${data.ambi_ciclici.map(a=>a[0].join("-")).join(" , ")}</p>
-
-<p><b>Convergenza ruote</b></p>
-<p>${data.convergenza_ruote.map(a=>a[0].join("-")).join(" , ")}</p>
-
-`
-
-const consigli=document.getElementById("consigli")
-
-let ruota=data.ruota_piu_satura
-
-let ruotaData=data.ruote.find(r=>r.ruota===ruota)
-
-let ambo=ruotaData.ambo_forte
-
-consigli.innerHTML=`
-
-<h2>Giocata Consigliata</h2>
-
-<p><b>Ruota:</b> ${ruota}</p>
-
-<p><b>Ambo:</b> ${ambo.join(" - ")}</p>
-
-<p>Motivo:</p>
-
-<p>
-• Ruota più satura<br>
-• Analisi statistica<br>
-• Convergenza algoritmo
-</p>
-
-`
-
-// riempie tabella test
-
-document.getElementById("ruotaM").innerText=ruota
-document.getElementById("amboM").innerText=ambo.join("-")
-
-document.getElementById("ruotaG").innerText=ruota
-document.getElementById("amboG").innerText=ambo.join("-")
-
-document.getElementById("ruotaS").innerText=ruota
-document.getElementById("amboS").innerText=ambo.join("-")
-
-})
+});
 
 </script>
-
-</body>
-</html>
