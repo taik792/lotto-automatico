@@ -3,196 +3,196 @@
     {
       "ruota": "Bari",
       "ultima_estrazione": [
-        58,
-        22,
-        47,
-        49,
-        69
-      ],
-      "numeri_caldi": [
-        4,
-        43
-      ],
-      "ambo_forte": [
-        4,
-        43
-      ],
-      "saturazione": 17.34
-    },
-    {
-      "ruota": "Firenze",
-      "ultima_estrazione": [
-        27,
-        57,
-        81,
-        43,
-        61
-      ],
-      "numeri_caldi": [
-        2,
-        45
-      ],
-      "ambo_forte": [
-        2,
-        45
-      ],
-      "saturazione": 18.0
-    },
-    {
-      "ruota": "Milano",
-      "ultima_estrazione": [
-        40,
-        38,
-        57,
+        26,
+        59,
+        60,
         67,
-        7
+        17
       ],
       "numeri_caldi": [
-        80,
-        64
+        35,
+        56
       ],
       "ambo_forte": [
-        80,
-        64
+        35,
+        56
       ],
-      "saturazione": 19.18
-    },
-    {
-      "ruota": "Napoli",
-      "ultima_estrazione": [
-        85,
-        44,
-        48,
-        88,
-        55
-      ],
-      "numeri_caldi": [
-        66,
-        67
-      ],
-      "ambo_forte": [
-        66,
-        67
-      ],
-      "saturazione": 16.72
-    },
-    {
-      "ruota": "Palermo",
-      "ultima_estrazione": [
-        73,
-        80,
-        39,
-        38,
-        57
-      ],
-      "numeri_caldi": [
-        54,
-        15
-      ],
-      "ambo_forte": [
-        54,
-        15
-      ],
-      "saturazione": 17.0
-    },
-    {
-      "ruota": "Roma",
-      "ultima_estrazione": [
-        73,
-        24,
-        4,
-        39,
-        22
-      ],
-      "numeri_caldi": [
-        8,
-        55
-      ],
-      "ambo_forte": [
-        8,
-        55
-      ],
-      "saturazione": 20.38
-    },
-    {
-      "ruota": "Torino",
-      "ultima_estrazione": [
-        19,
-        43,
-        10,
-        31,
-        27
-      ],
-      "numeri_caldi": [
-        53,
-        78
-      ],
-      "ambo_forte": [
-        53,
-        78
-      ],
-      "saturazione": 19.14
-    },
-    {
-      "ruota": "Venezia",
-      "ultima_estrazione": [
-        9,
-        43,
-        61,
-        14,
-        75
-      ],
-      "numeri_caldi": [
-        31,
-        52
-      ],
-      "ambo_forte": [
-        31,
-        52
-      ],
-      "saturazione": 18.57
+      "saturazione": 17.83
     },
     {
       "ruota": "Cagliari",
       "ultima_estrazione": [
-        52,
-        62,
-        77,
-        49,
-        87
+        13,
+        83,
+        16,
+        41,
+        68
       ],
       "numeri_caldi": [
-        82,
-        4
+        44,
+        58
       ],
       "ambo_forte": [
-        82,
-        4
+        44,
+        58
       ],
-      "saturazione": 16.84
+      "saturazione": 18.8
+    },
+    {
+      "ruota": "Firenze",
+      "ultima_estrazione": [
+        33,
+        87,
+        76,
+        7,
+        10
+      ],
+      "numeri_caldi": [
+        22,
+        81
+      ],
+      "ambo_forte": [
+        22,
+        81
+      ],
+      "saturazione": 17.41
     },
     {
       "ruota": "Genova",
       "ultima_estrazione": [
-        15,
-        14,
-        76,
-        42,
-        53
+        5,
+        38,
+        3,
+        65,
+        72
       ],
       "numeri_caldi": [
-        8,
-        2
+        14,
+        17
       ],
       "ambo_forte": [
-        8,
-        2
+        14,
+        17
       ],
-      "saturazione": 18.23
+      "saturazione": 19.88
+    },
+    {
+      "ruota": "Milano",
+      "ultima_estrazione": [
+        62,
+        30,
+        7,
+        61,
+        52
+      ],
+      "numeri_caldi": [
+        64,
+        23
+      ],
+      "ambo_forte": [
+        64,
+        23
+      ],
+      "saturazione": 20.31
+    },
+    {
+      "ruota": "Napoli",
+      "ultima_estrazione": [
+        25,
+        38,
+        15,
+        31,
+        86
+      ],
+      "numeri_caldi": [
+        21,
+        53
+      ],
+      "ambo_forte": [
+        21,
+        53
+      ],
+      "saturazione": 18.19
+    },
+    {
+      "ruota": "Palermo",
+      "ultima_estrazione": [
+        15,
+        56,
+        89,
+        85,
+        63
+      ],
+      "numeri_caldi": [
+        33,
+        3
+      ],
+      "ambo_forte": [
+        33,
+        3
+      ],
+      "saturazione": 19.88
+    },
+    {
+      "ruota": "Roma",
+      "ultima_estrazione": [
+        41,
+        17,
+        80,
+        48,
+        9
+      ],
+      "numeri_caldi": [
+        54,
+        49
+      ],
+      "ambo_forte": [
+        54,
+        49
+      ],
+      "saturazione": 17.88
+    },
+    {
+      "ruota": "Torino",
+      "ultima_estrazione": [
+        42,
+        16,
+        12,
+        60,
+        20
+      ],
+      "numeri_caldi": [
+        18,
+        8
+      ],
+      "ambo_forte": [
+        18,
+        8
+      ],
+      "saturazione": 20.53
+    },
+    {
+      "ruota": "Venezia",
+      "ultima_estrazione": [
+        51,
+        84,
+        76,
+        42,
+        90
+      ],
+      "numeri_caldi": [
+        43,
+        48
+      ],
+      "ambo_forte": [
+        43,
+        48
+      ],
+      "saturazione": 19.52
     }
   ],
-  "ruota_top_settimana": "Roma",
-  "ruota_piu_satura": "Roma",
+  "ruota_top_settimana": "Torino",
+  "ruota_piu_satura": "Torino",
   "ambi_ciclici": [],
   "convergenza_ruote": []
 }
