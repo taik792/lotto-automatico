@@ -1,173 +1,53 @@
 import json
-import requests
-from collections import Counter
-from itertools import combinations
+import random
 
-# ----------------------------
-# SCARICA ULTIME ESTRAZIONI
-# ----------------------------
-
-url = "https://raw.githubusercontent.com/MatteoMarchetti/lotto-data/master/lotto_latest.json"
-
-try:
-    response = requests.get(url)
-    nuove = response.json()
-except:
-    nuove = None
-
-# ----------------------------
-# CARICA STORICO
-# ----------------------------
-
-with open("estrazioni.json","r") as f:
+# carica estrazioni
+with open("estrazioni.json", "r") as f:
     data = json.load(f)
 
-ruote = list(data.keys())
+risultati = []
 
-# ----------------------------
-# AGGIORNA STORICO
-# ----------------------------
+for ruota, estrazioni in data.items():
 
-if nuove:
+    if len(estrazioni) < 10:
+        continue
 
-    for ruota in ruote:
+    # ultima estrazione (LA PIÙ NUOVA)
+    ultima = estrazioni[-1]
 
-        nuova = nuove[ruota]
+    # prendiamo le ultime 50 estrazioni
+    storico = estrazioni[-50:]
 
-        if data[ruota][0] != nuova:
-            data[ruota].insert(0, nuova)
+    frequenza = {}
 
-# salva storico aggiornato
-with open("estrazioni.json","w") as f:
-    json.dump(data,f,indent=2)
+    for estrazione in storico:
+        for numero in estrazione:
 
-# ----------------------------
-# PARAMETRI
-# ----------------------------
+            if numero not in frequenza:
+                frequenza[numero] = 0
 
-ULTIME_ESTRAZIONI = 24
-TOP_NUMERI = 4
-NUMERI_FINALI = 2
+            frequenza[numero] += 1
 
-# ----------------------------
-# FREQUENZA
-# ----------------------------
+    # ordina per frequenza
+    ordinati = sorted(frequenza.items(), key=lambda x: x[1], reverse=True)
 
-def calcola_frequenza(estrazioni):
+    # numeri più frequenti
+    numeri_caldi = [ordinati[0][0], ordinati[1][0]]
 
-    freq = Counter()
+    # ambo forte
+    ambo = f"{numeri_caldi[0]} - {numeri_caldi[1]}"
 
-    for estr in estrazioni[:ULTIME_ESTRAZIONI]:
-
-        for n in estr:
-
-            freq[n]+=1
-
-    return freq
-
-# ----------------------------
-# RITARDO
-# ----------------------------
-
-def calcola_ritardo(estrazioni):
-
-    ritardi = {}
-
-    for n in range(1,91):
-
-        ritardo=0
-
-        for estr in estrazioni:
-
-            if n in estr:
-                break
-
-            ritardo+=1
-
-        ritardi[n]=ritardo
-
-    return ritardi
-
-# ----------------------------
-# SCORE NUMERI
-# ----------------------------
-
-def score_numeri(freq,ritardi):
-
-    score={}
-
-    for n in range(1,91):
-
-        score[n]=freq.get(n,0)+ritardi.get(n,0)
-
-    return score
-
-# ----------------------------
-# ANALISI RUOTE
-# ----------------------------
-
-risultati=[]
-
-for ruota in ruote:
-
-    estrazioni=data[ruota]
-
-    freq=calcola_frequenza(estrazioni)
-
-    ritardi=calcola_ritardo(estrazioni)
-
-    score=score_numeri(freq,ritardi)
-
-    top=sorted(score.items(),key=lambda x:x[1],reverse=True)[:TOP_NUMERI]
-
-    top_numeri=[n[0] for n in top]
-
-    migliori_coppie=[]
-
-    for c in combinations(top_numeri,2):
-
-        forza=score[c[0]]+score[c[1]]
-
-        migliori_coppie.append((c,forza))
-
-    migliori_coppie.sort(key=lambda x:x[1],reverse=True)
+    # saturazione ruota
+    saturazione = round(sum(frequenza.values()) / len(frequenza), 2)
 
     risultati.append({
-
-        "ruota":ruota,
-        "ultima_estrazione":estrazioni[0],
-        "numeri_caldi":top_numeri[:NUMERI_FINALI],
-        "ambo_forte":list(migliori_coppie[0][0]),
-        "saturazione":round(sum(score.values())/90,2)
-
+        "ruota": ruota,
+        "ultima": ultima,
+        "numeri_caldi": numeri_caldi,
+        "ambo_forte": ambo,
+        "saturazione": saturazione
     })
 
-# ----------------------------
-# ANALISI GLOBALE
-# ----------------------------
-
-ruota_top=max(risultati,key=lambda x:x["saturazione"])["ruota"]
-
-ruota_satura=ruota_top
-
-# ----------------------------
-# SALVA RISULTATI
-# ----------------------------
-
-output={
-
-    "ruote":risultati,
-
-    "ruota_top_settimana":ruota_top,
-
-    "ruota_piu_satura":ruota_satura,
-
-    "ambi_ciclici":[],
-
-    "convergenza_ruote":[]
-
-}
-
-with open("risultati.json","w") as f:
-
-    json.dump(output,f,indent=2)
+# salva risultati
+with open("risultati.json", "w") as f:
+    json.dump(risultati, f, indent=4)
