@@ -1,135 +1,105 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="it">
 <head>
-
 <meta charset="UTF-8">
 <title>Lotto Evolution PRO MAX</title>
 
 <style>
 
 body{
-background:#111;
+background:#0d0d0d;
 color:white;
 font-family:Arial;
 text-align:center;
 }
 
 h1{
-margin-top:30px;
+margin-top:20px;
 }
 
 .container{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-margin-top:40px;
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:20px;
+padding:20px;
 }
 
-.card{
-background:#1e1e1e;
+.box{
 border:2px solid orange;
 border-radius:10px;
-padding:20px;
-margin:10px;
-width:230px;
+padding:15px;
+background:#111;
 }
 
-.card h2{
-color:#00ff9c;
+.ruota{
+color:#00ff88;
+font-size:20px;
+font-weight:bold;
+margin-bottom:10px;
 }
 
-table{
-margin:auto;
-margin-top:30px;
+.label{
+color:#ccc;
+font-size:14px;
+margin-top:6px;
+}
+
+.value{
+font-size:15px;
+margin-top:2px;
 }
 
 </style>
-
 </head>
 
 <body>
 
 <h1>Lotto Evolution PRO MAX</h1>
 
-<div class="container" id="risultati"></div>
-
-<h2 style="margin-top:60px">Test Settimanale</h2>
-
-<table border="1">
-
-<tr>
-<th>Estr.</th>
-<th>Ruota</th>
-<th>Ambo</th>
-<th>Usciti</th>
-<th>Risultato</th>
-</tr>
-
-<tr>
-<td>Martedi</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-
-<tr>
-<td>Giovedi</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-
-<tr>
-<td>Sabato</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-
-</table>
+<div class="container" id="ruote"></div>
 
 <script>
 
 fetch("risultati.json")
-.then(response => response.json())
-.then(data => {
+.then(r=>r.json())
+.then(data=>{
 
-const container = document.getElementById("risultati");
+const container = document.getElementById("ruote")
 
-data.ruote.forEach(r => {
+data.ruote.forEach(r=>{
 
-const card = document.createElement("div");
+const box = document.createElement("div")
+box.className="box"
 
-card.className = "card";
+box.innerHTML=`
 
-card.innerHTML = `
-<h2>${r.ruota}</h2>
+<div class="ruota">${r.ruota}</div>
 
-<p><b>Ultima estrazione</b><br>
-${r.ultima.join(" - ")}</p>
+<div class="label">Ultima estrazione</div>
+<div class="value">${r.ultima.join(" - ")}</div>
 
-<p><b>Numeri caldi</b><br>
-${r.numeri_caldi.join(" , ")}</p>
+<div class="label">Numeri caldi</div>
+<div class="value">${r.numeri_caldi.join(", ")}</div>
 
-<p><b>Ambo forte</b><br>
-${r.ambo_forte}</p>
+<div class="label">Ambo forte</div>
+<div class="value">${r.ambo_forte}</div>
 
-<p><b>Ambi ciclometrici</b><br>
-${r.ciclometria.join(" | ")}</p>
+<div class="label">🔥 Ambi statistici</div>
+<div class="value">${r.ambi_statistici.join(" | ")}</div>
 
-<p><b>Saturazione ruota</b><br>
-${r.saturazione}</p>
-`;
+<div class="label">Ambi ciclometrici</div>
+<div class="value">${r.ciclometria.join(" | ")}</div>
 
-container.appendChild(card);
+<div class="label">Saturazione ruota</div>
+<div class="value">${r.saturazione}</div>
 
-});
+`
 
-});
+container.appendChild(box)
+
+})
+
+})
 
 </script>
 
