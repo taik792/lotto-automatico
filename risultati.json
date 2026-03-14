@@ -2,43 +2,27 @@
     {
         "ruota": "Bari",
         "ultima": [
-            27,
-            35,
-            7,
-            5,
-            83
+            84,
+            21,
+            49,
+            24,
+            14
         ],
         "numeri_caldi": [
             24,
-            78
+            48
         ],
-        "ambo_forte": "24 - 78",
+        "ambo_forte": "24 - 48",
         "saturazione": 2.98
-    },
-    {
-        "ruota": "Cagliari",
-        "ultima": [
-            60,
-            75,
-            59,
-            40,
-            42
-        ],
-        "numeri_caldi": [
-            2,
-            31
-        ],
-        "ambo_forte": "2 - 31",
-        "saturazione": 2.94
     },
     {
         "ruota": "Firenze",
         "ultima": [
-            25,
-            2,
-            15,
-            26,
-            22
+            46,
+            51,
+            72,
+            86,
+            18
         ],
         "numeri_caldi": [
             50,
@@ -48,45 +32,29 @@
         "saturazione": 2.87
     },
     {
-        "ruota": "Genova",
-        "ultima": [
-            50,
-            63,
-            30,
-            77,
-            57
-        ],
-        "numeri_caldi": [
-            43,
-            81
-        ],
-        "ambo_forte": "43 - 81",
-        "saturazione": 2.84
-    },
-    {
         "ruota": "Milano",
         "ultima": [
-            33,
-            49,
-            66,
-            83,
-            11
+            58,
+            21,
+            35,
+            68,
+            60
         ],
         "numeri_caldi": [
-            14,
-            68
+            68,
+            21
         ],
-        "ambo_forte": "14 - 68",
+        "ambo_forte": "68 - 21",
         "saturazione": 2.98
     },
     {
         "ruota": "Napoli",
         "ultima": [
-            37,
+            50,
+            80,
+            25,
             51,
-            68,
-            53,
-            52
+            6
         ],
         "numeri_caldi": [
             7,
@@ -98,65 +66,97 @@
     {
         "ruota": "Palermo",
         "ultima": [
-            83,
-            64,
-            34,
-            59,
-            88
+            61,
+            24,
+            75,
+            26,
+            87
         ],
         "numeri_caldi": [
-            78,
-            50
+            50,
+            51
         ],
-        "ambo_forte": "78 - 50",
+        "ambo_forte": "50 - 51",
         "saturazione": 2.91
     },
     {
         "ruota": "Roma",
         "ultima": [
-            55,
-            59,
-            9,
-            72,
-            52
+            15,
+            44,
+            1,
+            54,
+            66
         ],
         "numeri_caldi": [
             66,
-            41
+            42
         ],
-        "ambo_forte": "66 - 41",
-        "saturazione": 2.91
+        "ambo_forte": "66 - 42",
+        "saturazione": 2.94
     },
     {
         "ruota": "Torino",
         "ultima": [
-            66,
             72,
-            41,
-            53,
-            67
+            21,
+            31,
+            66,
+            14
         ],
         "numeri_caldi": [
             73,
-            52
+            74
         ],
-        "ambo_forte": "73 - 52",
+        "ambo_forte": "73 - 74",
         "saturazione": 2.91
     },
     {
         "ruota": "Venezia",
         "ultima": [
-            48,
-            71,
-            11,
-            55,
-            1
+            5,
+            45,
+            34,
+            50,
+            69
         ],
         "numeri_caldi": [
             67,
             60
         ],
         "ambo_forte": "67 - 60",
-        "saturazione": 3.01
+        "saturazione": 2.98
+    },
+    {
+        "ruota": "Cagliari",
+        "ultima": [
+            49,
+            78,
+            42,
+            9,
+            47
+        ],
+        "numeri_caldi": [
+            2,
+            31
+        ],
+        "ambo_forte": "2 - 31",
+        "saturazione": 2.98
+    },
+    {
+        "ruota": "Genova",
+        "ultima": [
+            72,
+            71,
+            5,
+            80,
+            83
+        ],
+        "numeri_caldi": [
+            5,
+            81
+        ],
+        "ambo_forte": "5 - 81",
+        "saturazione": 2.84
     }
 ]
