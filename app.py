@@ -1,21 +1,39 @@
 import json
-import random
 
-# carica estrazioni
+# carica le estrazioni
 with open("estrazioni.json", "r") as f:
     data = json.load(f)
 
 risultati = []
 
-for ruota, estrazioni in data.items():
+# ordine ufficiale delle ruote
+ordine_ruote = [
+    "Bari",
+    "Cagliari",
+    "Firenze",
+    "Genova",
+    "Milano",
+    "Napoli",
+    "Palermo",
+    "Roma",
+    "Torino",
+    "Venezia"
+]
+
+for ruota in ordine_ruote:
+
+    if ruota not in data:
+        continue
+
+    estrazioni = data[ruota]
 
     if len(estrazioni) < 10:
         continue
 
-    # ultima estrazione (LA PIÙ NUOVA)
+    # ultima estrazione
     ultima = estrazioni[-1]
 
-    # prendiamo le ultime 50 estrazioni
+    # ultime 50 estrazioni
     storico = estrazioni[-50:]
 
     frequenza = {}
@@ -31,14 +49,17 @@ for ruota, estrazioni in data.items():
     # ordina per frequenza
     ordinati = sorted(frequenza.items(), key=lambda x: x[1], reverse=True)
 
-    # numeri più frequenti
-    numeri_caldi = [ordinati[0][0], ordinati[1][0]]
+    numeri_caldi = [
+        ordinati[0][0],
+        ordinati[1][0]
+    ]
 
-    # ambo forte
     ambo = f"{numeri_caldi[0]} - {numeri_caldi[1]}"
 
-    # saturazione ruota
-    saturazione = round(sum(frequenza.values()) / len(frequenza), 2)
+    saturazione = round(
+        sum(frequenza.values()) / len(frequenza),
+        2
+    )
 
     risultati.append({
         "ruota": ruota,
