@@ -59,7 +59,6 @@ for ruota in ordine_ruote:
     b = ultima[1]
 
     d = abs(a-b)
-
     d2 = 90-d
 
     c1 = (b+d)%90
@@ -130,9 +129,11 @@ for r1,r2 in coppie_ruote:
             "ambo":f"{d}-{c}"
         })
 
+# ⚠️ QUESTO È IL BLOCCO IMPORTANTE PER IL SITO
+
 output = {
-    "ruote":risultati,
-    "ciclometria_ruote":ciclometria_tra_ruote
+    "ruote": risultati,
+    "ciclometria_ruote": ciclometria_tra_ruote
 }
 
 with open("risultati.json","w") as f:
