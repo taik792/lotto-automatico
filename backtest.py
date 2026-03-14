@@ -1,29 +1,33 @@
 import json
 
-# carica storico
 with open("estrazioni.json") as f:
     estrazioni = json.load(f)
 
 ruote = list(estrazioni.keys())
 
-test_estrazioni = 100
-
-presenze = 0
-ambi = 0
 test_totali = 0
+
+caldi_presenze = 0
+caldi_ambi = 0
+
+freddi_presenze = 0
+freddi_ambi = 0
+
+ciclo_presenze = 0
+ciclo_ambi = 0
 
 for ruota in ruote:
 
     dati = estrazioni[ruota]
 
-    for i in range(30, min(len(dati)-1, test_estrazioni)):
+    for i in range(30, len(dati)-1):
 
         storico = dati[:i]
         target = dati[i]
 
-        freq = {}
-
         ultime = storico[-30:]
+
+        freq = {}
 
         for estr in ultime:
             for n in estr:
@@ -32,28 +36,53 @@ for ruota in ruote:
         ordinati = sorted(freq.items(), key=lambda x:x[1], reverse=True)
 
         numeri_caldi = [ordinati[0][0], ordinati[1][0]]
+        numeri_freddi = [ordinati[-1][0], ordinati[-2][0]]
 
-        # verifica presenza
+        # ciclometria semplice
+        ciclo = []
+        for n in ultime[-1]:
+            ciclo.append((n + 30) % 90 or 90)
+
+        ciclo = ciclo[:2]
+
+        # controlli CALDI
         if numeri_caldi[0] in target or numeri_caldi[1] in target:
-            presenze += 1
+            caldi_presenze += 1
 
-        # verifica ambo
         if numeri_caldi[0] in target and numeri_caldi[1] in target:
-            ambi += 1
+            caldi_ambi += 1
+
+        # controlli FREDDI
+        if numeri_freddi[0] in target or numeri_freddi[1] in target:
+            freddi_presenze += 1
+
+        if numeri_freddi[0] in target and numeri_freddi[1] in target:
+            freddi_ambi += 1
+
+        # controlli CICLOMETRIA
+        if ciclo[0] in target or ciclo[1] in target:
+            ciclo_presenze += 1
+
+        if ciclo[0] in target and ciclo[1] in target:
+            ciclo_ambi += 1
 
         test_totali += 1
 
-print("TEST COMPLETATO")
-print("----------------")
 
-print("Test effettuati:", test_totali)
-print("Presenze numeri:", presenze)
-print("Ambi presi:", ambi)
+print("\nTEST COMPLETATO")
+print("Test totali:", test_totali)
 
-if test_totali > 0:
+print("\n--- NUMERI CALDI ---")
+print("Presenze:", caldi_presenze)
+print("Ambi:", caldi_ambi)
+print("Percentuale ambi:", round((caldi_ambi/test_totali)*100,3),"%")
 
-    p_presenze = round((presenze/test_totali)*100,2)
-    p_ambi = round((ambi/test_totali)*100,2)
+print("\n--- NUMERI FREDDI ---")
+print("Presenze:", freddi_presenze)
+print("Ambi:", freddi_ambi)
+print("Percentuale ambi:", round((freddi_ambi/test_totali)*100,3),"%")
 
-    print("Percentuale presenze:", p_presenze,"%")
-    print("Percentuale ambi:", p_ambi,"%")
+print("\n--- CICLOMETRIA ---")
+print("Presenze:", ciclo_presenze)
+print("Ambi:", ciclo_ambi)
+print("Percentuale ambi:", round((ciclo_ambi/test_totali)*100,3),"%")
