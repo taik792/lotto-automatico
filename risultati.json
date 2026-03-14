@@ -9,11 +9,11 @@
             14
         ],
         "numeri_caldi": [
-            24,
-            48
+            21,
+            49
         ],
-        "ambo_forte": "24 - 48",
-        "saturazione": 2.98
+        "ambo_forte": "21 - 49",
+        "saturazione": 1.52
     },
     {
         "ruota": "Cagliari",
@@ -25,11 +25,11 @@
             47
         ],
         "numeri_caldi": [
-            2,
-            31
+            60,
+            42
         ],
-        "ambo_forte": "2 - 31",
-        "saturazione": 2.98
+        "ambo_forte": "60 - 42",
+        "saturazione": 1.28
     },
     {
         "ruota": "Firenze",
@@ -41,11 +41,11 @@
             18
         ],
         "numeri_caldi": [
-            50,
-            1
+            86,
+            30
         ],
-        "ambo_forte": "50 - 1",
-        "saturazione": 2.87
+        "ambo_forte": "86 - 30",
+        "saturazione": 1.22
     },
     {
         "ruota": "Genova",
@@ -57,11 +57,11 @@
             83
         ],
         "numeri_caldi": [
-            5,
-            81
+            83,
+            57
         ],
-        "ambo_forte": "5 - 81",
-        "saturazione": 2.84
+        "ambo_forte": "83 - 57",
+        "saturazione": 1.35
     },
     {
         "ruota": "Milano",
@@ -73,11 +73,11 @@
             60
         ],
         "numeri_caldi": [
-            68,
-            21
+            21,
+            18
         ],
-        "ambo_forte": "68 - 21",
-        "saturazione": 2.98
+        "ambo_forte": "21 - 18",
+        "saturazione": 1.35
     },
     {
         "ruota": "Napoli",
@@ -89,11 +89,11 @@
             6
         ],
         "numeri_caldi": [
-            7,
-            65
+            13,
+            5
         ],
-        "ambo_forte": "7 - 65",
-        "saturazione": 2.94
+        "ambo_forte": "13 - 5",
+        "saturazione": 1.19
     },
     {
         "ruota": "Palermo",
@@ -105,11 +105,11 @@
             87
         ],
         "numeri_caldi": [
-            50,
-            51
+            38,
+            58
         ],
-        "ambo_forte": "50 - 51",
-        "saturazione": 2.91
+        "ambo_forte": "38 - 58",
+        "saturazione": 1.32
     },
     {
         "ruota": "Roma",
@@ -121,11 +121,11 @@
             66
         ],
         "numeri_caldi": [
-            66,
-            42
+            89,
+            1
         ],
-        "ambo_forte": "66 - 42",
-        "saturazione": 2.94
+        "ambo_forte": "89 - 1",
+        "saturazione": 1.22
     },
     {
         "ruota": "Torino",
@@ -137,11 +137,11 @@
             14
         ],
         "numeri_caldi": [
-            73,
-            74
+            4,
+            54
         ],
-        "ambo_forte": "73 - 74",
-        "saturazione": 2.91
+        "ambo_forte": "4 - 54",
+        "saturazione": 1.28
     },
     {
         "ruota": "Venezia",
@@ -153,10 +153,10 @@
             69
         ],
         "numeri_caldi": [
-            67,
-            60
+            5,
+            14
         ],
-        "ambo_forte": "67 - 60",
-        "saturazione": 2.98
+        "ambo_forte": "5 - 14",
+        "saturazione": 1.22
     }
 ]
