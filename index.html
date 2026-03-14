@@ -8,48 +8,67 @@
 <style>
 
 body{
-    font-family: Arial;
-    background:#1e1e1e;
-    color:white;
-    margin:0;
+font-family:Arial;
+background:#121212;
+color:white;
+margin:0;
 }
 
 header{
-    text-align:center;
-    padding:30px;
-    background:#111;
+text-align:center;
+padding:30px;
+background:#0d0d0d;
+border-bottom:3px solid #00ff9c;
 }
 
 h1{
-    margin:0;
+color:#00ff9c;
 }
 
 .container{
-    width:90%;
-    margin:auto;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-    gap:20px;
-    padding:20px;
+width:90%;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:20px;
+padding:30px;
 }
 
 .card{
-    background:#2b2b2b;
-    border-radius:10px;
-    padding:20px;
+background:#1e1e1e;
+padding:20px;
+border-radius:10px;
+border-left:4px solid #00ff9c;
 }
 
 .card h2{
-    margin-top:0;
-    color:#ffd700;
+color:#00ff9c;
+margin-top:0;
 }
 
-.sezione{
-    margin-top:10px;
+.section{
+margin-top:10px;
 }
 
-.numero{
-    font-size:18px;
+.top{
+width:90%;
+margin:auto;
+margin-top:20px;
+background:#1e1e1e;
+padding:20px;
+border-radius:10px;
+border:2px solid #00ff9c;
+}
+
+.top h2{
+color:#00ff9c;
+text-align:center;
+}
+
+.play{
+font-size:20px;
+text-align:center;
+margin:10px;
 }
 
 </style>
@@ -61,6 +80,11 @@ h1{
 <h1>Lotto Evolution PRO MAX</h1>
 </header>
 
+<div class="top">
+<h2>🔥 Migliori Giocate del Giorno</h2>
+<div id="giocate"></div>
+</div>
+
 <div class="container" id="ruote"></div>
 
 <script>
@@ -69,45 +93,61 @@ fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    const container = document.getElementById("ruote")
+let ruote = document.getElementById("ruote")
+let giocate = document.getElementById("giocate")
 
-    data.ruote.forEach(r => {
+data.giocate_top.forEach(g=>{
 
-        const card = document.createElement("div")
-        card.className="card"
+let div=document.createElement("div")
 
-        card.innerHTML = `
-        <h2>${r.ruota}</h2>
+div.className="play"
 
-        <div class="sezione">
-        <b>Ultima estrazione</b><br>
-        ${r.ultima.join(" - ")}
-        </div>
+div.innerHTML=`${g.ruota} → ${g.ambo}`
 
-        <div class="sezione">
-        <b>Numeri caldi</b><br>
-        ${r.numeri_caldi.join(" - ")}
-        </div>
+giocate.appendChild(div)
 
-        <div class="sezione">
-        <b>Ambo forte</b><br>
-        ${r.ambo_forte}
-        </div>
+})
 
-        <div class="sezione">
-        <b>Ciclometria</b><br>
-        ${r.ciclometria.join(" | ")}
-        </div>
+data.ruote.forEach(r=>{
 
-        <div class="sezione">
-        <b>Saturazione</b><br>
-        ${r.saturazione}
-        </div>
-        `
+let card=document.createElement("div")
 
-        container.appendChild(card)
+card.className="card"
 
-    })
+card.innerHTML=`
+
+<h2>${r.ruota}</h2>
+
+<div class="section">
+Ultima estrazione<br>
+${r.ultima.join(" - ")}
+</div>
+
+<div class="section">
+Numeri caldi<br>
+${r.numeri_caldi.join(" - ")}
+</div>
+
+<div class="section">
+Ambo forte<br>
+${r.ambo_forte}
+</div>
+
+<div class="section">
+Ciclometria<br>
+${r.ciclometria.join(" | ")}
+</div>
+
+<div class="section">
+Saturazione<br>
+${r.saturazione}
+</div>
+
+`
+
+ruote.appendChild(card)
+
+})
 
 })
 
