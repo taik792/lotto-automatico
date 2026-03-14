@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <title>Lotto Evolution PRO MAX</title>
 
 <style>
@@ -93,16 +92,15 @@ margin-top:30px;
 
 </table>
 
-
 <script>
 
 fetch("risultati.json")
-.then(r => r.json())
+.then(response => response.json())
 .then(data => {
 
 const container = document.getElementById("risultati");
 
-data.forEach(r => {
+data.ruote.forEach(r => {
 
 const card = document.createElement("div");
 
@@ -123,7 +121,7 @@ ${r.ambo_forte}</p>
 <p><b>Ambi ciclometrici</b><br>
 ${r.ciclometria.join(" | ")}</p>
 
-<p><b>Saturazione</b><br>
+<p><b>Saturazione ruota</b><br>
 ${r.saturazione}</p>
 `;
 
