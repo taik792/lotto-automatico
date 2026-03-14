@@ -214,15 +214,18 @@
     "giocate_top": [
         {
             "ruota": "Bari",
-            "ambo": "1-49"
+            "ambo": "1-49",
+            "score": 5
         },
         {
-            "ruota": "Cagliari",
-            "ambo": "9-52"
+            "ruota": "Genova",
+            "ambo": "7-18",
+            "score": 5
         },
         {
-            "ruota": "Firenze",
-            "ambo": "1-36"
+            "ruota": "Palermo",
+            "ambo": "66-72",
+            "score": 5
         }
     ]
 }
