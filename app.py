@@ -1,6 +1,6 @@
 import json
-from itertools import combinations
 from collections import Counter
+from itertools import combinations
 
 ordine_ruote = [
 "Bari",
@@ -15,15 +15,6 @@ ordine_ruote = [
 "Venezia"
 ]
 
-# coppie ruote ciclometriche
-coppie_ruote = [
-("Bari","Napoli"),
-("Cagliari","Palermo"),
-("Firenze","Roma"),
-("Genova","Torino"),
-("Milano","Venezia")
-]
-
 with open("estrazioni.json") as f:
     estrazioni = json.load(f)
 
@@ -35,25 +26,37 @@ for ruota in ordine_ruote:
 
     ultima = dati[-1]
 
-    ultime = dati[-30:]
+    ultime_estrazioni = dati[-30:]
+    ultime_ambo = dati[-200:]
 
-    freq = {}
+    # -------------------------
+    # NUMERI CALDI
+    # -------------------------
 
-    for estr in ultime:
+    freq = Counter()
+
+    for estr in ultime_estrazioni:
         for n in estr:
-            freq[n] = freq.get(n,0)+1
+            freq[n] += 1
 
-    ordinati = sorted(freq.items(), key=lambda x:x[1], reverse=True)
+    numeri_caldi = [n for n,_ in freq.most_common(2)]
 
-    numeri_caldi = [ordinati[0][0], ordinati[1][0]]
+    # -------------------------
+    # AMBO STATISTICO
+    # -------------------------
 
-    ambo_forte = f"{numeri_caldi[0]}-{numeri_caldi[1]}"
+    ambi = Counter()
 
-    saturazione = round(sum(freq.values())/len(freq),2)
+    for estr in ultime_ambo:
+        for a,b in combinations(estr,2):
+            ambi[tuple(sorted((a,b)))] += 1
 
-    # ------------------------
-    # CICLOMETRIA RUOTA
-    # ------------------------
+    ambo_top = ambi.most_common(1)[0][0]
+    ambo_forte = f"{ambo_top[0]}-{ambo_top[1]}"
+
+    # -------------------------
+    # CICLOMETRIA
+    # -------------------------
 
     a = ultima[0]
     b = ultima[1]
@@ -61,8 +64,8 @@ for ruota in ordine_ruote:
     d = abs(a-b)
     d2 = 90-d
 
-    c1 = (b+d)%90
-    c2 = (b+d2)%90
+    c1 = (b+d) % 90
+    c2 = (b+d2) % 90
 
     if c1 == 0:
         c1 = 90
@@ -70,70 +73,31 @@ for ruota in ordine_ruote:
     if c2 == 0:
         c2 = 90
 
-    ciclometria_ruota = [
+    ciclometria = [
         f"{a}-{b}",
         f"{b}-{c1}",
         f"{b}-{c2}"
     ]
 
-    # ------------------------
-    # AMBI STATISTICI
-    # ------------------------
+    # -------------------------
+    # SATURAZIONE
+    # -------------------------
 
-    ultime200 = dati[-200:]
-
-    conta_ambi = Counter()
-
-    for estr in ultime200:
-        for ambo in combinations(estr,2):
-            conta_ambi[tuple(sorted(ambo))] += 1
-
-    top_ambi = []
-
-    for (x,y),freq_ambo in conta_ambi.most_common(5):
-        top_ambi.append(f"{x}-{y}")
+    saturazione = round(sum(freq.values())/len(freq),2)
 
     risultati.append({
+
         "ruota":ruota,
         "ultima":ultima,
         "numeri_caldi":numeri_caldi,
         "ambo_forte":ambo_forte,
-        "ambi_statistici":top_ambi,
-        "ciclometria":ciclometria_ruota,
+        "ciclometria":ciclometria,
         "saturazione":saturazione
+
     })
 
-# ------------------------
-# CICLOMETRIA TRA RUOTE
-# ------------------------
-
-ciclometria_tra_ruote = []
-
-for r1,r2 in coppie_ruote:
-
-    e1 = estrazioni[r1][-1]
-    e2 = estrazioni[r2][-1]
-
-    for a,b in zip(e1,e2):
-
-        d = abs(a-b)
-        c = 90-d
-
-        ciclometria_tra_ruote.append({
-            "ruote":f"{r1}-{r2}",
-            "ambo":f"{a}-{b}"
-        })
-
-        ciclometria_tra_ruote.append({
-            "ruote":f"{r1}-{r2}",
-            "ambo":f"{d}-{c}"
-        })
-
-# ⚠️ QUESTO È IL BLOCCO IMPORTANTE PER IL SITO
-
 output = {
-    "ruote": risultati,
-    "ciclometria_ruote": ciclometria_tra_ruote
+"ruote": risultati
 }
 
 with open("risultati.json","w") as f:
