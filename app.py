@@ -13,6 +13,15 @@ ordine_ruote = [
 "Venezia"
 ]
 
+# coppie ruote ciclometriche
+coppie_ruote = [
+("Bari","Napoli"),
+("Cagliari","Palermo"),
+("Firenze","Roma"),
+("Genova","Torino"),
+("Milano","Venezia")
+]
+
 with open("estrazioni.json") as f:
     estrazioni = json.load(f)
 
@@ -40,9 +49,9 @@ for ruota in ordine_ruote:
 
     saturazione = round(sum(freq.values())/len(freq),2)
 
-    # -------------------
-    # CICLOMETRIA
-    # -------------------
+    # -----------------------
+    # CICLOMETRIA RUOTA
+    # -----------------------
 
     a = ultima[0]
     b = ultima[1]
@@ -50,29 +59,57 @@ for ruota in ordine_ruote:
     d = abs(a-b)
     d2 = 90-d
 
-    c1 = (b + d) % 90
-    c2 = (b + d2) % 90
+    c1 = (b+d)%90
+    c2 = (b+d2)%90
 
-    c3 = (a + d) % 90
-    c4 = (a + d2) % 90
+    if c1==0: c1=90
+    if c2==0: c2=90
 
-    ciclometrici = []
-
-    for x,y in [(a,b),(b,c1),(b,c2),(a,c3),(a,c4)]:
-
-        if x==0: x=90
-        if y==0: y=90
-
-        ciclometrici.append(f"{x}-{y}")
+    ciclometria_ruota = [
+        f"{a}-{b}",
+        f"{b}-{c1}",
+        f"{b}-{c2}"
+    ]
 
     risultati.append({
         "ruota":ruota,
         "ultima":ultima,
         "numeri_caldi":numeri_caldi,
         "ambo_forte":ambo_forte,
-        "ciclometria":ciclometrici,
+        "ciclometria":ciclometria_ruota,
         "saturazione":saturazione
     })
 
+# -----------------------
+# CICLOMETRIA TRA RUOTE
+# -----------------------
+
+ciclometria_tra_ruote = []
+
+for r1,r2 in coppie_ruote:
+
+    e1 = estrazioni[r1][-1]
+    e2 = estrazioni[r2][-1]
+
+    for a,b in zip(e1,e2):
+
+        d = abs(a-b)
+        c = 90-d
+
+        ciclometria_tra_ruote.append({
+            "ruote":f"{r1}-{r2}",
+            "ambo":f"{a}-{b}"
+        })
+
+        ciclometria_tra_ruote.append({
+            "ruote":f"{r1}-{r2}",
+            "ambo":f"{d}-{c}"
+        })
+
+output = {
+"ruote": risultati,
+"ciclometria_ruote": ciclometria_tra_ruote
+}
+
 with open("risultati.json","w") as f:
-    json.dump(risultati,f,indent=4)
+    json.dump(output,f,indent=4)
