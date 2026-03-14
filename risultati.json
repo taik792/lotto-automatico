@@ -13,14 +13,7 @@
                 71,
                 27
             ],
-            "ambo_forte": "71-27",
-            "ambi_statistici": [
-                "1-49",
-                "5-7",
-                "59-63",
-                "63-72",
-                "7-31"
-            ],
+            "ambo_forte": "1-49",
             "ciclometria": [
                 "84-21",
                 "21-84",
@@ -41,14 +34,7 @@
                 2,
                 49
             ],
-            "ambo_forte": "2-49",
-            "ambi_statistici": [
-                "9-52",
-                "31-47",
-                "27-66",
-                "16-87",
-                "15-20"
-            ],
+            "ambo_forte": "9-52",
             "ciclometria": [
                 "49-78",
                 "78-17",
@@ -69,14 +55,7 @@
                 50,
                 22
             ],
-            "ambo_forte": "50-22",
-            "ambi_statistici": [
-                "1-36",
-                "11-21",
-                "50-66",
-                "17-49",
-                "38-51"
-            ],
+            "ambo_forte": "1-36",
             "ciclometria": [
                 "46-51",
                 "51-56",
@@ -97,14 +76,7 @@
                 63,
                 5
             ],
-            "ambo_forte": "63-5",
-            "ambi_statistici": [
-                "7-18",
-                "55-81",
-                "23-55",
-                "26-50",
-                "68-85"
-            ],
+            "ambo_forte": "7-18",
             "ciclometria": [
                 "72-71",
                 "71-72",
@@ -125,14 +97,7 @@
                 21,
                 14
             ],
-            "ambo_forte": "21-14",
-            "ambi_statistici": [
-                "70-77",
-                "22-77",
-                "27-61",
-                "19-76",
-                "24-76"
-            ],
+            "ambo_forte": "70-77",
             "ciclometria": [
                 "58-21",
                 "21-58",
@@ -153,14 +118,7 @@
                 65,
                 7
             ],
-            "ambo_forte": "65-7",
-            "ambi_statistici": [
-                "16-27",
-                "7-63",
-                "16-31",
-                "73-82",
-                "87-89"
-            ],
+            "ambo_forte": "16-27",
             "ciclometria": [
                 "50-80",
                 "80-20",
@@ -181,14 +139,7 @@
                 61,
                 50
             ],
-            "ambo_forte": "61-50",
-            "ambi_statistici": [
-                "66-72",
-                "41-66",
-                "40-71",
-                "50-57",
-                "8-32"
-            ],
+            "ambo_forte": "66-72",
             "ciclometria": [
                 "61-24",
                 "24-61",
@@ -209,14 +160,7 @@
                 66,
                 89
             ],
-            "ambo_forte": "66-89",
-            "ambi_statistici": [
-                "57-80",
-                "80-84",
-                "55-72",
-                "29-43",
-                "57-79"
-            ],
+            "ambo_forte": "57-80",
             "ciclometria": [
                 "15-44",
                 "44-73",
@@ -237,14 +181,7 @@
                 73,
                 90
             ],
-            "ambo_forte": "73-90",
-            "ambi_statistici": [
-                "26-59",
-                "74-83",
-                "16-78",
-                "3-60",
-                "26-54"
-            ],
+            "ambo_forte": "26-59",
             "ciclometria": [
                 "72-21",
                 "21-72",
@@ -265,222 +202,13 @@
                 47,
                 66
             ],
-            "ambo_forte": "47-66",
-            "ambi_statistici": [
-                "36-66",
-                "43-60",
-                "2-72",
-                "14-45",
-                "19-33"
-            ],
+            "ambo_forte": "36-66",
             "ciclometria": [
                 "5-45",
                 "45-85",
                 "45-5"
             ],
             "saturazione": 1.97
-        }
-    ],
-    "ciclometria_ruote": [
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "84-50"
-        },
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "34-56"
-        },
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "21-80"
-        },
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "59-31"
-        },
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "49-25"
-        },
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "24-66"
-        },
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "24-51"
-        },
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "27-63"
-        },
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "14-6"
-        },
-        {
-            "ruote": "Bari-Napoli",
-            "ambo": "8-82"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "49-61"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "12-78"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "78-24"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "54-36"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "42-75"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "33-57"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "9-26"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "17-73"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "47-87"
-        },
-        {
-            "ruote": "Cagliari-Palermo",
-            "ambo": "40-50"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "46-15"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "31-59"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "51-44"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "7-83"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "72-1"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "71-19"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "86-54"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "32-58"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "18-66"
-        },
-        {
-            "ruote": "Firenze-Roma",
-            "ambo": "48-42"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "72-72"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "0-90"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "71-21"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "50-40"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "5-31"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "26-64"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "80-66"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "14-76"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "83-14"
-        },
-        {
-            "ruote": "Genova-Torino",
-            "ambo": "69-21"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "58-5"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "53-37"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "21-45"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "24-66"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "35-34"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "1-89"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "68-50"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "18-72"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "60-69"
-        },
-        {
-            "ruote": "Milano-Venezia",
-            "ambo": "9-81"
         }
     ]
 }
