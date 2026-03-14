@@ -210,5 +210,19 @@
             ],
             "saturazione": 1.97
         }
+    ],
+    "giocate_top": [
+        {
+            "ruota": "Bari",
+            "ambo": "1-49"
+        },
+        {
+            "ruota": "Cagliari",
+            "ambo": "9-52"
+        },
+        {
+            "ruota": "Firenze",
+            "ambo": "1-36"
+        }
     ]
 }
