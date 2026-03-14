@@ -1,162 +1,416 @@
-[
-    {
-        "ruota": "Bari",
-        "ultima": [
-            84,
-            21,
-            49,
-            24,
-            14
-        ],
-        "numeri_caldi": [
-            21,
-            49
-        ],
-        "ambo_forte": "21 - 49",
-        "saturazione": 1.52
-    },
-    {
-        "ruota": "Cagliari",
-        "ultima": [
-            49,
-            78,
-            42,
-            9,
-            47
-        ],
-        "numeri_caldi": [
-            60,
-            42
-        ],
-        "ambo_forte": "60 - 42",
-        "saturazione": 1.28
-    },
-    {
-        "ruota": "Firenze",
-        "ultima": [
-            46,
-            51,
-            72,
-            86,
-            18
-        ],
-        "numeri_caldi": [
-            86,
-            30
-        ],
-        "ambo_forte": "86 - 30",
-        "saturazione": 1.22
-    },
-    {
-        "ruota": "Genova",
-        "ultima": [
-            72,
-            71,
-            5,
-            80,
-            83
-        ],
-        "numeri_caldi": [
-            83,
-            57
-        ],
-        "ambo_forte": "83 - 57",
-        "saturazione": 1.35
-    },
-    {
-        "ruota": "Milano",
-        "ultima": [
-            58,
-            21,
-            35,
-            68,
-            60
-        ],
-        "numeri_caldi": [
-            21,
-            18
-        ],
-        "ambo_forte": "21 - 18",
-        "saturazione": 1.35
-    },
-    {
-        "ruota": "Napoli",
-        "ultima": [
-            50,
-            80,
-            25,
-            51,
-            6
-        ],
-        "numeri_caldi": [
-            13,
-            5
-        ],
-        "ambo_forte": "13 - 5",
-        "saturazione": 1.19
-    },
-    {
-        "ruota": "Palermo",
-        "ultima": [
-            61,
-            24,
-            75,
-            26,
-            87
-        ],
-        "numeri_caldi": [
-            38,
-            58
-        ],
-        "ambo_forte": "38 - 58",
-        "saturazione": 1.32
-    },
-    {
-        "ruota": "Roma",
-        "ultima": [
-            15,
-            44,
-            1,
-            54,
-            66
-        ],
-        "numeri_caldi": [
-            89,
-            1
-        ],
-        "ambo_forte": "89 - 1",
-        "saturazione": 1.22
-    },
-    {
-        "ruota": "Torino",
-        "ultima": [
-            72,
-            21,
-            31,
-            66,
-            14
-        ],
-        "numeri_caldi": [
-            4,
-            54
-        ],
-        "ambo_forte": "4 - 54",
-        "saturazione": 1.28
-    },
-    {
-        "ruota": "Venezia",
-        "ultima": [
-            5,
-            45,
-            34,
-            50,
-            69
-        ],
-        "numeri_caldi": [
-            5,
-            14
-        ],
-        "ambo_forte": "5 - 14",
-        "saturazione": 1.22
-    }
-]
+{
+    "ruote": [
+        {
+            "ruota": "Bari",
+            "ultima": [
+                84,
+                21,
+                49,
+                24,
+                14
+            ],
+            "numeri_caldi": [
+                71,
+                27
+            ],
+            "ambo_forte": "71-27",
+            "ciclometria": [
+                "84-21",
+                "21-84",
+                "21-48"
+            ],
+            "saturazione": 2.11
+        },
+        {
+            "ruota": "Cagliari",
+            "ultima": [
+                49,
+                78,
+                42,
+                9,
+                47
+            ],
+            "numeri_caldi": [
+                2,
+                49
+            ],
+            "ambo_forte": "2-49",
+            "ciclometria": [
+                "49-78",
+                "78-17",
+                "78-49"
+            ],
+            "saturazione": 2.05
+        },
+        {
+            "ruota": "Firenze",
+            "ultima": [
+                46,
+                51,
+                72,
+                86,
+                18
+            ],
+            "numeri_caldi": [
+                50,
+                22
+            ],
+            "ambo_forte": "50-22",
+            "ciclometria": [
+                "46-51",
+                "51-56",
+                "51-46"
+            ],
+            "saturazione": 2.08
+        },
+        {
+            "ruota": "Genova",
+            "ultima": [
+                72,
+                71,
+                5,
+                80,
+                83
+            ],
+            "numeri_caldi": [
+                63,
+                5
+            ],
+            "ambo_forte": "63-5",
+            "ciclometria": [
+                "72-71",
+                "71-72",
+                "71-70"
+            ],
+            "saturazione": 1.88
+        },
+        {
+            "ruota": "Milano",
+            "ultima": [
+                58,
+                21,
+                35,
+                68,
+                60
+            ],
+            "numeri_caldi": [
+                21,
+                14
+            ],
+            "ambo_forte": "21-14",
+            "ciclometria": [
+                "58-21",
+                "21-58",
+                "21-74"
+            ],
+            "saturazione": 2.14
+        },
+        {
+            "ruota": "Napoli",
+            "ultima": [
+                50,
+                80,
+                25,
+                51,
+                6
+            ],
+            "numeri_caldi": [
+                65,
+                7
+            ],
+            "ambo_forte": "65-7",
+            "ciclometria": [
+                "50-80",
+                "80-20",
+                "80-50"
+            ],
+            "saturazione": 2.03
+        },
+        {
+            "ruota": "Palermo",
+            "ultima": [
+                61,
+                24,
+                75,
+                26,
+                87
+            ],
+            "numeri_caldi": [
+                61,
+                50
+            ],
+            "ambo_forte": "61-50",
+            "ciclometria": [
+                "61-24",
+                "24-61",
+                "24-77"
+            ],
+            "saturazione": 2.05
+        },
+        {
+            "ruota": "Roma",
+            "ultima": [
+                15,
+                44,
+                1,
+                54,
+                66
+            ],
+            "numeri_caldi": [
+                66,
+                89
+            ],
+            "ambo_forte": "66-89",
+            "ciclometria": [
+                "15-44",
+                "44-73",
+                "44-15"
+            ],
+            "saturazione": 2.14
+        },
+        {
+            "ruota": "Torino",
+            "ultima": [
+                72,
+                21,
+                31,
+                66,
+                14
+            ],
+            "numeri_caldi": [
+                73,
+                90
+            ],
+            "ambo_forte": "73-90",
+            "ciclometria": [
+                "72-21",
+                "21-72",
+                "21-60"
+            ],
+            "saturazione": 2.08
+        },
+        {
+            "ruota": "Venezia",
+            "ultima": [
+                5,
+                45,
+                34,
+                50,
+                69
+            ],
+            "numeri_caldi": [
+                47,
+                66
+            ],
+            "ambo_forte": "47-66",
+            "ciclometria": [
+                "5-45",
+                "45-85",
+                "45-5"
+            ],
+            "saturazione": 1.97
+        }
+    ],
+    "ciclometria_ruote": [
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "84-50"
+        },
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "34-56"
+        },
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "21-80"
+        },
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "59-31"
+        },
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "49-25"
+        },
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "24-66"
+        },
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "24-51"
+        },
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "27-63"
+        },
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "14-6"
+        },
+        {
+            "ruote": "Bari-Napoli",
+            "ambo": "8-82"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "49-61"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "12-78"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "78-24"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "54-36"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "42-75"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "33-57"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "9-26"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "17-73"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "47-87"
+        },
+        {
+            "ruote": "Cagliari-Palermo",
+            "ambo": "40-50"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "46-15"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "31-59"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "51-44"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "7-83"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "72-1"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "71-19"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "86-54"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "32-58"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "18-66"
+        },
+        {
+            "ruote": "Firenze-Roma",
+            "ambo": "48-42"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "72-72"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "0-90"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "71-21"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "50-40"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "5-31"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "26-64"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "80-66"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "14-76"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "83-14"
+        },
+        {
+            "ruote": "Genova-Torino",
+            "ambo": "69-21"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "58-5"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "53-37"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "21-45"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "24-66"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "35-34"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "1-89"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "68-50"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "18-72"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "60-69"
+        },
+        {
+            "ruote": "Milano-Venezia",
+            "ambo": "9-81"
+        }
+    ]
+}
