@@ -16,6 +16,22 @@
         "saturazione": 2.98
     },
     {
+        "ruota": "Cagliari",
+        "ultima": [
+            49,
+            78,
+            42,
+            9,
+            47
+        ],
+        "numeri_caldi": [
+            2,
+            31
+        ],
+        "ambo_forte": "2 - 31",
+        "saturazione": 2.98
+    },
+    {
         "ruota": "Firenze",
         "ultima": [
             46,
@@ -30,6 +46,22 @@
         ],
         "ambo_forte": "50 - 1",
         "saturazione": 2.87
+    },
+    {
+        "ruota": "Genova",
+        "ultima": [
+            72,
+            71,
+            5,
+            80,
+            83
+        ],
+        "numeri_caldi": [
+            5,
+            81
+        ],
+        "ambo_forte": "5 - 81",
+        "saturazione": 2.84
     },
     {
         "ruota": "Milano",
@@ -126,37 +158,5 @@
         ],
         "ambo_forte": "67 - 60",
         "saturazione": 2.98
-    },
-    {
-        "ruota": "Cagliari",
-        "ultima": [
-            49,
-            78,
-            42,
-            9,
-            47
-        ],
-        "numeri_caldi": [
-            2,
-            31
-        ],
-        "ambo_forte": "2 - 31",
-        "saturazione": 2.98
-    },
-    {
-        "ruota": "Genova",
-        "ultima": [
-            72,
-            71,
-            5,
-            80,
-            83
-        ],
-        "numeri_caldi": [
-            5,
-            81
-        ],
-        "ambo_forte": "5 - 81",
-        "saturazione": 2.84
     }
 ]
