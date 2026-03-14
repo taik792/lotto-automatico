@@ -19,6 +19,7 @@ with open("estrazioni.json") as f:
     estrazioni = json.load(f)
 
 risultati = []
+giocate = []
 
 for ruota in ordine_ruote:
 
@@ -26,8 +27,8 @@ for ruota in ordine_ruote:
 
     ultima = dati[-1]
 
-    ultime_estrazioni = dati[-30:]
-    ultime_ambo = dati[-200:]
+    ultime_30 = dati[-30:]
+    ultime_200 = dati[-200:]
 
     # -------------------------
     # NUMERI CALDI
@@ -35,7 +36,7 @@ for ruota in ordine_ruote:
 
     freq = Counter()
 
-    for estr in ultime_estrazioni:
+    for estr in ultime_30:
         for n in estr:
             freq[n] += 1
 
@@ -47,12 +48,12 @@ for ruota in ordine_ruote:
 
     ambi = Counter()
 
-    for estr in ultime_ambo:
+    for estr in ultime_200:
         for a,b in combinations(estr,2):
             ambi[tuple(sorted((a,b)))] += 1
 
-    ambo_top = ambi.most_common(1)[0][0]
-    ambo_forte = f"{ambo_top[0]}-{ambo_top[1]}"
+    ambo = ambi.most_common(1)[0][0]
+    ambo_forte = f"{ambo[0]}-{ambo[1]}"
 
     # -------------------------
     # CICLOMETRIA
@@ -79,10 +80,6 @@ for ruota in ordine_ruote:
         f"{b}-{c2}"
     ]
 
-    # -------------------------
-    # SATURAZIONE
-    # -------------------------
-
     saturazione = round(sum(freq.values())/len(freq),2)
 
     risultati.append({
@@ -96,8 +93,20 @@ for ruota in ordine_ruote:
 
     })
 
+    giocate.append({
+        "ruota":ruota,
+        "ambo":ambo_forte
+    })
+
+# -------------------------
+# MIGLIORI GIOCATE
+# -------------------------
+
+migliori = giocate[:3]
+
 output = {
-"ruote": risultati
+"ruote": risultati,
+"giocate_top": migliori
 }
 
 with open("risultati.json","w") as f:
