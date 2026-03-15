@@ -1,5 +1,6 @@
 import json
 from collections import Counter
+from itertools import combinations
 
 ordine_ruote = [
 "Bari","Cagliari","Firenze","Genova","Milano",
@@ -28,6 +29,7 @@ for ruota in ordine_ruote:
 
     ultime30 = dati[-30:]
 
+    # frequenze numeri
     freq = Counter()
 
     for estr in ultime30:
@@ -38,7 +40,7 @@ for ruota in ordine_ruote:
 
     numeri_caldi = [ordinati[0][0], ordinati[1][0]]
 
-    # ciclometria ruota
+    # ciclometria
     a = ultima[0]
     b = ultima[1]
 
@@ -52,10 +54,12 @@ for ruota in ordine_ruote:
 
     saturazione = round(sum(freq.values())/len(freq),2)
 
+    # candidato 1 numeri caldi
     ambo1 = f"{numeri_caldi[0]}-{numeri_caldi[1]}"
-    ambo2 = f"{d}-{c}"
-
     score1 = freq[numeri_caldi[0]] + freq[numeri_caldi[1]] + saturazione
+
+    # candidato 2 ciclometria
+    ambo2 = f"{d}-{c}"
     score2 = freq.get(d,0) + freq.get(c,0) + saturazione
 
     # bonus ciclometria
@@ -69,17 +73,31 @@ for ruota in ordine_ruote:
 
     score1 += bonus
 
-    if score2 > score1:
-        ambo_forte = ambo2
-        score = score2
-    else:
-        ambo_forte = ambo1
-        score = score1
+    # candidato 3 ambo storico
+    coppie = Counter()
+
+    for estr in ultime30:
+        for x,y in combinations(sorted(estr),2):
+            coppie[(x,y)] += 1
+
+    ambo_storico = max(coppie, key=coppie.get)
+
+    ambo3 = f"{ambo_storico[0]}-{ambo_storico[1]}"
+    score3 = coppie[ambo_storico] + saturazione
+
+    # scelta migliore
+    candidati = [
+        (ambo1,score1),
+        (ambo2,score2),
+        (ambo3,score3)
+    ]
+
+    ambo_forte,score = max(candidati, key=lambda x:x[1])
 
     giocate.append({
-        "ruota": ruota,
-        "ambo": ambo_forte,
-        "score": score
+        "ruota":ruota,
+        "ambo":ambo_forte,
+        "score":score
     })
 
     risultati.append({
@@ -91,7 +109,7 @@ for ruota in ordine_ruote:
         "saturazione":saturazione
     })
 
-# migliori giocate
+# migliori giocate del giorno
 giocate_top = sorted(giocate, key=lambda x:x["score"], reverse=True)[:3]
 
 # ciclometria tra ruote
@@ -114,9 +132,9 @@ for r1,r2 in coppie_ruote:
             })
 
 output = {
-    "ruote": risultati,
-    "giocate_top": giocate_top,
-    "ciclometria_ruote": ciclometria_tra_ruote
+    "ruote":risultati,
+    "giocate_top":giocate_top,
+    "ciclometria_ruote":ciclometria_tra_ruote
 }
 
 with open("risultati.json","w") as f:
