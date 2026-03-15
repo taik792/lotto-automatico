@@ -203,19 +203,19 @@
     ],
     "giocate_top": [
         {
+            "ruota": "Roma",
+            "ambo": "66-76",
+            "score": 19.17
+        },
+        {
+            "ruota": "Palermo",
+            "ambo": "38-39",
+            "score": 18.05
+        },
+        {
             "ruota": "Cagliari",
             "ambo": "2-49",
             "score": 15.05
-        },
-        {
-            "ruota": "Bari",
-            "ambo": "71-27",
-            "score": 14.17
-        },
-        {
-            "ruota": "Roma",
-            "ambo": "66-76",
-            "score": 13.17
         }
     ],
     "ciclometria_ruote": [
