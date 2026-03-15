@@ -2,43 +2,38 @@
 <html lang="it">
 
 <head>
+
 <meta charset="UTF-8">
 <title>Lotto Evolution PRO MAX</title>
 
 <style>
 
 body{
-font-family:Arial;
-background:#121212;
+background:#111;
 color:white;
-margin:0;
-}
-
-header{
-text-align:center;
+font-family:Arial;
 padding:30px;
-background:#0d0d0d;
-border-bottom:3px solid #00ff9c;
 }
 
 h1{
+text-align:center;
 color:#00ff9c;
 }
 
 .container{
-width:90%;
-margin:auto;
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+grid-template-columns:repeat(5,1fr);
 gap:20px;
-padding:30px;
+margin-top:30px;
 }
 
 .card{
-background:#1e1e1e;
-padding:20px;
+
+background:#1c1c1c;
+padding:15px;
 border-radius:10px;
 border-left:4px solid #00ff9c;
+
 }
 
 .card h2{
@@ -46,112 +41,90 @@ color:#00ff9c;
 margin-top:0;
 }
 
-.section{
-margin-top:10px;
-}
-
 .top{
-width:90%;
-margin:auto;
-margin-top:20px;
-background:#1e1e1e;
-padding:20px;
-border-radius:10px;
+
 border:2px solid #00ff9c;
-}
-
-.top h2{
-color:#00ff9c;
+padding:20px;
+margin-bottom:30px;
+border-radius:10px;
 text-align:center;
-}
-
-.play{
 font-size:20px;
-text-align:center;
-margin:10px;
+
 }
 
 </style>
+
 </head>
 
 <body>
 
-<header>
-<h1>Lotto Evolution PRO MAX</h1>
-</header>
+<h1>🔥 Lotto Evolution PRO MAX</h1>
 
-<div class="top">
-<h2>🔥 Migliori Giocate del Giorno</h2>
-<div id="giocate"></div>
+<div class="top" id="top">
+
+Caricamento...
+
 </div>
 
-<div class="container" id="ruote"></div>
+<div class="container" id="ruote">
+
+</div>
 
 <script>
 
 fetch("risultati.json")
-.then(res => res.json())
-.then(data => {
+.then(r=>r.json())
+.then(data=>{
 
-let ruote = document.getElementById("ruote")
-let giocate = document.getElementById("giocate")
+let topHTML="🔥 Migliori Giocate del Giorno<br><br>"
 
 data.giocate_top.forEach(g=>{
 
-let div=document.createElement("div")
-
-div.className="play"
-
-div.innerHTML=`${g.ruota} → ${g.ambo}`
-
-giocate.appendChild(div)
+topHTML+=`${g.ruota} → ${g.ambo}<br>`
 
 })
 
+document.getElementById("top").innerHTML=topHTML
+
+
+
+let ruoteHTML=""
+
 data.ruote.forEach(r=>{
 
-let card=document.createElement("div")
+ruoteHTML+=`
 
-card.className="card"
-
-card.innerHTML=`
+<div class="card">
 
 <h2>${r.ruota}</h2>
 
-<div class="section">
 Ultima estrazione<br>
-${r.ultima.join(" - ")}
-</div>
+${r.ultima.join(" - ")}<br><br>
 
-<div class="section">
 Numeri caldi<br>
-${r.numeri_caldi.join(" - ")}
-</div>
+${r.numeri_caldi.join(" - ")}<br><br>
 
-<div class="section">
 Ambo forte<br>
-${r.ambo_forte}
-</div>
+${r.ambo_forte}<br><br>
 
-<div class="section">
 Ciclometria<br>
-${r.ciclometria.join(" | ")}
-</div>
+${r.ciclometria.join(" | ")}<br><br>
 
-<div class="section">
 Saturazione<br>
 ${r.saturazione}
+
 </div>
 
 `
 
-ruote.appendChild(card)
-
 })
+
+document.getElementById("ruote").innerHTML=ruoteHTML
 
 })
 
 </script>
 
 </body>
+
 </html>
