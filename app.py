@@ -1,21 +1,11 @@
 import json
 from collections import Counter
 
-# ordine ruote
 ordine_ruote = [
-"Bari",
-"Cagliari",
-"Firenze",
-"Genova",
-"Milano",
-"Napoli",
-"Palermo",
-"Roma",
-"Torino",
-"Venezia"
+"Bari","Cagliari","Firenze","Genova","Milano",
+"Napoli","Palermo","Roma","Torino","Venezia"
 ]
 
-# coppie ruote ciclometriche
 coppie_ruote = [
 ("Bari","Napoli"),
 ("Cagliari","Palermo"),
@@ -38,7 +28,6 @@ for ruota in ordine_ruote:
 
     ultime30 = dati[-30:]
 
-    # frequenza numeri
     freq = Counter()
 
     for estr in ultime30:
@@ -61,15 +50,24 @@ for ruota in ordine_ruote:
         f"{d}-{c}"
     ]
 
-    # saturazione
     saturazione = round(sum(freq.values())/len(freq),2)
 
-    # ambo forte (score)
     ambo1 = f"{numeri_caldi[0]}-{numeri_caldi[1]}"
     ambo2 = f"{d}-{c}"
 
     score1 = freq[numeri_caldi[0]] + freq[numeri_caldi[1]] + saturazione
     score2 = freq.get(d,0) + freq.get(c,0) + saturazione
+
+    # bonus ciclometria
+    bonus = 0
+
+    if numeri_caldi[0] in [a,b,d,c]:
+        bonus += 3
+
+    if numeri_caldi[1] in [a,b,d,c]:
+        bonus += 3
+
+    score1 += bonus
 
     if score2 > score1:
         ambo_forte = ambo2
@@ -93,10 +91,10 @@ for ruota in ordine_ruote:
         "saturazione":saturazione
     })
 
-# TOP GIOCATE
+# migliori giocate
 giocate_top = sorted(giocate, key=lambda x:x["score"], reverse=True)[:3]
 
-# CICLOMETRIA TRA RUOTE
+# ciclometria tra ruote
 ciclometria_tra_ruote = []
 
 for r1,r2 in coppie_ruote:
