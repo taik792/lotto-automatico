@@ -83,7 +83,7 @@ for ruota in ordine_ruote:
     ambo_storico = max(coppie, key=coppie.get)
 
     ambo3 = f"{ambo_storico[0]}-{ambo_storico[1]}"
-    score3 = coppie[ambo_storico] + saturazione
+    score3 = coppie[ambo_storico] * 2 + saturazione
 
     # scelta migliore
     candidati = [
