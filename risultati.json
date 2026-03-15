@@ -13,7 +13,7 @@
                 71,
                 27
             ],
-            "ambo_forte": "26-38",
+            "ambo_forte": "41-23",
             "ciclometria": [
                 "34-85",
                 "51-39"
@@ -33,7 +33,7 @@
                 2,
                 49
             ],
-            "ambo_forte": "2-49",
+            "ambo_forte": "55-50",
             "ciclometria": [
                 "88-62",
                 "26-64"
@@ -53,7 +53,7 @@
                 50,
                 25
             ],
-            "ambo_forte": "50-25",
+            "ambo_forte": "47-90",
             "ciclometria": [
                 "11-46",
                 "35-55"
@@ -73,7 +73,7 @@
                 63,
                 5
             ],
-            "ambo_forte": "63-5",
+            "ambo_forte": "70-28",
             "ciclometria": [
                 "64-62",
                 "2-88"
@@ -93,7 +93,7 @@
                 21,
                 69
             ],
-            "ambo_forte": "21-69",
+            "ambo_forte": "45-85",
             "ciclometria": [
                 "56-16",
                 "40-50"
@@ -113,7 +113,7 @@
                 7,
                 65
             ],
-            "ambo_forte": "7-65",
+            "ambo_forte": "40-28",
             "ciclometria": [
                 "44-66",
                 "22-68"
@@ -133,7 +133,7 @@
                 38,
                 39
             ],
-            "ambo_forte": "38-39",
+            "ambo_forte": "46-45",
             "ciclometria": [
                 "39-38",
                 "1-89"
@@ -153,7 +153,7 @@
                 66,
                 76
             ],
-            "ambo_forte": "66-76",
+            "ambo_forte": "81-25",
             "ciclometria": [
                 "76-52",
                 "24-66"
@@ -173,7 +173,7 @@
                 73,
                 75
             ],
-            "ambo_forte": "73-75",
+            "ambo_forte": "40-58",
             "ciclometria": [
                 "38-8",
                 "30-60"
@@ -193,7 +193,7 @@
                 47,
                 66
             ],
-            "ambo_forte": "47-66",
+            "ambo_forte": "65-59",
             "ciclometria": [
                 "84-69",
                 "15-75"
@@ -203,19 +203,19 @@
     ],
     "giocate_top": [
         {
-            "ruota": "Roma",
-            "ambo": "66-76",
-            "score": 19.17
-        },
-        {
-            "ruota": "Palermo",
-            "ambo": "38-39",
-            "score": 18.05
-        },
-        {
             "ruota": "Cagliari",
-            "ambo": "2-49",
-            "score": 15.05
+            "ambo": "55-50",
+            "score": 206
+        },
+        {
+            "ruota": "Roma",
+            "ambo": "81-25",
+            "score": 182
+        },
+        {
+            "ruota": "Bari",
+            "ambo": "41-23",
+            "score": 172
         }
     ]
 }
