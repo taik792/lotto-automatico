@@ -77,14 +77,24 @@ for ruota in ordine_ruote:
     ambo3 = f"{ambo_storico[0]}-{ambo_storico[1]}"
     score3 = coppie[ambo_storico] * 2 + saturazione
 
-    # scelta migliore
+    # scelta intelligente
     candidati = [
         (ambo1,score1),
         (ambo2,score2),
         (ambo3,score3)
     ]
 
-    ambo_forte,score = max(candidati, key=lambda x:x[1])
+    candidati = sorted(candidati, key=lambda x: x[1], reverse=True)
+
+    migliore = candidati[0]
+    secondo = candidati[1]
+
+    if migliore[1] - secondo[1] <= 2:
+        ambo_forte = secondo[0]
+        score = secondo[1]
+    else:
+        ambo_forte = migliore[0]
+        score = migliore[1]
 
     giocate.append({
         "ruota":ruota,
