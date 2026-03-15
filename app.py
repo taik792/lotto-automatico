@@ -21,7 +21,10 @@ for ruota in ordine_ruote:
 
     ultime30 = dati[-30:]
 
+    # -------------------
     # frequenze numeri
+    # -------------------
+
     freq = Counter()
 
     for estr in ultime30:
@@ -32,7 +35,10 @@ for ruota in ordine_ruote:
 
     numeri_caldi = [ordinati[0][0], ordinati[1][0]]
 
+    # -------------------
     # ciclometria
+    # -------------------
+
     a = ultima[0]
     b = ultima[1]
 
@@ -44,17 +50,30 @@ for ruota in ordine_ruote:
         f"{d}-{c}"
     ]
 
+    # -------------------
+    # saturazione
+    # -------------------
+
     saturazione = round(sum(freq.values())/len(freq),2)
 
+    # -------------------
     # candidato 1 numeri caldi
+    # -------------------
+
     ambo1 = f"{numeri_caldi[0]}-{numeri_caldi[1]}"
     score1 = freq[numeri_caldi[0]] + freq[numeri_caldi[1]] + saturazione
 
+    # -------------------
     # candidato 2 ciclometria
+    # -------------------
+
     ambo2 = f"{d}-{c}"
     score2 = freq.get(d,0) + freq.get(c,0) + saturazione
 
+    # -------------------
     # bonus ciclometria
+    # -------------------
+
     bonus = 0
 
     if numeri_caldi[0] in [a,b,d,c]:
@@ -65,7 +84,10 @@ for ruota in ordine_ruote:
 
     score1 += bonus
 
+    # -------------------
     # candidato 3 ambo storico
+    # -------------------
+
     coppie = Counter()
 
     for estr in ultime30:
@@ -77,24 +99,46 @@ for ruota in ordine_ruote:
     ambo3 = f"{ambo_storico[0]}-{ambo_storico[1]}"
     score3 = coppie[ambo_storico] * 3 + saturazione + 1
 
-    # scelta intelligente
+    # -------------------
+    # NUOVO: ritardi
+    # -------------------
+
+    ritardi = {}
+
+    for n in range(1,91):
+
+        ritardo = 0
+
+        for estr in reversed(dati):
+
+            if n in estr:
+                break
+
+            ritardo += 1
+
+        ritardi[n] = ritardo
+
+    ritardati = sorted(ritardi.items(), key=lambda x: x[1], reverse=True)
+
+    n1 = ritardati[0][0]
+    n2 = ritardati[1][0]
+
+    ambo4 = f"{n1}-{n2}"
+
+    score4 = ritardati[0][1] + ritardati[1][1]
+
+    # -------------------
+    # scelta migliore
+    # -------------------
+
     candidati = [
         (ambo1,score1),
         (ambo2,score2),
-        (ambo3,score3)
+        (ambo3,score3),
+        (ambo4,score4)
     ]
 
-    candidati = sorted(candidati, key=lambda x: x[1], reverse=True)
-
-    migliore = candidati[0]
-    secondo = candidati[1]
-
-    if migliore[1] - secondo[1] <= 2:
-        ambo_forte = secondo[0]
-        score = secondo[1]
-    else:
-        ambo_forte = migliore[0]
-        score = migliore[1]
+    ambo_forte,score = max(candidati, key=lambda x: x[1])
 
     giocate.append({
         "ruota":ruota,
@@ -111,7 +155,10 @@ for ruota in ordine_ruote:
         "saturazione":saturazione
     })
 
-# migliori giocate del giorno
+# -------------------
+# migliori giocate
+# -------------------
+
 giocate_top = sorted(giocate, key=lambda x: x["score"], reverse=True)[:3]
 
 output = {
