@@ -7,14 +7,6 @@ ordine_ruote = [
 "Napoli","Palermo","Roma","Torino","Venezia"
 ]
 
-coppie_ruote = [
-("Bari","Napoli"),
-("Cagliari","Palermo"),
-("Firenze","Roma"),
-("Genova","Torino"),
-("Milano","Venezia")
-]
-
 with open("estrazioni.json") as f:
     estrazioni = json.load(f)
 
@@ -110,31 +102,11 @@ for ruota in ordine_ruote:
     })
 
 # migliori giocate del giorno
-giocate_top = sorted(giocate, key=lambda x:x["score"], reverse=True)[:3]
-
-# ciclometria tra ruote
-ciclometria_tra_ruote = []
-
-for r1,r2 in coppie_ruote:
-
-    e1 = estrazioni[r1][-1]
-    e2 = estrazioni[r2][-1]
-
-    for a,b in zip(e1,e2):
-
-        d = abs(a-b)
-        c = 90-d
-
-        if d != 0:
-            ciclometria_tra_ruote.append({
-                "ruote":f"{r1}-{r2}",
-                "ambo":f"{d}-{c}"
-            })
+giocate_top = sorted(giocate, key=lambda x: x["score"], reverse=True)[:3]
 
 output = {
     "ruote":risultati,
-    "giocate_top":giocate_top,
-    "ciclometria_ruote":ciclometria_tra_ruote
+    "giocate_top":giocate_top
 }
 
 with open("risultati.json","w") as f:
