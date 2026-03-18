@@ -3,11 +3,11 @@
         {
             "ruota": "Bari",
             "ultima": [
-                34,
-                85,
-                22,
-                52,
-                9
+                49,
+                21,
+                62,
+                51,
+                47
             ],
             "numeri_caldi": [
                 71,
@@ -15,19 +15,19 @@
             ],
             "ambo_forte": "41-23",
             "ciclometria": [
-                "34-85",
-                "51-39"
+                "49-21",
+                "28-62"
             ],
-            "saturazione": 2.17
+            "saturazione": 2.21
         },
         {
             "ruota": "Cagliari",
             "ultima": [
-                88,
-                62,
-                57,
-                53,
-                80
+                33,
+                6,
+                44,
+                74,
+                86
             ],
             "numeri_caldi": [
                 2,
@@ -35,19 +35,19 @@
             ],
             "ambo_forte": "55-50",
             "ciclometria": [
-                "88-62",
-                "26-64"
+                "33-6",
+                "27-63"
             ],
-            "saturazione": 2.05
+            "saturazione": 2.03
         },
         {
             "ruota": "Firenze",
             "ultima": [
-                11,
-                46,
-                34,
-                49,
-                15
+                7,
+                41,
+                83,
+                38,
+                81
             ],
             "numeri_caldi": [
                 50,
@@ -55,8 +55,8 @@
             ],
             "ambo_forte": "47-90",
             "ciclometria": [
-                "11-46",
-                "35-55"
+                "7-41",
+                "34-56"
             ],
             "saturazione": 2.05
         },
@@ -64,30 +64,30 @@
             "ruota": "Genova",
             "ultima": [
                 64,
-                62,
-                78,
-                30,
-                65
+                43,
+                29,
+                73,
+                19
             ],
             "numeri_caldi": [
-                63,
+                43,
                 5
             ],
             "ambo_forte": "70-28",
             "ciclometria": [
-                "64-62",
-                "2-88"
+                "64-43",
+                "21-69"
             ],
-            "saturazione": 1.92
+            "saturazione": 1.95
         },
         {
             "ruota": "Milano",
             "ultima": [
-                56,
-                16,
-                31,
-                12,
-                49
+                39,
+                82,
+                9,
+                41,
+                64
             ],
             "numeri_caldi": [
                 21,
@@ -95,99 +95,99 @@
             ],
             "ambo_forte": "45-85",
             "ciclometria": [
-                "56-16",
-                "40-50"
+                "39-82",
+                "43-47"
             ],
-            "saturazione": 2.14
+            "saturazione": 2.21
         },
         {
             "ruota": "Napoli",
             "ultima": [
-                44,
-                66,
-                80,
-                45,
-                7
+                88,
+                54,
+                30,
+                75,
+                38
             ],
             "numeri_caldi": [
                 7,
-                65
+                50
             ],
             "ambo_forte": "40-28",
             "ciclometria": [
-                "44-66",
-                "22-68"
+                "88-54",
+                "34-56"
             ],
             "saturazione": 2.03
         },
         {
             "ruota": "Palermo",
             "ultima": [
-                39,
-                38,
-                83,
-                66,
-                84
+                26,
+                28,
+                80,
+                65,
+                47
             ],
             "numeri_caldi": [
-                38,
-                39
+                39,
+                23
             ],
             "ambo_forte": "46-45",
             "ciclometria": [
-                "39-38",
-                "1-89"
+                "26-28",
+                "2-88"
             ],
-            "saturazione": 2.05
+            "saturazione": 2.03
         },
         {
             "ruota": "Roma",
             "ultima": [
-                76,
-                52,
-                44,
-                4,
-                33
+                68,
+                62,
+                41,
+                5,
+                25
             ],
             "numeri_caldi": [
                 66,
                 76
             ],
-            "ambo_forte": "81-25",
+            "ambo_forte": "81-80",
             "ciclometria": [
-                "76-52",
-                "24-66"
+                "68-62",
+                "6-84"
             ],
-            "saturazione": 2.17
+            "saturazione": 2.11
         },
         {
             "ruota": "Torino",
             "ultima": [
-                38,
-                8,
+                90,
                 17,
-                70,
-                5
+                12,
+                78,
+                40
             ],
             "numeri_caldi": [
                 73,
-                75
+                78
             ],
-            "ambo_forte": "40-58",
+            "ambo_forte": "58-7",
             "ciclometria": [
-                "38-8",
-                "30-60"
+                "90-17",
+                "73-17"
             ],
-            "saturazione": 2.08
+            "saturazione": 2.11
         },
         {
             "ruota": "Venezia",
             "ultima": [
-                84,
-                69,
-                42,
-                74,
-                29
+                15,
+                58,
+                12,
+                68,
+                10
             ],
             "numeri_caldi": [
                 47,
@@ -195,27 +195,27 @@
             ],
             "ambo_forte": "65-59",
             "ciclometria": [
-                "84-69",
-                "15-75"
+                "15-58",
+                "43-47"
             ],
-            "saturazione": 1.95
+            "saturazione": 1.97
         }
     ],
     "giocate_top": [
         {
             "ruota": "Cagliari",
             "ambo": "55-50",
-            "score": 206
-        },
-        {
-            "ruota": "Roma",
-            "ambo": "81-25",
-            "score": 182
+            "score": 208
         },
         {
             "ruota": "Bari",
             "ambo": "41-23",
-            "score": 172
+            "score": 174
+        },
+        {
+            "ruota": "Roma",
+            "ambo": "81-80",
+            "score": 168
         }
     ]
 }
