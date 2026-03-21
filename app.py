@@ -1,22 +1,24 @@
 import json
 from analisi_ambi import analizza_ruote
-from ambo_engine import genera_giocate
+from ambo_engine import genera_giocata_top
+
 
 def main():
-    with open("estrazioni.json") as f:
+    with open("estrazioni.json", "r") as f:
         dati = json.load(f)
 
     ruote = analizza_ruote(dati)
 
-    giocate = genera_giocate(ruote)
+    top = genera_giocata_top(ruote)
 
-    output = {
+    risultato = {
         "ruote": ruote,
-        "giocate_top": giocate
+        "giocate_top": top
     }
 
     with open("risultati.json", "w") as f:
-        json.dump(output, f, indent=4)
+        json.dump(risultato, f, indent=4)
+
 
 if __name__ == "__main__":
     main()
