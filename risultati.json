@@ -1,4 +1,239 @@
 {
-    "ruote": [],
-    "giocate_top": []
+    "ruote": [
+        {
+            "ruota": "Bari",
+            "ultima": [
+                26,
+                59,
+                60,
+                67,
+                17
+            ],
+            "numeri_caldi": [
+                84,
+                26
+            ],
+            "ambo_forte": "84-26",
+            "ciclometria": [
+                "26-59",
+                "59-60"
+            ],
+            "saturazione": 2.29
+        },
+        {
+            "ruota": "Cagliari",
+            "ultima": [
+                13,
+                83,
+                16,
+                41,
+                68
+            ],
+            "numeri_caldi": [
+                13,
+                68
+            ],
+            "ambo_forte": "13-68",
+            "ciclometria": [
+                "13-83",
+                "83-16"
+            ],
+            "saturazione": 2.21
+        },
+        {
+            "ruota": "Firenze",
+            "ultima": [
+                33,
+                87,
+                76,
+                7,
+                10
+            ],
+            "numeri_caldi": [
+                76,
+                84
+            ],
+            "ambo_forte": "76-84",
+            "ciclometria": [
+                "33-87",
+                "87-76"
+            ],
+            "saturazione": 2.13
+        },
+        {
+            "ruota": "Genova",
+            "ultima": [
+                5,
+                38,
+                3,
+                65,
+                72
+            ],
+            "numeri_caldi": [
+                38,
+                3
+            ],
+            "ambo_forte": "38-3",
+            "ciclometria": [
+                "5-38",
+                "38-3"
+            ],
+            "saturazione": 1.83
+        },
+        {
+            "ruota": "Milano",
+            "ultima": [
+                62,
+                30,
+                7,
+                61,
+                52
+            ],
+            "numeri_caldi": [
+                30,
+                61
+            ],
+            "ambo_forte": "30-61",
+            "ciclometria": [
+                "62-30",
+                "30-7"
+            ],
+            "saturazione": 2.12
+        },
+        {
+            "ruota": "Napoli",
+            "ultima": [
+                25,
+                38,
+                15,
+                31,
+                86
+            ],
+            "numeri_caldi": [
+                38,
+                31
+            ],
+            "ambo_forte": "38-31",
+            "ciclometria": [
+                "25-38",
+                "38-15"
+            ],
+            "saturazione": 1.95
+        },
+        {
+            "ruota": "Palermo",
+            "ultima": [
+                15,
+                56,
+                89,
+                85,
+                63
+            ],
+            "numeri_caldi": [
+                15,
+                16
+            ],
+            "ambo_forte": "15-16",
+            "ciclometria": [
+                "15-56",
+                "56-89"
+            ],
+            "saturazione": 3.08
+        },
+        {
+            "ruota": "Roma",
+            "ultima": [
+                41,
+                17,
+                80,
+                48,
+                9
+            ],
+            "numeri_caldi": [
+                41,
+                17
+            ],
+            "ambo_forte": "41-17",
+            "ciclometria": [
+                "41-17",
+                "17-80"
+            ],
+            "saturazione": 1.95
+        },
+        {
+            "ruota": "Torino",
+            "ultima": [
+                42,
+                16,
+                12,
+                60,
+                20
+            ],
+            "numeri_caldi": [
+                20,
+                42
+            ],
+            "ambo_forte": "20-42",
+            "ciclometria": [
+                "42-16",
+                "16-12"
+            ],
+            "saturazione": 1.5
+        },
+        {
+            "ruota": "Venezia",
+            "ultima": [
+                51,
+                84,
+                76,
+                42,
+                90
+            ],
+            "numeri_caldi": [
+                65,
+                51
+            ],
+            "ambo_forte": "65-51",
+            "ciclometria": [
+                "51-84",
+                "84-76"
+            ],
+            "saturazione": 3.43
+        }
+    ],
+    "giocate_top": [
+        {
+            "ruota": "Torino",
+            "ambo": "20-42",
+            "ruote_gioco": [
+                "Torino",
+                "Genova",
+                "Milano"
+            ],
+            "score": 7.5,
+            "colpi": 3
+        },
+        {
+            "ruota": "Genova",
+            "ambo": "38-3",
+            "ruote_gioco": [
+                "Genova",
+                "Milano",
+                "Torino"
+            ],
+            "score": 7.17,
+            "colpi": 3
+        },
+        {
+            "ruota": "Napoli",
+            "ambo": "38-31",
+            "ruote_gioco": [
+                "Napoli",
+                "Bari",
+                "Palermo"
+            ],
+            "score": 7.05,
+            "colpi": 3
+        }
+    ]
 }
