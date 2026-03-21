@@ -4,7 +4,6 @@ def genera_giocata_top(ruote):
     for r in ruote:
         score = r["saturazione"]
 
-        # Bonus se numeri NON usciti
         ultima = r["ultima"]
         caldi = r["numeri_caldi"]
 
@@ -14,7 +13,8 @@ def genera_giocata_top(ruote):
 
         classifica.append((score, r))
 
-    top = sorted(classifica, reverse=True)[:3]
+    # 🔥 FIX QUI
+    top = sorted(classifica, key=lambda x: x[0], reverse=True)[:3]
 
     return [
         f"{r['ruota']} → {r['ambo_forte']}"
