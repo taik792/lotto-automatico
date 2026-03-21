@@ -1,5 +1,3 @@
-import random
-
 RUOTE_COLLEGATE = {
     "Bari": ["Bari", "Napoli", "Palermo"],
     "Cagliari": ["Cagliari", "Roma", "Firenze"],
@@ -18,10 +16,10 @@ def genera_ambo(numeri_caldi):
         return None
     return f"{numeri_caldi[0]}-{numeri_caldi[1]}"
 
-def calcola_score(ruota):
-    base = len(ruota["numeri_caldi"]) * 2
-    ciclo = len(ruota["ciclometria"])
-    sat = max(0, 3 - ruota["saturazione"])
+def calcola_score(r):
+    base = len(r["numeri_caldi"]) * 2
+    ciclo = len(r["ciclometria"])
+    sat = max(0, 3 - r["saturazione"])
     return round(base + ciclo + sat, 2)
 
 def genera_giocate(dati_ruote):
