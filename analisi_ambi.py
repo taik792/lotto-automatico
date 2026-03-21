@@ -1,39 +1,51 @@
 def analizza_ruote(dati):
     risultato = []
 
-    for nome_ruota, estrazioni in dati.items():
+    for ruota, estrazioni in dati.items():
 
-        if not estrazioni:
-            continue
+        # Prendi ultime 5 estrazioni
+        ultime = estrazioni[-5:]
 
-        ultima = estrazioni[0]  # 🔥 ultima estrazione
+        # Flatten numeri
+        numeri = [n for estrazione in ultime for n in estrazione]
 
-        # NUMERI CALDI (su più estrazioni)
+        # Conta frequenze
         freq = {}
-        for estrazione in estrazioni[:5]:  # ultime 5
-            for n in estrazione:
-                freq[n] = freq.get(n, 0) + 1
+        for n in numeri:
+            freq[n] = freq.get(n, 0) + 1
 
-        ordinati = sorted(freq.items(), key=lambda x: x[1], reverse=True)
-        numeri_caldi = [x[0] for x in ordinati[:2]]
+        # Numeri caldi (top 2)
+        caldi = sorted(freq, key=freq.get, reverse=True)[:2]
 
-        # CICLOMETRIA sulla ultima
-        ciclometria = []
-        for i in range(len(ultima) - 1):
-            ciclometria.append(f"{ultima[i]}-{ultima[i+1]}")
+        # ❌ ESCLUDI numeri ultima estrazione
+        ultima = ultime[-1]
+        caldi = [n for n in caldi if n not in ultima]
 
-        ciclometria = ciclometria[:2]
+        # Se pochi → aggiungi altri
+        if len(caldi) < 2:
+            extra = sorted(freq, key=freq.get, reverse=True)
+            for n in extra:
+                if n not in caldi and n not in ultima:
+                    caldi.append(n)
+                if len(caldi) == 2:
+                    break
 
-        # SATURAZIONE
-        saturazione = round(sum(ultima) / len(ultima) / 20, 2)
+        # Ambo forte
+        ambo = f"{caldi[0]}-{caldi[1]}"
+
+        # Ciclometria base
+        ciclometria = [
+            f"{ultime[-1][0]}-{ultime[-2][0]}",
+            f"{ultime[-1][1]}-{ultime[-2][1]}"
+        ]
 
         risultato.append({
-            "ruota": nome_ruota,
+            "ruota": ruota,
             "ultima": ultima,
-            "numeri_caldi": numeri_caldi,
-            "ambo_forte": f"{numeri_caldi[0]}-{numeri_caldi[1]}",
+            "numeri_caldi": caldi,
+            "ambo_forte": ambo,
             "ciclometria": ciclometria,
-            "saturazione": saturazione
+            "saturazione": round(sum(freq.values()) / len(freq), 2)
         })
 
     return risultato
