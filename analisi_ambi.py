@@ -1,32 +1,35 @@
-import json
-from itertools import combinations
+def analizza_ruote(dati):
+    risultato = []
 
-with open("estrazioni.json") as f:
-    estrazioni = json.load(f)
+    for ruota in dati["ruote"]:
+        nome = ruota["ruota"]
+        ultima = ruota["ultima"]
 
-print("\nANALISI AMBI STORICI\n")
+        # NUMERI CALDI (primi 2 più frequenti)
+        freq = {}
+        for n in ultima:
+            freq[n] = freq.get(n, 0) + 1
 
-for ruota in estrazioni:
+        ordinati = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+        numeri_caldi = [x[0] for x in ordinati[:2]]
 
-    dati = estrazioni[ruota]
+        # CICLOMETRIA (coppie consecutive)
+        ciclometria = []
+        for i in range(len(ultima) - 1):
+            ciclometria.append(f"{ultima[i]}-{ultima[i+1]}")
 
-    conteggio = {}
+        ciclometria = ciclometria[:2]
 
-    for estrazione in dati:
+        # SATURAZIONE
+        saturazione = round(sum(ultima) / len(ultima) / 20, 2)
 
-        ambi = list(combinations(estrazione,2))
+        risultato.append({
+            "ruota": nome,
+            "ultima": ultima,
+            "numeri_caldi": numeri_caldi,
+            "ambo_forte": f"{numeri_caldi[0]}-{numeri_caldi[1]}",
+            "ciclometria": ciclometria,
+            "saturazione": saturazione
+        })
 
-        for a in ambi:
-
-            a = tuple(sorted(a))
-
-            conteggio[a] = conteggio.get(a,0)+1
-
-
-    top = sorted(conteggio.items(), key=lambda x:x[1], reverse=True)[:10]
-
-    print("\nRUOTA:", ruota)
-
-    for ambo, n in top:
-
-        print(ambo,"uscito",n,"volte")
+    return risultato
