@@ -9,11 +9,11 @@ def main():
 
     ruote = analizza_ruote(dati)
 
-    top = genera_giocata_top(ruote)
+    giocate_top = genera_giocata_top(ruote)
 
     risultato = {
         "ruote": ruote,
-        "giocate_top": top
+        "giocate_top": giocate_top
     }
 
     with open("risultati.json", "w") as f:
