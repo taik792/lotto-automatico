@@ -1,11 +1,17 @@
 def analizza_ruote(dati):
     risultato = []
 
-    for ruota in dati["ruote"]:
+    # 🔥 FIX: supporta sia {"ruote": [...]} che lista diretta
+    if isinstance(dati, dict):
+        lista_ruote = dati.get("ruote", [])
+    else:
+        lista_ruote = dati
+
+    for ruota in lista_ruote:
         nome = ruota["ruota"]
         ultima = ruota["ultima"]
 
-        # NUMERI CALDI (primi 2 più frequenti)
+        # NUMERI CALDI
         freq = {}
         for n in ultima:
             freq[n] = freq.get(n, 0) + 1
@@ -13,7 +19,7 @@ def analizza_ruote(dati):
         ordinati = sorted(freq.items(), key=lambda x: x[1], reverse=True)
         numeri_caldi = [x[0] for x in ordinati[:2]]
 
-        # CICLOMETRIA (coppie consecutive)
+        # CICLOMETRIA
         ciclometria = []
         for i in range(len(ultima) - 1):
             ciclometria.append(f"{ultima[i]}-{ultima[i+1]}")
