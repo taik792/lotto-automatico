@@ -1,22 +1,20 @@
-def genera_giocata_top(ruote):
+def genera_giocata_top(ruote, segnali):
     classifica = []
 
     for r in ruote:
         score = r["saturazione"]
 
-        ultima = r["ultima"]
-        caldi = r["numeri_caldi"]
+        # BONUS cross ruote 🔥
+        bonus_cross = sum(
+            s["forza"] for s in segnali if s["a"] == r["ruota"]
+        )
 
-        # Bonus numeri NON usciti
-        bonus = sum(1 for n in caldi if n not in ultima)
-        score += bonus * 0.5
+        score += bonus_cross
 
         classifica.append((score, r))
 
-    # 🔥 FIX ORDINAMENTO
     top = sorted(classifica, key=lambda x: x[0], reverse=True)[:3]
 
-    # 🔥 FORMATO GIUSTO PER IL SITO
     return [
         {
             "ruota": r["ruota"],
