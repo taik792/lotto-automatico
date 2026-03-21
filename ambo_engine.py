@@ -1,4 +1,3 @@
-import json
 import random
 
 RUOTE_COLLEGATE = {
@@ -14,40 +13,34 @@ RUOTE_COLLEGATE = {
     "Venezia": ["Venezia", "Milano", "Torino"]
 }
 
-def calcola_score(numeri_caldi, ciclometria, saturazione):
-    base = len(numeri_caldi) * 2
-    ciclo = len(ciclometria)
-    sat = max(0, 3 - saturazione)
+def genera_ambo(numeri_caldi):
+    if len(numeri_caldi) < 2:
+        return None
+    return f"{numeri_caldi[0]}-{numeri_caldi[1]}"
+
+def calcola_score(ruota):
+    base = len(ruota["numeri_caldi"]) * 2
+    ciclo = len(ruota["ciclometria"])
+    sat = max(0, 3 - ruota["saturazione"])
     return round(base + ciclo + sat, 2)
 
-def genera_ambo(numeri):
-    if len(numeri) < 2:
-        return None
-    return f"{numeri[0]}-{numeri[1]}"
-
-def genera_giocate(dati):
+def genera_giocate(dati_ruote):
     giocate = []
 
-    for ruota in dati:
-        nome = ruota["ruota"]
-        numeri_caldi = ruota["numeri_caldi"]
-        ciclometria = ruota["ciclometria"]
-        saturazione = ruota["saturazione"]
+    for r in dati_ruote:
+        ambo = genera_ambo(r["numeri_caldi"])
+        score = calcola_score(r)
 
-        ambo = genera_ambo(numeri_caldi)
-        score = calcola_score(numeri_caldi, ciclometria, saturazione)
-
-        ruote_target = RUOTE_COLLEGATE.get(nome, [nome])
+        ruote_gioco = RUOTE_COLLEGATE.get(r["ruota"], [r["ruota"]])
 
         giocate.append({
-            "ruota_origine": nome,
-            "ruote_gioco": ruote_target,
+            "ruota": r["ruota"],
             "ambo": ambo,
-            "score": score
+            "ruote_gioco": ruote_gioco,
+            "score": score,
+            "colpi": 3
         })
 
-    # Ordina per score
     giocate = sorted(giocate, key=lambda x: x["score"], reverse=True)
 
-    # Prendi top 3
     return giocate[:3]
