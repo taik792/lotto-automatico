@@ -1,64 +1,53 @@
 import json
-from itertools import combinations
-from collections import Counter
+import random
 
-# carica estrazioni
-with open("estrazioni.json") as f:
-    estrazioni = json.load(f)
+RUOTE_COLLEGATE = {
+    "Bari": ["Bari", "Napoli", "Palermo"],
+    "Cagliari": ["Cagliari", "Roma", "Firenze"],
+    "Firenze": ["Firenze", "Genova", "Roma"],
+    "Genova": ["Genova", "Milano", "Torino"],
+    "Milano": ["Milano", "Genova", "Venezia"],
+    "Napoli": ["Napoli", "Bari", "Palermo"],
+    "Palermo": ["Palermo", "Napoli", "Bari"],
+    "Roma": ["Roma", "Firenze", "Cagliari"],
+    "Torino": ["Torino", "Genova", "Milano"],
+    "Venezia": ["Venezia", "Milano", "Torino"]
+}
 
-print("\n🔥 AMBO ENGINE LOTTO EVOLUTION\n")
+def calcola_score(numeri_caldi, ciclometria, saturazione):
+    base = len(numeri_caldi) * 2
+    ciclo = len(ciclometria)
+    sat = max(0, 3 - saturazione)
+    return round(base + ciclo + sat, 2)
 
-for ruota in estrazioni:
+def genera_ambo(numeri):
+    if len(numeri) < 2:
+        return None
+    return f"{numeri[0]}-{numeri[1]}"
 
-    dati = estrazioni[ruota]
+def genera_giocate(dati):
+    giocate = []
 
-    ultime200 = dati[-200:]
-    ultime50 = dati[-50:]
+    for ruota in dati:
+        nome = ruota["ruota"]
+        numeri_caldi = ruota["numeri_caldi"]
+        ciclometria = ruota["ciclometria"]
+        saturazione = ruota["saturazione"]
 
-    # ----------------
-    # numeri caldi
-    # ----------------
-    freq = Counter()
+        ambo = genera_ambo(numeri_caldi)
+        score = calcola_score(numeri_caldi, ciclometria, saturazione)
 
-    for estrazione in ultime50:
-        for numero in estrazione:
-            freq[numero] += 1
+        ruote_target = RUOTE_COLLEGATE.get(nome, [nome])
 
-    numeri_caldi = [n for n,_ in freq.most_common(10)]
+        giocate.append({
+            "ruota_origine": nome,
+            "ruote_gioco": ruote_target,
+            "ambo": ambo,
+            "score": score
+        })
 
-    # ----------------
-    # ambi recenti
-    # ----------------
-    ambi = Counter()
+    # Ordina per score
+    giocate = sorted(giocate, key=lambda x: x["score"], reverse=True)
 
-    for estrazione in ultime200:
-        for ambo in combinations(estrazione,2):
-            ambi[tuple(sorted(ambo))] += 1
-
-    # ----------------
-    # punteggio ambo
-    # ----------------
-    score_ambi = []
-
-    for ambo, freq_ambo in ambi.items():
-
-        score = freq_ambo
-
-        # bonus numeri caldi
-        if ambo[0] in numeri_caldi:
-            score += 2
-
-        if ambo[1] in numeri_caldi:
-            score += 2
-
-        score_ambi.append((ambo,score))
-
-    # ----------------
-    # migliori ambi
-    # ----------------
-    top = sorted(score_ambi,key=lambda x:x[1],reverse=True)[:5]
-
-    print("\nRUOTA:",ruota)
-
-    for ambo,score in top:
-        print("AMBO:",ambo,"SCORE:",score)
+    # Prendi top 3
+    return giocate[:3]
