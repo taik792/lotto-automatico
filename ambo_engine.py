@@ -1,44 +1,22 @@
-RUOTE_COLLEGATE = {
-    "Bari": ["Bari", "Napoli", "Palermo"],
-    "Cagliari": ["Cagliari", "Roma", "Firenze"],
-    "Firenze": ["Firenze", "Genova", "Roma"],
-    "Genova": ["Genova", "Milano", "Torino"],
-    "Milano": ["Milano", "Genova", "Venezia"],
-    "Napoli": ["Napoli", "Bari", "Palermo"],
-    "Palermo": ["Palermo", "Napoli", "Bari"],
-    "Roma": ["Roma", "Firenze", "Cagliari"],
-    "Torino": ["Torino", "Genova", "Milano"],
-    "Venezia": ["Venezia", "Milano", "Torino"]
-}
+def genera_giocata_top(ruote):
+    classifica = []
 
-def genera_ambo(numeri_caldi):
-    if len(numeri_caldi) < 2:
-        return None
-    return f"{numeri_caldi[0]}-{numeri_caldi[1]}"
+    for r in ruote:
+        score = r["saturazione"]
 
-def calcola_score(r):
-    base = len(r["numeri_caldi"]) * 2
-    ciclo = len(r["ciclometria"])
-    sat = max(0, 3 - r["saturazione"])
-    return round(base + ciclo + sat, 2)
+        # Bonus se numeri NON usciti
+        ultima = r["ultima"]
+        caldi = r["numeri_caldi"]
 
-def genera_giocate(dati_ruote):
-    giocate = []
+        bonus = sum(1 for n in caldi if n not in ultima)
 
-    for r in dati_ruote:
-        ambo = genera_ambo(r["numeri_caldi"])
-        score = calcola_score(r)
+        score += bonus * 0.5
 
-        ruote_gioco = RUOTE_COLLEGATE.get(r["ruota"], [r["ruota"]])
+        classifica.append((score, r))
 
-        giocate.append({
-            "ruota": r["ruota"],
-            "ambo": ambo,
-            "ruote_gioco": ruote_gioco,
-            "score": score,
-            "colpi": 3
-        })
+    top = sorted(classifica, reverse=True)[:3]
 
-    giocate = sorted(giocate, key=lambda x: x["score"], reverse=True)
-
-    return giocate[:3]
+    return [
+        f"{r['ruota']} → {r['ambo_forte']}"
+        for _, r in top
+    ]
