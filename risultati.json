@@ -202,8 +202,17 @@
         }
     ],
     "giocate_top": [
-        "Napoli \u2192 44-88",
-        "Torino \u2192 17-5",
-        "Bari \u2192 21-49"
+        {
+            "ruota": "Napoli",
+            "ambo": "44-88"
+        },
+        {
+            "ruota": "Torino",
+            "ambo": "17-5"
+        },
+        {
+            "ruota": "Bari",
+            "ambo": "21-49"
+        }
     ]
 }
