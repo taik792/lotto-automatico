@@ -3,171 +3,171 @@
         {
             "ruota": "Bari",
             "ultima": [
-                36,
-                23,
+                17,
+                81,
+                25,
+                89,
+                6
+            ],
+            "numeri_caldi": [
                 51,
-                64,
-                82
+                34
             ],
-            "numeri_caldi": [
-                21,
-                49
-            ],
-            "ambo_forte": "21-49",
+            "ambo_forte": "51-34",
             "ciclometria": [
-                "36-2",
-                "23-88"
-            ],
-            "saturazione": 1.19
-        },
-        {
-            "ruota": "Cagliari",
-            "ultima": [
-                50,
-                33,
-                36,
-                90,
-                55
-            ],
-            "numeri_caldi": [
-                47,
-                49
-            ],
-            "ambo_forte": "47-49",
-            "ciclometria": [
-                "50-35",
-                "33-37"
+                "17-36",
+                "81-23"
             ],
             "saturazione": 1.09
         },
         {
-            "ruota": "Firenze",
+            "ruota": "Cagliari",
             "ultima": [
-                49,
-                48,
-                53,
-                59,
-                54
+                83,
+                36,
+                5,
+                76,
+                69
             ],
             "numeri_caldi": [
-                46,
-                72
+                33,
+                88
             ],
-            "ambo_forte": "46-72",
+            "ambo_forte": "33-88",
             "ciclometria": [
-                "49-12",
-                "48-34"
+                "83-50",
+                "36-33"
             ],
-            "saturazione": 1.19
+            "saturazione": 1.14
+        },
+        {
+            "ruota": "Firenze",
+            "ultima": [
+                6,
+                43,
+                60,
+                21,
+                44
+            ],
+            "numeri_caldi": [
+                34,
+                49
+            ],
+            "ambo_forte": "34-49",
+            "ciclometria": [
+                "6-49",
+                "43-48"
+            ],
+            "saturazione": 1.09
         },
         {
             "ruota": "Genova",
             "ultima": [
-                16,
-                41,
-                73,
-                62,
-                34
+                84,
+                56,
+                21,
+                75,
+                33
             ],
             "numeri_caldi": [
-                64,
-                72
+                62,
+                64
             ],
-            "ambo_forte": "64-72",
+            "ambo_forte": "62-64",
             "ciclometria": [
-                "16-18",
-                "41-58"
+                "84-16",
+                "56-41"
             ],
             "saturazione": 1.19
         },
         {
             "ruota": "Milano",
             "ultima": [
-                43,
-                42,
-                59,
-                38,
-                75
+                79,
+                24,
+                89,
+                5,
+                2
             ],
             "numeri_caldi": [
-                58,
-                31
+                31,
+                56
             ],
-            "ambo_forte": "58-31",
+            "ambo_forte": "31-56",
             "ciclometria": [
-                "43-72",
-                "42-58"
+                "79-43",
+                "24-42"
             ],
-            "saturazione": 1.09
+            "saturazione": 1.04
         },
         {
             "ruota": "Napoli",
             "ultima": [
-                25,
-                58,
-                62,
-                38,
-                80
+                76,
+                65,
+                70,
+                31,
+                5
             ],
             "numeri_caldi": [
                 44,
-                88
+                80
             ],
-            "ambo_forte": "44-88",
+            "ambo_forte": "44-80",
             "ciclometria": [
-                "25-64",
-                "58-88"
-            ],
-            "saturazione": 1.32
-        },
-        {
-            "ruota": "Palermo",
-            "ultima": [
-                84,
-                86,
-                88,
-                62,
-                22
-            ],
-            "numeri_caldi": [
-                26,
-                87
-            ],
-            "ambo_forte": "26-87",
-            "ciclometria": [
-                "84-88",
-                "86-14"
+                "76-25",
+                "65-58"
             ],
             "saturazione": 1.19
         },
         {
-            "ruota": "Roma",
+            "ruota": "Palermo",
             "ultima": [
-                83,
-                70,
+                29,
+                7,
                 67,
-                49,
-                66
+                62,
+                18
             ],
             "numeri_caldi": [
-                44,
-                52
+                84,
+                88
             ],
-            "ambo_forte": "44-52",
+            "ambo_forte": "84-88",
             "ciclometria": [
-                "83-52",
-                "70-59"
+                "29-84",
+                "7-86"
             ],
             "saturazione": 1.14
         },
         {
+            "ruota": "Roma",
+            "ultima": [
+                66,
+                10,
+                89,
+                57,
+                28
+            ],
+            "numeri_caldi": [
+                52,
+                76
+            ],
+            "ambo_forte": "52-76",
+            "ciclometria": [
+                "66-83",
+                "10-70"
+            ],
+            "saturazione": 1.09
+        },
+        {
             "ruota": "Torino",
             "ultima": [
-                29,
-                62,
-                21,
-                7,
-                37
+                18,
+                40,
+                85,
+                9,
+                4
             ],
             "numeri_caldi": [
                 17,
@@ -175,60 +175,52 @@
             ],
             "ambo_forte": "17-5",
             "ciclometria": [
-                "29-5",
-                "62-37"
+                "18-29",
+                "40-62"
             ],
-            "saturazione": 1.25
+            "saturazione": 1.32
         },
         {
             "ruota": "Venezia",
             "ultima": [
-                26,
-                23,
-                43,
-                42,
-                56
+                51,
+                22,
+                11,
+                66,
+                73
             ],
             "numeri_caldi": [
-                69,
-                5
+                42,
+                84
             ],
-            "ambo_forte": "69-5",
+            "ambo_forte": "42-84",
             "ciclometria": [
-                "26-60",
-                "23-28"
+                "51-26",
+                "22-23"
             ],
             "saturazione": 1.09
         }
     ],
     "giocate_top": [
         {
+            "ruota": "Torino",
+            "ambo": "17-5"
+        },
+        {
+            "ruota": "Napoli",
+            "ambo": "44-80"
+        },
+        {
             "ruota": "Roma",
-            "ambo": "44-52"
-        },
-        {
-            "ruota": "Bari",
-            "ambo": "21-49"
-        },
-        {
-            "ruota": "Milano",
-            "ambo": "58-31"
+            "ambo": "52-76"
         }
     ],
     "segnali_cross": [
         {
             "da": "Bari",
-            "a": "Cagliari",
+            "a": "Firenze",
             "numeri": [
-                36
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Bari",
-            "a": "Genova",
-            "numeri": [
-                64
+                6
             ],
             "forza": 1
         },
@@ -236,33 +228,65 @@
             "da": "Bari",
             "a": "Milano",
             "numeri": [
-                64,
-                82
-            ],
-            "forza": 2
-        },
-        {
-            "da": "Bari",
-            "a": "Napoli",
-            "numeri": [
-                64
+                89
             ],
             "forza": 1
         },
         {
             "da": "Bari",
-            "a": "Venezia",
+            "a": "Napoli",
             "numeri": [
-                36,
-                23
+                25,
+                89
             ],
             "forza": 2
+        },
+        {
+            "da": "Bari",
+            "a": "Roma",
+            "numeri": [
+                89
+            ],
+            "forza": 1
         },
         {
             "da": "Cagliari",
             "a": "Bari",
             "numeri": [
                 36
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Cagliari",
+            "a": "Milano",
+            "numeri": [
+                5
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Cagliari",
+            "a": "Napoli",
+            "numeri": [
+                5,
+                76
+            ],
+            "forza": 2
+        },
+        {
+            "da": "Cagliari",
+            "a": "Palermo",
+            "numeri": [
+                5
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Cagliari",
+            "a": "Roma",
+            "numeri": [
+                83
             ],
             "forza": 1
         },
@@ -270,9 +294,10 @@
             "da": "Cagliari",
             "a": "Torino",
             "numeri": [
-                90
+                83,
+                5
             ],
-            "forza": 1
+            "forza": 2
         },
         {
             "da": "Cagliari",
@@ -286,7 +311,15 @@
             "da": "Firenze",
             "a": "Bari",
             "numeri": [
-                49
+                6
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Firenze",
+            "a": "Genova",
+            "numeri": [
+                21
             ],
             "forza": 1
         },
@@ -294,41 +327,40 @@
             "da": "Firenze",
             "a": "Milano",
             "numeri": [
-                48,
-                59
+                43
             ],
-            "forza": 2
+            "forza": 1
         },
         {
             "da": "Firenze",
             "a": "Napoli",
             "numeri": [
-                54
+                44
             ],
             "forza": 1
         },
         {
             "da": "Firenze",
-            "a": "Palermo",
+            "a": "Torino",
             "numeri": [
-                53
+                21
             ],
             "forza": 1
         },
         {
             "da": "Firenze",
-            "a": "Roma",
+            "a": "Venezia",
             "numeri": [
-                49,
-                59
+                43,
+                60
             ],
             "forza": 2
         },
         {
             "da": "Genova",
-            "a": "Bari",
+            "a": "Cagliari",
             "numeri": [
-                62
+                33
             ],
             "forza": 1
         },
@@ -336,24 +368,15 @@
             "da": "Genova",
             "a": "Firenze",
             "numeri": [
-                41,
-                34
-            ],
-            "forza": 2
-        },
-        {
-            "da": "Genova",
-            "a": "Milano",
-            "numeri": [
-                41
+                21
             ],
             "forza": 1
         },
         {
             "da": "Genova",
-            "a": "Napoli",
+            "a": "Milano",
             "numeri": [
-                62
+                75
             ],
             "forza": 1
         },
@@ -361,93 +384,91 @@
             "da": "Genova",
             "a": "Palermo",
             "numeri": [
-                62
+                84
             ],
             "forza": 1
         },
         {
             "da": "Genova",
-            "a": "Roma",
+            "a": "Torino",
             "numeri": [
-                41,
-                73,
-                62
+                21
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Genova",
+            "a": "Venezia",
+            "numeri": [
+                56
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Milano",
+            "a": "Bari",
+            "numeri": [
+                89,
+                2
+            ],
+            "forza": 2
+        },
+        {
+            "da": "Milano",
+            "a": "Cagliari",
+            "numeri": [
+                5
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Milano",
+            "a": "Firenze",
+            "numeri": [
+                24
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Milano",
+            "a": "Napoli",
+            "numeri": [
+                24,
+                89,
+                5
             ],
             "forza": 3
         },
         {
-            "da": "Genova",
-            "a": "Torino",
+            "da": "Milano",
+            "a": "Palermo",
             "numeri": [
-                62
+                5
             ],
             "forza": 1
-        },
-        {
-            "da": "Milano",
-            "a": "Firenze",
-            "numeri": [
-                59,
-                38
-            ],
-            "forza": 2
-        },
-        {
-            "da": "Milano",
-            "a": "Genova",
-            "numeri": [
-                43
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Milano",
-            "a": "Napoli",
-            "numeri": [
-                38,
-                75
-            ],
-            "forza": 2
         },
         {
             "da": "Milano",
             "a": "Roma",
             "numeri": [
-                59
+                89
             ],
             "forza": 1
         },
         {
             "da": "Milano",
-            "a": "Venezia",
+            "a": "Torino",
             "numeri": [
-                43,
-                42
-            ],
-            "forza": 2
-        },
-        {
-            "da": "Napoli",
-            "a": "Bari",
-            "numeri": [
-                62
+                5
             ],
             "forza": 1
         },
         {
             "da": "Napoli",
-            "a": "Firenze",
+            "a": "Cagliari",
             "numeri": [
-                38
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Napoli",
-            "a": "Genova",
-            "numeri": [
-                58,
-                62
+                76,
+                5
             ],
             "forza": 2
         },
@@ -455,8 +476,8 @@
             "da": "Napoli",
             "a": "Milano",
             "numeri": [
-                58,
-                38
+                31,
+                5
             ],
             "forza": 2
         },
@@ -464,50 +485,23 @@
             "da": "Napoli",
             "a": "Palermo",
             "numeri": [
-                62,
-                80
+                5
             ],
-            "forza": 2
+            "forza": 1
         },
         {
             "da": "Napoli",
             "a": "Roma",
             "numeri": [
-                25,
-                62
+                70
             ],
-            "forza": 2
+            "forza": 1
         },
         {
             "da": "Napoli",
             "a": "Torino",
             "numeri": [
-                62
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Napoli",
-            "a": "Venezia",
-            "numeri": [
-                58
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Palermo",
-            "a": "Bari",
-            "numeri": [
-                88,
-                62
-            ],
-            "forza": 2
-        },
-        {
-            "da": "Palermo",
-            "a": "Cagliari",
-            "numeri": [
-                86
+                5
             ],
             "forza": 1
         },
@@ -515,124 +509,92 @@
             "da": "Palermo",
             "a": "Genova",
             "numeri": [
-                62
+                62,
+                18
             ],
-            "forza": 1
-        },
-        {
-            "da": "Palermo",
-            "a": "Milano",
-            "numeri": [
-                86
-            ],
-            "forza": 1
+            "forza": 2
         },
         {
             "da": "Palermo",
             "a": "Napoli",
             "numeri": [
-                88,
                 62
             ],
-            "forza": 2
+            "forza": 1
         },
         {
             "da": "Palermo",
             "a": "Roma",
             "numeri": [
-                62,
-                22
+                67
             ],
-            "forza": 2
+            "forza": 1
         },
         {
             "da": "Palermo",
             "a": "Torino",
-            "numeri": [
-                62
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Roma",
-            "a": "Bari",
-            "numeri": [
-                49
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Roma",
-            "a": "Cagliari",
-            "numeri": [
-                83
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Roma",
-            "a": "Firenze",
-            "numeri": [
-                83,
-                49
-            ],
-            "forza": 2
-        },
-        {
-            "da": "Roma",
-            "a": "Torino",
-            "numeri": [
-                83
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Roma",
-            "a": "Venezia",
-            "numeri": [
-                66
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Torino",
-            "a": "Bari",
-            "numeri": [
-                62,
-                21
-            ],
-            "forza": 2
-        },
-        {
-            "da": "Torino",
-            "a": "Cagliari",
-            "numeri": [
-                37
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Torino",
-            "a": "Firenze",
-            "numeri": [
-                7
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Torino",
-            "a": "Genova",
             "numeri": [
                 29,
-                62
+                7,
+                62,
+                18
+            ],
+            "forza": 4
+        },
+        {
+            "da": "Roma",
+            "a": "Bari",
+            "numeri": [
+                89
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Roma",
+            "a": "Milano",
+            "numeri": [
+                89
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Roma",
+            "a": "Napoli",
+            "numeri": [
+                89
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Roma",
+            "a": "Venezia",
+            "numeri": [
+                66,
+                28
             ],
             "forza": 2
         },
         {
             "da": "Torino",
-            "a": "Napoli",
+            "a": "Bari",
             "numeri": [
-                62
+                4
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Torino",
+            "a": "Cagliari",
+            "numeri": [
+                40
+            ],
+            "forza": 1
+        },
+        {
+            "da": "Torino",
+            "a": "Genova",
+            "numeri": [
+                18
             ],
             "forza": 1
         },
@@ -640,15 +602,7 @@
             "da": "Torino",
             "a": "Palermo",
             "numeri": [
-                62
-            ],
-            "forza": 1
-        },
-        {
-            "da": "Torino",
-            "a": "Roma",
-            "numeri": [
-                62
+                18
             ],
             "forza": 1
         },
@@ -656,7 +610,7 @@
             "da": "Venezia",
             "a": "Bari",
             "numeri": [
-                23
+                51
             ],
             "forza": 1
         },
@@ -664,25 +618,15 @@
             "da": "Venezia",
             "a": "Genova",
             "numeri": [
-                26,
-                43
+                73
             ],
-            "forza": 2
-        },
-        {
-            "da": "Venezia",
-            "a": "Milano",
-            "numeri": [
-                43,
-                42
-            ],
-            "forza": 2
+            "forza": 1
         },
         {
             "da": "Venezia",
             "a": "Palermo",
             "numeri": [
-                26
+                22
             ],
             "forza": 1
         },
@@ -690,9 +634,11 @@
             "da": "Venezia",
             "a": "Roma",
             "numeri": [
-                26
+                22,
+                66,
+                73
             ],
-            "forza": 1
+            "forza": 3
         }
     ]
 }
