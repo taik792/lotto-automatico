@@ -1,40 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Lotto Evolution PRO MAX</title>
+
+<style>
+body {
+    background: #0b0f14;
+    color: #e6edf3;
+    font-family: Arial;
+    text-align: center;
+}
+
+h1 { color: #00d4ff; }
+
+#top {
+    border: 1px solid #00d4ff;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 20px;
+    background: #111821;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card {
+    background: #111821;
+    border: 1px solid #1f2a36;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 10px;
+    width: 170px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 Lotto Evolution PRO MAX</h1>
+
+<div id="top">
+    <h3>🔥 Migliori Giocate</h3>
+    <div id="top-content">Caricamento...</div>
+</div>
+
+<div class="container" id="ruote"></div>
+
 <script>
 fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    let topHTML = "";
-    data.giocate_top.forEach(g => {
-        topHTML += `<p>${g.ruota} → ${g.ambo}</p>`;
-    });
-    document.getElementById("giocate").innerHTML = topHTML;
+    // TOP
+    let top = "";
+    if (data.giocate_top) {
+        for (let g of data.giocate_top) {
+            top += "<p>" + g.ruota + " → " + g.ambo + "</p>";
+        }
+    }
+    document.getElementById("top-content").innerHTML = top;
 
+    // RUOTE
     let html = "";
 
-    data.ruote.forEach(r => {
+    if (data.ruote) {
+        for (let r of data.ruote) {
 
-        let ultima = Array.isArray(r.ultima) ? r.ultima.join(" - ") : "-";
-        let caldi = Array.isArray(r.numeri_caldi) ? r.numeri_caldi.join(" - ") : "-";
-        let ciclo = Array.isArray(r.ciclometria) ? r.ciclometria.join(" | ") : "-";
+            let ultima = "-";
+            if (r.ultima && r.ultima.join) ultima = r.ultima.join(" - ");
 
-        html += `
-        <div class="card">
-            <h3>${r.ruota || "-"}</h3>
+            let caldi = "-";
+            if (r.numeri_caldi && r.numeri_caldi.join) caldi = r.numeri_caldi.join(" - ");
 
-            <p><b>Ultima</b><br>${ultima}</p>
+            let ciclo = "-";
+            if (r.ciclometria && r.ciclometria.join) ciclo = r.ciclometria.join(" | ");
 
-            <p><b>Numeri caldi</b><br>${caldi}</p>
+            html += `
+            <div class="card">
+                <h3>${r.ruota}</h3>
+                <p>Ultima<br>${ultima}</p>
+                <p>Caldi<br>${caldi}</p>
+                <p>Ambo<br>${r.ambo_forte}</p>
+                <p>Ciclo<br>${ciclo}</p>
+                <p>Saturazione<br>${r.saturazione}</p>
+            </div>
+            `;
+        }
+    }
 
-            <p><b>Ambo</b><br>${r.ambo_forte || "-"}</p>
+    document.getElementById("ruote").innerHTML = html;
 
-            <p><b>Ciclometria</b><br>${ciclo}</p>
-
-            <p><b>Saturazione</b><br>${r.saturazione ?? "-"}</p>
-        </div>
-        `;
-    });
-
-    document.getElementById("contenitore").innerHTML = html;
-
+})
+.catch(e => {
+    document.body.innerHTML += "<p>ERRORE JSON</p>";
+    console.error(e);
 });
 </script>
+
+</body>
+</html>
