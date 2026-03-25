@@ -1,5 +1,18 @@
-from utils import prendi_ultime_estrazioni
 from collections import Counter
+from utils import prendi_ultime_estrazioni
+
+# 🔥 NUOVA SATURAZIONE INTELLIGENTE
+def calcola_saturazione(freq, numeri_caldi):
+    if not numeri_caldi:
+        return 0
+
+    valori = [freq.get(n, 0) for n in numeri_caldi]
+    media = sum(valori) / len(valori)
+    max_freq = max(freq.values()) if freq else 1
+
+    saturazione = media / max_freq
+
+    return round(saturazione * 3, 2)
 
 
 def analizza_ruote(dati):
@@ -15,53 +28,44 @@ def analizza_ruote(dati):
 
         ultima = estrazioni[-1]
 
-        # 🔢 FLATTEN NUMERI
-        numeri = [n for estr in estrazioni for n in estr]
+        # 🔢 FREQUENZA NUMERI
+        freq = Counter()
 
-        # 📊 FREQUENZA
-        freq = Counter(numeri)
+        for estrazione in estrazioni:
+            for n in estrazione:
+                freq[n] += 1
 
-        # 🔥 ORDINA PER FREQUENZA
+        # 🔥 NUMERI CALDI (escludi ultima)
         ordinati = sorted(freq, key=freq.get, reverse=True)
+        numeri_caldi = [n for n in ordinati if n not in ultima][:2]
 
-        # ❌ ESCLUDI NUMERI APPENA USCITI
-        numeri_caldissimi = [n for n in ordinati if n not in ultima]
+        if len(numeri_caldi) < 2:
+            numeri_caldi = ordinati[:2]
 
-        # 🎯 PRENDI I MIGLIORI 2
-        numeri_caldissimi = numeri_caldissimi[:2]
+        # 🎯 AMBO FORTE
+        ambo = f"{numeri_caldi[0]}-{numeri_caldi[1]}"
 
-        # 🛟 BACKUP
-        if len(numeri_caldissimi) < 2:
-            for n in ordinati:
-                if n not in numeri_caldissimi:
-                    numeri_caldissimi.append(n)
-                if len(numeri_caldissimi) == 2:
-                    break
-
-        # 💣 AMBO
-        ambo = f"{numeri_caldissimi[0]}-{numeri_caldissimi[1]}"
-
-        # 🔁 CICLOMETRIA (DISTANZA REALE)
+        # 🔄 CICLOMETRIA (semplice ma stabile)
         ciclometria = []
-        for num in numeri_caldissimi:
+        for n in numeri_caldi:
             distanza = 0
-            for estr in reversed(estrazioni):
+            for estrazione in reversed(estrazioni):
                 distanza += 1
-                if num in estr:
+                if n in estrazione:
                     break
             ciclometria.append(distanza)
 
-        # 📉 SATURAZIONE CORRETTA
-        valori_freq = [freq[n] for n in numeri_caldissimi]
-        tot_numeri = len(estrazioni) * 5
-        saturazione = round((sum(valori_freq) / tot_numeri) * 10, 2)
+        ciclometria_str = f"{ciclometria[0]} | {ciclometria[1]}"
+
+        # 🔥 SATURAZIONE NUOVA
+        saturazione = calcola_saturazione(freq, numeri_caldi)
 
         risultato.append({
             "ruota": ruota,
             "ultima": ultima,
-            "numeri_caldi": numeri_caldissimi,
+            "numeri_caldi": numeri_caldi,
             "ambo_forte": ambo,
-            "ciclometria": ciclometria,
+            "ciclometria": ciclometria_str,
             "saturazione": saturazione
         })
 
