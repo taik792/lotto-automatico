@@ -15,49 +15,52 @@ body {
 /* TITOLO */
 h1 {
     color: #00ff88;
-    font-size: 42px;
+    font-size: 38px;
     margin-top: 20px;
 }
 
 /* CONTENITORE */
 .container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
-    padding: 40px;
-    max-width: 1400px;
-    margin: auto;
+    grid-template-columns: repeat(2, 1fr); /* mobile */
+    gap: 20px;
+    padding: 20px;
+}
+
+/* PC */
+@media (min-width: 900px) {
+    .container {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 1400px;
+        margin: auto;
+    }
 }
 
 /* CARD */
 .card {
     background: #0a162b;
     border: 2px solid #00ff88;
-    border-radius: 18px;
-    padding: 30px;
-    min-height: 140px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    border-radius: 15px;
+    padding: 20px;
 }
 
 /* RUOTA */
 .ruota {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
     color: #00ff88;
 }
 
 /* AMBO */
 .ambo {
-    font-size: 28px;
+    font-size: 26px;
     margin: 10px 0;
     color: #00ff88;
 }
 
 /* INDEX */
 .index {
-    font-size: 34px;
+    font-size: 30px;
     font-weight: bold;
     color: #ff4d6d;
 }
@@ -69,14 +72,18 @@ h1 {
 
 <h1>🔥 Lotto Evolution PRO MAX</h1>
 
-<div class="container" id="contenitore"></div>
+<div id="contenitore" class="container">Caricamento...</div>
 
 <script>
 fetch("./risultati.json")
-.then(res => res.json())
+.then(res => {
+    if (!res.ok) throw new Error("File risultati.json NON trovato");
+    return res.json();
+})
 .then(data => {
 
     const cont = document.getElementById("contenitore");
+    cont.innerHTML = "";
 
     for (let ruota in data) {
 
@@ -85,19 +92,19 @@ fetch("./risultati.json")
         cont.innerHTML += `
             <div class="card">
                 <div class="ruota">${ruota}</div>
-
-                <div class="ambo">
-                    ${r.ambo[0]} - ${r.ambo[1]}
-                </div>
-
-                <div class="index">
-                    ${r.indice[0]} | ${r.indice[1]}
-                </div>
+                <div class="ambo">${r.ambo[0]} - ${r.ambo[1]}</div>
+                <div class="index">${r.indice[0]} | ${r.indice[1]}</div>
             </div>
         `;
     }
 
 })
 .catch(err => {
-    document.getElementById("contenitore").innerHTML = "Errore caricamento dati";
+    document.getElementById("contenitore").innerHTML =
+        "<span style='color:red'>❌ Errore: risultati.json non trovato</span>";
+    console.error(err);
 });
+</script>
+
+</body>
+</html>
