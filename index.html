@@ -19,6 +19,15 @@ h1 {
     margin: 20px 0;
 }
 
+/* BOX MIGLIORI */
+.topbox {
+    border: 2px solid #00ff88;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 12px;
+    max-width: 600px;
+}
+
 /* GRIGLIA */
 .container {
     display: grid;
@@ -45,50 +54,14 @@ h1 {
     box-shadow: 0 0 15px #00ff8840;
 }
 
-/* RUOTA */
-.ruota {
-    font-size: 26px;
-    font-weight: bold;
-    color: #00ff88;
-    margin-bottom: 10px;
-}
-
 /* TESTI */
-.label {
-    font-size: 16px;
-    color: #aaa;
-}
-
-.valori {
-    font-size: 20px;
-    margin-bottom: 10px;
-}
-
-/* AMBO */
-.ambo {
-    font-size: 24px;
-    color: #00ff88;
-    font-weight: bold;
-}
-
-/* CICLO */
-.ciclo {
-    font-size: 20px;
-    color: orange;
-}
-
-/* INDEX */
-.index {
-    font-size: 26px;
-    color: #ff4d6d;
-    font-weight: bold;
-}
-
-/* SATURAZIONE */
-.sat {
-    font-size: 18px;
-    color: #00cfff;
-}
+.ruota { font-size: 26px; color: #00ff88; font-weight: bold; }
+.label { font-size: 16px; color: #aaa; }
+.valori { font-size: 20px; margin-bottom: 10px; }
+.ambo { font-size: 24px; color: #00ff88; font-weight: bold; }
+.ciclo { font-size: 20px; color: orange; }
+.index { font-size: 26px; color: #ff4d6d; font-weight: bold; }
+.sat { font-size: 18px; color: #00cfff; }
 </style>
 
 </head>
@@ -97,7 +70,8 @@ h1 {
 
 <h1>🔥 Lotto Evolution PRO MAX</h1>
 
-<div id="contenitore" class="container">Caricamento...</div>
+<div id="top" class="topbox">Caricamento...</div>
+<div id="contenitore" class="container"></div>
 
 <script>
 fetch("./risultati.json")
@@ -105,11 +79,23 @@ fetch("./risultati.json")
 .then(data => {
 
     const cont = document.getElementById("contenitore");
+    const topDiv = document.getElementById("top");
+
     cont.innerHTML = "";
+    let migliori = [];
 
     for (let ruota in data) {
 
         let r = data[ruota];
+
+        // FORZA = MEDIA INDEX
+        let forza = (r.indice[0] + r.indice[1]) / 2;
+
+        migliori.push({
+            ruota: ruota,
+            ambo: r.ambo,
+            forza: forza
+        });
 
         cont.innerHTML += `
             <div class="card">
@@ -136,6 +122,19 @@ fetch("./risultati.json")
         `;
     }
 
+    // 🔥 ORDINA MIGLIORI
+    migliori.sort((a, b) => b.forza - a.forza);
+
+    let top3 = migliori.slice(0, 3);
+
+    topDiv.innerHTML = `
+        <h2 style="color:#00ff88">🔥 Migliori Giocate</h2>
+        ${top3.map(g => `
+            <div style="font-size:22px; margin:6px;">
+                ${g.ruota} → ${g.ambo[0]}-${g.ambo[1]}
+            </div>
+        `).join("")}
+    `;
 });
 </script>
 
