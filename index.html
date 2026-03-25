@@ -2,157 +2,93 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lotto Evolution PRO MAX</title>
 
 <style>
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #020617;
-  color: white;
+    background: #050b1a;
+    font-family: Arial;
+    color: white;
+    text-align: center;
 }
 
-/* HEADER */
-.header {
-  text-align: center;
-  padding: 20px;
-  font-size: 22px;
-  color: #22c55e;
-  font-weight: bold;
+/* TITOLO */
+h1 {
+    color: #00ff88;
+    font-size: 40px;
 }
 
-/* TOP BOX */
-.top {
-  border: 1px solid #22c55e;
-  margin: 15px;
-  padding: 10px;
-  border-radius: 10px;
-  text-align: center;
-}
-
-/* 🔥 GRID FISSO COME VUOI TU */
-.grid {
-  display: grid;
-  gap: 15px;
-  padding: 15px;
-}
-
-/* 📱 TELEFONO */
-@media (max-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* 📲 TABLET */
-@media (min-width: 601px) and (max-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* 💻 DESKTOP */
-@media (min-width: 901px) {
-  .grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+/* GRID */
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
 }
 
 /* CARD */
 .card {
-  background: #020617;
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 0 10px rgba(0,255,150,0.1);
-  text-align: center;
-  border-left: 2px solid #22c55e;
+    background: #0a162b;
+    border: 2px solid #00ff88;
+    border-radius: 15px;
+    padding: 20px;
 }
 
-.card h2 {
-  color: #22c55e;
-  font-size: 16px;
-  margin-bottom: 8px;
+/* RUOTA */
+.ruota {
+    color: #00ff88;
+    font-size: 26px;
+    margin-bottom: 10px;
 }
 
-/* LABEL */
-.label {
-  color: #9ca3af;
-  font-size: 11px;
+/* AMBO */
+.ambo {
+    font-size: 30px;
+    color: #00ff88;
+    margin: 10px 0;
 }
 
-/* COLORI */
-.green { color: #22c55e; }
-.orange { color: orange; }
-.red { color: #f43f5e; }
-.blue { color: #38bdf8; }
-
-.small {
-  font-size: 13px;
+/* INDEX GIGANTE */
+.index {
+    font-size: 42px;
+    font-weight: bold;
+    color: #ff4d6d;
+    margin-top: 10px;
 }
 </style>
-</head>
 
+</head>
 <body>
 
-<div class="header">🔥 Lotto Evolution PRO MAX</div>
+<h1>🔥 Lotto Evolution PRO MAX</h1>
 
-<div class="top" id="top"></div>
-
-<div class="grid" id="grid"></div>
+<div class="container" id="contenitore"></div>
 
 <script>
 fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-  const grid = document.getElementById("grid");
-  const top = document.getElementById("top");
+    const cont = document.getElementById("contenitore");
 
-  let migliori = [];
+    for (let ruota in data) {
 
-  Object.values(data).forEach(r => {
+        let r = data[ruota];
 
-    if (r.indice && r.indice[0] > 4) {
-      migliori.push(`${r.ruota} → ${r.ambo.join("-")}`);
+        cont.innerHTML += `
+            <div class="card">
+                <div class="ruota">${ruota}</div>
+
+                <div class="ambo">
+                    ${r.ambo[0]} - ${r.ambo[1]}
+                </div>
+
+                <div class="index">
+                    ${r.indice[0]} | ${r.indice[1]}
+                </div>
+            </div>
+        `;
     }
-
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <h2>${r.ruota}</h2>
-
-      <div class="label">Ultima</div>
-      <div class="small">${r.ultima.join(" - ")}</div>
-
-      <div class="label">Caldi</div>
-      <div class="small">${r.caldi.join(" - ")}</div>
-
-      <div class="label">Ambo</div>
-      <div class="green small">${r.ambo.join("-")}</div>
-
-      <div class="label">Ciclo</div>
-      <div class="orange small">${r.ciclo.join(" | ")}</div>
-
-      <div class="label">Indice</div>
-      <div class="red small">${r.indice.join(" | ")}</div>
-
-      <div class="label">Saturazione</div>
-      <div class="blue small">${r.saturazione}</div>
-    `;
-
-    grid.appendChild(card);
-  });
-
-  top.innerHTML = `
-    🔥 Migliori Giocate<br>
-    ${migliori.slice(0,3).join("<br>")}
-  `;
-
-})
-.catch(() => {
-  document.getElementById("top").innerHTML = "Errore caricamento dati";
 });
 </script>
 
