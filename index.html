@@ -2,31 +2,35 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Lotto Evolution PRO MAX</title>
 
 <style>
 body {
+  margin: 0;
+  font-family: Arial, sans-serif;
   background: #020617;
   color: white;
-  font-family: Arial;
   text-align: center;
 }
 
 h1 {
   color: #22c55e;
+  margin: 20px 0;
 }
 
-.box-top {
+.top {
   border: 1px solid #22c55e;
-  padding: 15px;
-  margin: 20px;
   border-radius: 10px;
+  padding: 15px;
+  margin: 15px;
 }
 
-.grid {
+.container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
   padding: 10px;
 }
 
@@ -34,32 +38,22 @@ h1 {
   background: #0f172a;
   border-radius: 12px;
   padding: 10px;
+  box-shadow: 0 0 10px rgba(0,255,200,0.1);
 }
 
-.ruota {
+.card h2 {
   color: #22c55e;
-  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 8px;
 }
 
 .label {
+  font-size: 11px;
   color: #94a3b8;
-  font-size: 12px;
 }
 
-.ambo {
-  color: #22c55e;
-}
-
-.ciclo {
-  color: orange;
-}
-
-.indice {
-  color: #f43f5e;
-}
-
-.sat {
-  color: #38bdf8;
+.value {
+  margin-bottom: 6px;
 }
 </style>
 </head>
@@ -68,52 +62,80 @@ h1 {
 
 <h1>🔥 Lotto Evolution PRO MAX</h1>
 
-<div class="box-top" id="top"></div>
+<div class="top" id="top">
+  🔥 Migliori Giocate...
+</div>
 
-<div class="grid" id="grid"></div>
+<div class="container" id="cards"></div>
 
 <script>
 fetch("risultati.json?v=" + new Date().getTime())
-  .then(res => res.json())
-  .then(data => {
+.then(res => res.json())
+.then(data => {
 
-    const container = document.getElementById("cards");
-    container.innerHTML = "";
+  const container = document.getElementById("cards");
+  const topBox = document.getElementById("top");
 
-    Object.values(data).forEach(r => {
+  container.innerHTML = "";
 
-      const card = document.createElement("div");
-      card.className = "card";
+  let ranking = [];
 
-      card.innerHTML = `
-        <h2>${r.ruota}</h2>
+  Object.values(data).forEach(r => {
 
-        <div class="label">Ultima</div>
-        <div>${r.ultima.join(" - ")}</div>
+    // sicurezza valori
+    const ultima = r.ultima || [];
+    const caldi = r.caldi || [];
+    const ambo = r.ambo || [];
+    const ciclo = r.ciclo || [];
+    const indice = r.indice || [];
+    const saturazione = r.saturazione ?? "-";
 
-        <div class="label">Caldi</div>
-        <div>${r.caldi.join(" - ")}</div>
+    // ranking per top giocate
+    const score = (indice[0] || 0) + (ciclo[0] || 0);
+    ranking.push({ ruota: r.ruota, ambo, score });
 
-        <div class="label">Ambo</div>
-        <div style="color:#22c55e">${r.ambo.join("-")}</div>
+    const card = document.createElement("div");
+    card.className = "card";
 
-        <div class="label">Ciclo</div>
-        <div style="color:#f59e0b">${r.ciclo.join(" | ")}</div>
+    card.innerHTML = `
+      <h2>${r.ruota}</h2>
 
-        <div class="label">Indice</div>
-        <div style="color:#f43f5e">${r.indice.join(" | ")}</div>
+      <div class="label">Ultima</div>
+      <div class="value">${ultima.join(" - ")}</div>
 
-        <div class="label">Saturazione</div>
-        <div style="color:#38bdf8">${r.saturazione}</div>
-      `;
+      <div class="label">Caldi</div>
+      <div class="value">${caldi.join(" - ")}</div>
 
-      container.appendChild(card);
-    });
+      <div class="label">Ambo</div>
+      <div class="value" style="color:#22c55e">${ambo.join("-")}</div>
 
-  })
-  .catch(() => {
-    document.getElementById("cards").innerHTML = "Errore caricamento dati";
+      <div class="label">Ciclo</div>
+      <div class="value" style="color:#f59e0b">${ciclo.join(" | ")}</div>
+
+      <div class="label">Indice</div>
+      <div class="value" style="color:#f43f5e">${indice.join(" | ")}</div>
+
+      <div class="label">Saturazione</div>
+      <div class="value" style="color:#38bdf8">${saturazione}</div>
+    `;
+
+    container.appendChild(card);
   });
+
+  // TOP 3 automatiche
+  ranking.sort((a,b) => b.score - a.score);
+
+  const top3 = ranking.slice(0,3);
+
+  topBox.innerHTML = `
+    🔥 Migliori Giocate<br><br>
+    ${top3.map(t => `${t.ruota} → ${t.ambo.join("-")}`).join("<br>")}
+  `;
+
+})
+.catch(() => {
+  document.getElementById("cards").innerHTML = "Errore caricamento dati";
+});
 </script>
 
 </body>
