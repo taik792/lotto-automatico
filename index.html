@@ -8,7 +8,7 @@
 body {
     background: #0b0f14;
     color: #e6edf3;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     text-align: center;
 }
 
@@ -16,32 +16,41 @@ h1 {
     color: #00d4ff;
 }
 
+h3 {
+    color: #00ffa6;
+}
+
+/* BOX TOP */
 #top {
     border: 1px solid #00d4ff;
     border-radius: 12px;
     padding: 15px;
-    margin: 20px;
+    margin: 20px auto;
+    width: 80%;
     background: #111821;
 }
 
+/* GRID */
 .container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
 
+/* CARD */
 .card {
     background: #111821;
     border: 1px solid #1f2a36;
-    border-radius: 10px;
+    border-radius: 12px;
     margin: 10px;
-    padding: 10px;
-    width: 170px;
+    padding: 12px;
+    width: 180px;
 }
 
-.sat-alta { color: #00ffa6; }
-.sat-media { color: #ffd166; }
-.sat-bassa { color: #ff6b6b; }
+/* TESTO */
+.card b {
+    color: #00d4ff;
+}
 </style>
 </head>
 
@@ -50,69 +59,48 @@ h1 {
 <h1>🔥 Lotto Evolution PRO MAX</h1>
 
 <div id="top">
-    <h3>🔥 Migliori Giocate</h3>
-    <div id="top-content">Caricamento...</div>
+    <h3>🔥 Migliori Giocate del Giorno</h3>
+    <div id="giocate">Caricamento...</div>
 </div>
 
-<div class="container" id="ruote"></div>
+<div class="container" id="contenitore"></div>
 
 <script>
-
 fetch("risultati.json")
-.then(r => r.json())
+.then(res => res.json())
 .then(data => {
 
-    console.log("JSON:", data); // debug
-
-    // 🔥 TOP
-    let top = "";
-    if (data.giocate_top) {
-        data.giocate_top.forEach(g => {
-            top += `<p>${g.ruota} → ${g.ambo}</p>`;
-        });
-    }
-    document.getElementById("top-content").innerHTML = top || "Nessuna giocata";
+    // 🔥 TOP GIOCATE
+    let topHTML = "";
+    data.giocate_top.forEach(g => {
+        topHTML += `<p>${g.ruota} → ${g.ambo}</p>`;
+    });
+    document.getElementById("giocate").innerHTML = topHTML;
 
     // 🎯 RUOTE
     let html = "";
 
-    if (!data.ruote) {
-        document.getElementById("ruote").innerHTML = "ERRORE: ruote non trovate";
-        return;
-    }
-
     data.ruote.forEach(r => {
-
-        let satClass = "sat-bassa";
-        if (r.saturazione >= 2.5) satClass = "sat-alta";
-        else if (r.saturazione >= 1.5) satClass = "sat-media";
-
         html += `
         <div class="card">
             <h3>${r.ruota}</h3>
 
-            <p>Ultima:<br>${(r.ultima || []).join(" - ")}</p>
+            <p><b>Ultima</b><br>${r.ultima.join(" - ")}</p>
 
-            <p>Caldi:<br>${(r.numeri_caldi || []).join(" - ")}</p>
+            <p><b>Numeri caldi</b><br>${r.numeri_caldi.join(" - ")}</p>
 
-            <p>Ambo:<br>${r.ambo_forte || "-"}</p>
+            <p><b>Ambo</b><br>${r.ambo_forte}</p>
 
-            <p>Ciclo:<br>${(r.ciclometria || []).join(" | ")}</p>
+            <p><b>Ciclometria</b><br>${r.ciclometria.join(" | ")}</p>
 
-            <p>Saturazione:<br>
-            <span class="${satClass}">${r.saturazione || 0}</span></p>
+            <p><b>Saturazione</b><br>${r.saturazione}</p>
         </div>
         `;
     });
 
-    document.getElementById("ruote").innerHTML = html;
+    document.getElementById("contenitore").innerHTML = html;
 
-})
-.catch(err => {
-    console.error(err);
-    document.body.innerHTML += "<p>Errore caricamento dati</p>";
 });
-
 </script>
 
 </body>
