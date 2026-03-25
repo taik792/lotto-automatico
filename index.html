@@ -1,99 +1,35 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<title>Lotto Evolution PRO MAX</title>
-
-<style>
-body {
-    background: #0b0f14;
-    color: #e6edf3;
-    font-family: Arial, sans-serif;
-    text-align: center;
-}
-
-h1 {
-    color: #00d4ff;
-}
-
-h3 {
-    color: #00ffa6;
-}
-
-/* BOX TOP */
-#top {
-    border: 1px solid #00d4ff;
-    border-radius: 12px;
-    padding: 15px;
-    margin: 20px auto;
-    width: 80%;
-    background: #111821;
-}
-
-/* GRID */
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-/* CARD */
-.card {
-    background: #111821;
-    border: 1px solid #1f2a36;
-    border-radius: 12px;
-    margin: 10px;
-    padding: 12px;
-    width: 180px;
-}
-
-/* TESTO */
-.card b {
-    color: #00d4ff;
-}
-</style>
-</head>
-
-<body>
-
-<h1>🔥 Lotto Evolution PRO MAX</h1>
-
-<div id="top">
-    <h3>🔥 Migliori Giocate del Giorno</h3>
-    <div id="giocate">Caricamento...</div>
-</div>
-
-<div class="container" id="contenitore"></div>
-
 <script>
 fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    // 🔥 TOP GIOCATE
     let topHTML = "";
     data.giocate_top.forEach(g => {
         topHTML += `<p>${g.ruota} → ${g.ambo}</p>`;
     });
     document.getElementById("giocate").innerHTML = topHTML;
 
-    // 🎯 RUOTE
     let html = "";
 
     data.ruote.forEach(r => {
+
+        let ultima = Array.isArray(r.ultima) ? r.ultima.join(" - ") : "-";
+        let caldi = Array.isArray(r.numeri_caldi) ? r.numeri_caldi.join(" - ") : "-";
+        let ciclo = Array.isArray(r.ciclometria) ? r.ciclometria.join(" | ") : "-";
+
         html += `
         <div class="card">
-            <h3>${r.ruota}</h3>
+            <h3>${r.ruota || "-"}</h3>
 
-            <p><b>Ultima</b><br>${r.ultima.join(" - ")}</p>
+            <p><b>Ultima</b><br>${ultima}</p>
 
-            <p><b>Numeri caldi</b><br>${r.numeri_caldi.join(" - ")}</p>
+            <p><b>Numeri caldi</b><br>${caldi}</p>
 
-            <p><b>Ambo</b><br>${r.ambo_forte}</p>
+            <p><b>Ambo</b><br>${r.ambo_forte || "-"}</p>
 
-            <p><b>Ciclometria</b><br>${r.ciclometria.join(" | ")}</p>
+            <p><b>Ciclometria</b><br>${ciclo}</p>
 
-            <p><b>Saturazione</b><br>${r.saturazione}</p>
+            <p><b>Saturazione</b><br>${r.saturazione ?? "-"}</p>
         </div>
         `;
     });
@@ -102,6 +38,3 @@ fetch("risultati.json")
 
 });
 </script>
-
-</body>
-</html>
