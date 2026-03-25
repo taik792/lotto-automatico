@@ -1,4 +1,4 @@
-ULTIME_ESTRAZIONI = 20  # puoi mettere 15 o 20
+ULTIME_ESTRAZIONI = 300  # puoi mettere 15 o 20
 
 def prendi_ultime_estrazioni(lista_estrazioni):
     """
