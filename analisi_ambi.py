@@ -26,23 +26,19 @@ def analizza_ruote(dati):
 
         ultima = estrazioni[-1]
 
-        # 🔢 Frequenze
         freq = Counter()
         for estrazione in estrazioni:
             for n in estrazione:
                 freq[n] += 1
 
-        # 🔥 Numeri caldi (senza ultima)
         ordinati = sorted(freq, key=freq.get, reverse=True)
         numeri_caldi = [n for n in ordinati if n not in ultima][:2]
 
         if len(numeri_caldi) < 2:
             numeri_caldi = ordinati[:2]
 
-        # 🎯 Ambo
         ambo = f"{numeri_caldi[0]}-{numeri_caldi[1]}"
 
-        # 🔄 Ciclometria
         ciclometria = []
         for n in numeri_caldi:
             distanza = 0
@@ -54,13 +50,12 @@ def analizza_ruote(dati):
 
         ciclometria_str = f"{ciclometria[0]} | {ciclometria[1]}"
 
-        # 🔥 Saturazione nuova
         saturazione = calcola_saturazione(freq, numeri_caldi)
 
         risultato.append({
             "ruota": ruota,
-            "ultima": " - ".join(map(str, ultima)),  # 🔥 FIX IMPORTANTE
-            "numeri_caldi": numeri_caldi,
+            "ultima": " - ".join(map(str, ultima)),
+            "numeri_caldi": " - ".join(map(str, numeri_caldi)),
             "ambo_forte": ambo,
             "ciclometria": ciclometria_str,
             "saturazione": saturazione
