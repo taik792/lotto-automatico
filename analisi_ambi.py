@@ -1,6 +1,27 @@
 from collections import Counter
 from utils import prendi_ultime_estrazioni, prendi_recenti
 
+# 🔥 CICLOMETRIA REALE (media tra uscite)
+def calcola_ciclo_reale(numero, estrazioni):
+    posizioni = []
+
+    for i, estr in enumerate(estrazioni):
+        if numero in estr:
+            posizioni.append(i)
+
+    # se esce troppo poco → ciclo 0
+    if len(posizioni) < 2:
+        return 0
+
+    # distanza tra uscite
+    distanze = []
+    for i in range(1, len(posizioni)):
+        distanze.append(posizioni[i] - posizioni[i - 1])
+
+    # media
+    return int(sum(distanze) / len(distanze))
+
+
 def analizza_ruote(dati):
     risultato = []
     giocate_top = []
@@ -10,17 +31,17 @@ def analizza_ruote(dati):
         estrazioni_lungo = prendi_ultime_estrazioni(estrazioni)
         estrazioni_breve = prendi_recenti(estrazioni)
 
-        if len(estrazioni_lungo) < 5:
+        if len(estrazioni_lungo) < 10:
             continue
 
         ultima = estrazioni_lungo[-1]
 
-        # 🔥 FREQUENZE LUNGO
+        # 🔥 FREQUENZA
         freq = Counter()
         for estr in estrazioni_lungo:
             freq.update(estr)
 
-        # 🔥 NUMERI RECENTI (ATTIVI)
+        # 🔥 NUMERI RECENTI (attivi)
         recenti = set()
         for estr in estrazioni_breve:
             recenti.update(estr)
@@ -28,7 +49,7 @@ def analizza_ruote(dati):
         # 🔥 ORDINA PER FREQUENZA
         ordinati = sorted(freq, key=freq.get, reverse=True)
 
-        # 🔥 FILTRO INTELLIGENTE
+        # 🔥 FILTRO (no ultima + presenti nel breve)
         numeri_caldi = [
             n for n in ordinati
             if n not in ultima and n in recenti
@@ -41,25 +62,22 @@ def analizza_ruote(dati):
         # 🔥 AMBO
         ambo = f"{numeri_caldi[0]}-{numeri_caldi[1]}"
 
-        # 🔥 CICLOMETRIA
-        ciclo = []
+        # 🔥 CICLO REALE
+        ciclo_vals = []
         for n in numeri_caldi:
-            distanza = 0
-            for estr in reversed(estrazioni_lungo):
-                if n in estr:
-                    break
-                distanza += 1
-            ciclo.append(distanza)
+            ciclo_vals.append(calcola_ciclo_reale(n, estrazioni_lungo))
 
-        ciclometria = f"{ciclo[0]} | {ciclo[1]}"
+        ciclometria = f"{ciclo_vals[0]} | {ciclo_vals[1]}"
 
-        # 🔥 SATURAZIONE
-        saturazione = round(sum(freq.values()) / len(freq), 2)
+        # 🔥 SATURAZIONE (più corretta)
+        totale_numeri = sum(freq.values())
+        numeri_unici = len(freq)
+        saturazione = round(totale_numeri / numeri_unici / 10, 2)
 
-        # 🔥 INDICE (NUOVO)
-        indice_val = round(
+        # 🔥 INDICE INTELLIGENTE
+        indice = round(
             (freq[numeri_caldi[0]] + freq[numeri_caldi[1]]) /
-            (1 + ciclo[0] + ciclo[1]),
+            (1 + ciclo_vals[0] + ciclo_vals[1]),
             2
         )
 
@@ -70,16 +88,16 @@ def analizza_ruote(dati):
             "ambo_forte": ambo,
             "ciclometria": ciclometria,
             "saturazione": saturazione,
-            "indice": indice_val
+            "indice": indice
         })
 
         giocate_top.append({
             "ruota": ruota,
             "ambo": ambo,
-            "score": indice_val
+            "score": indice
         })
 
-    # 🔥 TOP 3 REALI
+    # 🔥 TOP 3
     giocate_top = sorted(giocate_top, key=lambda x: x["score"], reverse=True)[:3]
 
     return risultato, giocate_top
