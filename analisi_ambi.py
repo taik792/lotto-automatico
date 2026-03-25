@@ -1,4 +1,6 @@
 from utils import prendi_ultime_estrazioni
+from collections import Counter
+
 
 def analizza_ruote(dati):
     risultato = []
@@ -13,52 +15,41 @@ def analizza_ruote(dati):
 
         ultima = estrazioni[-1]
 
-        # 🔢 FLATTEN NUMERI
-        numeri = []
-        for estr in estrazioni:
-            numeri.extend(estr)
+        # 🔢 FLATTEN (tutti i numeri)
+        numeri = [n for estr in estrazioni for n in estr]
 
-        # 📊 FREQUENZE
-        freq = {}
-        for n in numeri:
-            freq[n] = freq.get(n, 0) + 1
+        # 📊 FREQUENZA
+        freq = Counter(numeri)
 
-        # 🔥 NUMERI CALDI (ordinati)
+        # 🔥 NUMERI ORDINATI PER FREQUENZA
         ordinati = sorted(freq, key=freq.get, reverse=True)
 
-        # ❌ ESCLUDI NUMERI ULTIMA ESTRAZIONE
-        numeri_caldi = [n for n in ordinati if n not in ultima]
+        # ❌ ESCLUDI ULTIMA ESTRAZIONE
+        numeri_caldissimi = [n for n in ordinati if n not in ultima]
 
-        # PRENDI I PRIMI 2
-        numeri_caldi = numeri_caldi[:2]
+        # 🎯 PRENDI I MIGLIORI 2
+        numeri_caldissimi = numeri_caldissimi[:2]
 
-        # SE NON BASTANO
-        if len(numeri_caldi) < 2:
+        # 🛟 BACKUP se non bastano
+        if len(numeri_caldissimi) < 2:
             for n in ordinati:
-                if n not in numeri_caldi:
-                    numeri_caldi.append(n)
-                if len(numeri_caldi) == 2:
+                if n not in numeri_caldissimi:
+                    numeri_caldissimi.append(n)
+                if len(numeri_caldissimi) == 2:
                     break
 
-        # 🎯 AMBO FORTE
-        ambo = f"{numeri_caldi[0]}-{numeri_caldi[1]}"
+        # 💣 AMBO
+        ambo = f"{numeri_caldissimi[0]}-{numeri_caldissimi[1]}"
 
-        # 🔄 CICLOMETRIA BASE
-        ciclometria = [
-            f"{estrazioni[-1][0]}-{estrazioni[-2][0]}",
-            f"{estrazioni[-1][1]}-{estrazioni[-2][1]}"
-        ]
+        # 🔁 CICLOMETRIA BASE (distanza ultima uscita)
+        ciclometria = []
+        for num in numeri_caldissimi:
+            distanza = 0
+            for estr in reversed(estrazioni):
+                distanza += 1
+                if num in estr:
+                    break
+            ciclometria.append(distanza)
 
-        # 📉 SATURAZIONE (media frequenze)
-        saturazione = round(sum(freq.values()) / len(freq), 2)
-
-        risultato.append({
-            "ruota": ruota,
-            "ultima": ultima,
-            "numeri_caldi": numeri_caldi,
-            "ambo_forte": ambo,
-            "ciclometria": ciclometria,
-            "saturazione": saturazione
-        })
-
-    return risultato
+        # 📉 SATURAZIONE (media frequenze normalizzata)
+        valori
