@@ -73,24 +73,20 @@ h1 {
 <div class="grid" id="grid"></div>
 
 <script>
-fetch("risultati.json")
-  .then(r => r.json())
+fetch("risultati.json?v=" + new Date().getTime())
+  .then(res => res.json())
   .then(data => {
 
-    const ruote = Object.values(data);
+    const container = document.getElementById("cards");
+    container.innerHTML = "";
 
-    // TOP 3
-    const top = ruote.slice(0, 3).map(r =>
-      `${r.ruota} → ${r.ambo.join("-")}`
-    ).join("<br>");
+    Object.values(data).forEach(r => {
 
-    document.getElementById("top").innerHTML =
-      "🔥 Migliori Giocate<br><br>" + top;
+      const card = document.createElement("div");
+      card.className = "card";
 
-    // CARDS
-    document.getElementById("grid").innerHTML = ruote.map(r => `
-      <div class="card">
-        <div class="ruota">${r.ruota}</div>
+      card.innerHTML = `
+        <h2>${r.ruota}</h2>
 
         <div class="label">Ultima</div>
         <div>${r.ultima.join(" - ")}</div>
@@ -99,23 +95,24 @@ fetch("risultati.json")
         <div>${r.caldi.join(" - ")}</div>
 
         <div class="label">Ambo</div>
-        <div class="ambo">${r.ambo.join("-")}</div>
+        <div style="color:#22c55e">${r.ambo.join("-")}</div>
 
         <div class="label">Ciclo</div>
-        <div class="ciclo">${r.ciclo.join(" | ")}</div>
+        <div style="color:#f59e0b">${r.ciclo.join(" | ")}</div>
 
         <div class="label">Indice</div>
-        <div class="indice">${r.indice.join(" | ")}</div>
+        <div style="color:#f43f5e">${r.indice.join(" | ")}</div>
 
         <div class="label">Saturazione</div>
-        <div class="sat">${r.saturazione}</div>
-      </div>
-    `).join("");
+        <div style="color:#38bdf8">${r.saturazione}</div>
+      `;
+
+      container.appendChild(card);
+    });
 
   })
-  .catch(err => {
-    document.body.innerHTML = "Errore caricamento dati";
-    console.error(err);
+  .catch(() => {
+    document.getElementById("cards").innerHTML = "Errore caricamento dati";
   });
 </script>
 
