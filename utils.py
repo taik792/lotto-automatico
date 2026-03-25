@@ -1,6 +1,12 @@
-ULTIME_ESTRAZIONI = 300  # puoi mettere 200–500
+ULTIME_ESTRAZIONI = 100
+FILTRO_ATTIVITA = 20
 
-def prendi_ultime_estrazioni(lista_estrazioni):
-    if not lista_estrazioni:
+def prendi_ultime_estrazioni(lista):
+    if not lista:
         return []
-    return lista_estrazioni[-ULTIME_ESTRAZIONI:]
+    return lista[-ULTIME_ESTRAZIONI:]
+
+def prendi_recenti(lista):
+    if not lista:
+        return []
+    return lista[-FILTRO_ATTIVITA:]
