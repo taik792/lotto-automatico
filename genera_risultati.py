@@ -19,47 +19,38 @@ risultati = {}
 # =========================
 
 def ritardo_numero(lista_estrazioni, numero):
-    """
-    Quante estrazioni sono passate dall’ultima uscita
-    """
-    for i, estr in enumerate(reversed(lista_estrazioni)):
+    # ESCLUDE ultima estrazione (fondamentale)
+    for i, estr in enumerate(reversed(lista_estrazioni[:-1])):
         if numero in estr:
-            return i
+            return i + 1
     return len(lista_estrazioni)
 
 
 def numeri_caldi(lista, n=2):
-    """
-    Numeri più frequenti nelle ultime 25
-    """
     freq = {}
     ultime = lista[-25:]
 
-    for estr in ultime:
+    for i, estr in enumerate(reversed(ultime)):
+        peso = 25 - i  # più recente pesa di più
         for num in estr:
-            freq[num] = freq.get(num, 0) + 1
+            freq[num] = freq.get(num, 0) + peso
 
     return sorted(freq, key=freq.get, reverse=True)[:n]
 
 
 def calcola_saturazione(lista):
-    """
-    Saturazione = varietà numeri ultime 50 estrazioni
-    """
     ultime = lista[-50:]
-    tutti = []
+    numeri = []
 
     for estr in ultime:
-        tutti.extend(estr)
+        numeri += estr
 
-    unici = len(set(tutti))
-    return round(unici / 90, 2)
+    unici = len(set(numeri))
+
+    return round(unici / (len(ultime) * 5), 2)
 
 
 def calcola_indice(r1, r2):
-    """
-    Indice basato su ritardi (più alto = più interessante)
-    """
     media = (r1 + r2) / 2
     diff = abs(r1 - r2)
 
@@ -77,7 +68,7 @@ for ruota in RUOTE:
 
     estr = estrazioni.get(ruota, [])
 
-    if not estr:
+    if not estr or len(estr) < 10:
         continue
 
     ultima = estr[-1]
@@ -92,7 +83,6 @@ for ruota in RUOTE:
     # CICLOMETRIA REALE
     r1 = ritardo_numero(estr, n1)
     r2 = ritardo_numero(estr, n2)
-
     ciclo = [r1, r2]
 
     # INDICE
@@ -118,4 +108,4 @@ for ruota in RUOTE:
 with open("risultati.json", "w") as f:
     json.dump(risultati, f, indent=2)
 
-print("✅ Risultati aggiornati")
+print("✅ RISULTATI GENERATI CORRETTAMENTE")
