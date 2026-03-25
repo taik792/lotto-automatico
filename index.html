@@ -6,70 +6,60 @@
 
 <style>
 body {
-    background: #020617;
-    color: #e2e8f0;
-    font-family: Arial;
-    text-align: center;
+  background: #020617;
+  color: white;
+  font-family: Arial;
+  text-align: center;
 }
 
 h1 {
-    color: #22c55e;
+  color: #22c55e;
 }
 
 .box-top {
-    border: 1px solid #22c55e;
-    border-radius: 10px;
-    padding: 15px;
-    margin: 20px auto;
-    width: 90%;
-    max-width: 500px;
-    background: #020617;
+  border: 1px solid #22c55e;
+  padding: 15px;
+  margin: 20px;
+  border-radius: 10px;
 }
 
-.container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 15px;
-    padding: 10px;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  padding: 10px;
 }
 
 .card {
-    background: #0f172a;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 0 10px #000;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 10px;
 }
 
 .ruota {
-    color: #22c55e;
-    font-weight: bold;
-    margin-bottom: 5px;
+  color: #22c55e;
+  font-weight: bold;
 }
 
 .label {
-    color: #94a3b8;
-    font-size: 12px;
-}
-
-.numero {
-    color: #38bdf8;
+  color: #94a3b8;
+  font-size: 12px;
 }
 
 .ambo {
-    color: #22c55e;
-    font-weight: bold;
+  color: #22c55e;
 }
 
 .ciclo {
-    color: #f59e0b;
-}
-
-.sat {
-    color: #38bdf8;
+  color: orange;
 }
 
 .indice {
-    color: #f43f5e;
+  color: #f43f5e;
+}
+
+.sat {
+  color: #38bdf8;
 }
 </style>
 </head>
@@ -80,62 +70,53 @@ h1 {
 
 <div class="box-top" id="top"></div>
 
-<div class="container" id="grid"></div>
+<div class="grid" id="grid"></div>
 
 <script>
 fetch("risultati.json")
-.then(res => res.json())
-.then(data => {
+  .then(r => r.json())
+  .then(data => {
 
-    // 🔥 TOP GIOCATE
-    let topHtml = "<h3>🔥 Migliori Giocate</h3>";
+    const ruote = Object.values(data);
 
-    data.giocate_top.forEach(g => {
-        topHtml += `<div>${g.ruota} → ${g.ambo}</div>`;
-    });
+    // TOP 3
+    const top = ruote.slice(0, 3).map(r =>
+      `${r.ruota} → ${r.ambo.join("-")}`
+    ).join("<br>");
 
-    document.getElementById("top").innerHTML = topHtml;
+    document.getElementById("top").innerHTML =
+      "🔥 Migliori Giocate<br><br>" + top;
 
-    // 🔥 RUOTE
-    let grid = "";
+    // CARDS
+    document.getElementById("grid").innerHTML = ruote.map(r => `
+      <div class="card">
+        <div class="ruota">${r.ruota}</div>
 
-    data.ruote.forEach(r => {
+        <div class="label">Ultima</div>
+        <div>${r.ultima.join(" - ")}</div>
 
-        grid += `
-        <div class="card">
+        <div class="label">Caldi</div>
+        <div>${r.caldi.join(" - ")}</div>
 
-            <div class="ruota">${r.ruota}</div>
+        <div class="label">Ambo</div>
+        <div class="ambo">${r.ambo.join("-")}</div>
 
-            <div class="label">Ultima</div>
-            <div>${r.ultima ? r.ultima.join(" - ") : "-"}</div>
+        <div class="label">Ciclo</div>
+        <div class="ciclo">${r.ciclo.join(" | ")}</div>
 
-            <div class="label">Caldi</div>
-            <div class="numero">
-                ${r.numeri_caldi ? r.numeri_caldi.join(" - ") : "-"}
-            </div>
+        <div class="label">Indice</div>
+        <div class="indice">${r.indice.join(" | ")}</div>
 
-            <div class="label">Ambo</div>
-            <div class="ambo">${r.ambo_forte || "-"}</div>
+        <div class="label">Saturazione</div>
+        <div class="sat">${r.saturazione}</div>
+      </div>
+    `).join("");
 
-            <div class="label">Ciclo</div>
-            <div class="ciclo">${r.ciclometria || "-"}</div>
-
-            <div class="label">Indice</div>
-            <div class="indice">${r.indice || "-"}</div>
-
-            <div class="label">Saturazione</div>
-            <div class="sat">${r.saturazione || "-"}</div>
-
-        </div>
-        `;
-    });
-
-    document.getElementById("grid").innerHTML = grid;
-
-})
-.catch(err => {
-    document.body.innerHTML += "<p>Errore caricamento dati</p>";
-});
+  })
+  .catch(err => {
+    document.body.innerHTML = "Errore caricamento dati";
+    console.error(err);
+  });
 </script>
 
 </body>
