@@ -10,13 +10,13 @@
         28
       ],
       "numeri_caldi": [
-        41,
-        33
+        73,
+        65
       ],
-      "ambo_forte": "41-33",
-      "ciclometria": "93 | 46",
-      "indice": "4.34 | 3.53",
-      "saturazione": 7.93
+      "ambo_forte": "73-65",
+      "ciclometria": "44 | 48",
+      "indice": "3.3 | 2.4",
+      "saturazione": 5.76
     },
     {
       "ruota": "Cagliari",
@@ -28,13 +28,13 @@
         43
       ],
       "numeri_caldi": [
-        20,
-        26
+        41,
+        67
       ],
-      "ambo_forte": "20-26",
-      "ciclometria": "48 | 65",
-      "indice": "3.52 | 3.03",
-      "saturazione": 6.61
+      "ambo_forte": "41-67",
+      "ciclometria": "71 | 39",
+      "indice": "2.66 | 2.44",
+      "saturazione": 5.15
     },
     {
       "ruota": "Firenze",
@@ -46,13 +46,13 @@
         31
       ],
       "numeri_caldi": [
-        33,
-        80
+        74,
+        58
       ],
-      "ambo_forte": "33-80",
-      "ciclometria": "54 | 50",
-      "indice": "3.78 | 3.17",
-      "saturazione": 7.01
+      "ambo_forte": "74-58",
+      "ciclometria": "36 | 30",
+      "indice": "2.7 | 2.62",
+      "saturazione": 5.41
     },
     {
       "ruota": "Genova",
@@ -64,13 +64,13 @@
         27
       ],
       "numeri_caldi": [
-        70,
-        66
+        66,
+        2
       ],
-      "ambo_forte": "70-66",
-      "ciclometria": "71 | 53",
-      "indice": "3.55 | 3.36",
-      "saturazione": 6.96
+      "ambo_forte": "66-2",
+      "ciclometria": "53 | 53",
+      "indice": "2.65 | 2.65",
+      "saturazione": 5.35
     },
     {
       "ruota": "Milano",
@@ -82,13 +82,13 @@
         79
       ],
       "numeri_caldi": [
-        85,
+        34,
         77
       ],
-      "ambo_forte": "85-77",
-      "ciclometria": "69 | 50",
-      "indice": "4.37 | 4.33",
-      "saturazione": 8.78
+      "ambo_forte": "34-77",
+      "ciclometria": "55 | 50",
+      "indice": "3.44 | 3.12",
+      "saturazione": 6.62
     },
     {
       "ruota": "Napoli",
@@ -100,13 +100,13 @@
         48
       ],
       "numeri_caldi": [
-        28,
-        1
+        73,
+        47
       ],
-      "ambo_forte": "28-1",
-      "ciclometria": "73 | 57",
-      "indice": "3.65 | 3.42",
-      "saturazione": 7.12
+      "ambo_forte": "73-47",
+      "ciclometria": "31 | 51",
+      "indice": "2.71 | 2.55",
+      "saturazione": 5.33
     },
     {
       "ruota": "Palermo",
@@ -118,13 +118,13 @@
         9
       ],
       "numeri_caldi": [
-        74,
-        25
+        25,
+        44
       ],
-      "ambo_forte": "74-25",
-      "ciclometria": "44 | 38",
-      "indice": "3.67 | 3.42",
-      "saturazione": 7.17
+      "ambo_forte": "25-44",
+      "ciclometria": "38 | 26",
+      "indice": "2.85 | 2.6",
+      "saturazione": 5.54
     },
     {
       "ruota": "Roma",
@@ -136,13 +136,13 @@
         53
       ],
       "numeri_caldi": [
-        80,
-        79
+        17,
+        2
       ],
-      "ambo_forte": "80-79",
-      "ciclometria": "76 | 43",
-      "indice": "4.31 | 3.58",
-      "saturazione": 7.96
+      "ambo_forte": "17-2",
+      "ciclometria": "56 | 26",
+      "indice": "3.5 | 2.6",
+      "saturazione": 6.18
     },
     {
       "ruota": "Torino",
@@ -154,13 +154,13 @@
         87
       ],
       "numeri_caldi": [
-        49,
-        77
+        23,
+        35
       ],
-      "ambo_forte": "49-77",
-      "ciclometria": "55 | 43",
-      "indice": "3.85 | 2.87",
-      "saturazione": 6.79
+      "ambo_forte": "23-35",
+      "ciclometria": "36 | 41",
+      "indice": "3.6 | 3.59",
+      "saturazione": 7.28
     },
     {
       "ruota": "Venezia",
@@ -172,27 +172,27 @@
         52
       ],
       "numeri_caldi": [
-        75,
-        65
+        49,
+        53
       ],
-      "ambo_forte": "75-65",
-      "ciclometria": "63 | 64",
-      "indice": "4.2 | 3.2",
-      "saturazione": 7.46
+      "ambo_forte": "49-53",
+      "ciclometria": "30 | 34",
+      "indice": "3.0 | 2.98",
+      "saturazione": 6.07
     }
   ],
   "giocate_top": [
     {
+      "ruota": "Torino",
+      "ambo": "23-35"
+    },
+    {
       "ruota": "Milano",
-      "ambo": "85-77"
+      "ambo": "34-77"
     },
     {
       "ruota": "Roma",
-      "ambo": "80-79"
-    },
-    {
-      "ruota": "Bari",
-      "ambo": "41-33"
+      "ambo": "17-2"
     }
   ]
 }
