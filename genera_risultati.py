@@ -6,36 +6,27 @@ RUOTE = [
     "Torino","Venezia"
 ]
 
-# =========================
-# CARICA DATI
-# =========================
 with open("estrazioni.json", "r") as f:
     estrazioni = json.load(f)
 
 risultati = {}
 
-# =========================
-# FUNZIONI
-# =========================
-
-def ritardo_numero(lista_estrazioni, numero):
-    # ESCLUDE ultima estrazione (fondamentale)
-    for i, estr in enumerate(reversed(lista_estrazioni[:-1])):
+def ritardo_numero(lista, numero):
+    for i, estr in enumerate(reversed(lista)):
         if numero in estr:
-            return i + 1
-    return len(lista_estrazioni)
+            return i
+    return len(lista)
 
 
-def numeri_caldi(lista, n=2):
-    freq = {}
-    ultime = lista[-25:]
+def trova_ritardatari(lista):
+    ritardi = {}
 
-    for i, estr in enumerate(reversed(ultime)):
-        peso = 25 - i  # più recente pesa di più
-        for num in estr:
-            freq[num] = freq.get(num, 0) + peso
+    for n in range(1, 91):
+        ritardi[n] = ritardo_numero(lista, n)
 
-    return sorted(freq, key=freq.get, reverse=True)[:n]
+    ordinati = sorted(ritardi, key=ritardi.get, reverse=True)
+
+    return ordinati[:2], ritardi
 
 
 def calcola_saturazione(lista):
@@ -45,67 +36,43 @@ def calcola_saturazione(lista):
     for estr in ultime:
         numeri += estr
 
-    unici = len(set(numeri))
+    return round(len(set(numeri)) / 90, 2)
 
-    return round(unici / (len(ultime) * 5), 2)
-
-
-def calcola_indice(r1, r2):
-    media = (r1 + r2) / 2
-    diff = abs(r1 - r2)
-
-    indice1 = round(media / 5, 2)
-    indice2 = round(diff / 3, 2)
-
-    return [indice1, indice2]
-
-
-# =========================
-# LOOP PRINCIPALE
-# =========================
 
 for ruota in RUOTE:
 
     estr = estrazioni.get(ruota, [])
 
-    if not estr or len(estr) < 10:
+    if not estr:
         continue
 
     ultima = estr[-1]
 
-    caldi = numeri_caldi(estr)
+    # 🔥 NUMERI RITARDATARI (NON CALDI)
+    ambo, mappa = trova_ritardatari(estr)
 
-    if len(caldi) < 2:
-        continue
+    n1, n2 = ambo
 
-    n1, n2 = caldi
+    ciclo = [mappa[n1], mappa[n2]]
 
-    # CICLOMETRIA REALE
-    r1 = ritardo_numero(estr, n1)
-    r2 = ritardo_numero(estr, n2)
-    ciclo = [r1, r2]
+    indice = [
+        round(ciclo[0] / 5, 2),
+        round(ciclo[1] / 5, 2)
+    ]
 
-    # INDICE
-    indice = calcola_indice(r1, r2)
-
-    # SATURAZIONE
     saturazione = calcola_saturazione(estr)
 
     risultati[ruota] = {
         "ruota": ruota,
         "ultima": ultima,
-        "caldi": [n1, n2],
-        "ambo": [n1, n2],
+        "caldi": ambo,
+        "ambo": ambo,
         "ciclo": ciclo,
         "indice": indice,
         "saturazione": saturazione
     }
 
-# =========================
-# SALVA FILE
-# =========================
-
 with open("risultati.json", "w") as f:
     json.dump(risultati, f, indent=2)
 
-print("✅ RISULTATI GENERATI CORRETTAMENTE")
+print("✅ CICLOMETRIA REALE ATTIVA")
