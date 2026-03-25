@@ -2,64 +2,62 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Lotto Evolution PRO MAX</title>
 
 <style>
 body {
-    background: #0b1220;
-    color: #e5e7eb;
-    font-family: Arial, sans-serif;
+    background: #020617;
+    color: #e2e8f0;
+    font-family: Arial;
     text-align: center;
-    margin: 0;
 }
 
 h1 {
-    color: #22d3ee;
-    margin-top: 20px;
+    color: #22c55e;
 }
 
 .box-top {
-    border: 1px solid #22d3ee;
-    border-radius: 12px;
+    border: 1px solid #22c55e;
+    border-radius: 10px;
     padding: 15px;
-    margin: 20px;
-    background: #0f172a;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 500px;
+    background: #020617;
 }
 
 .container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 15px;
-    padding: 15px;
+    padding: 10px;
 }
 
 .card {
     background: #0f172a;
     border-radius: 12px;
-    padding: 15px;
-    border: 1px solid #1f2937;
-    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    padding: 10px;
+    box-shadow: 0 0 10px #000;
 }
 
-.card h3 {
+.ruota {
     color: #22c55e;
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .label {
-    color: #9ca3af;
-    font-size: 13px;
+    color: #94a3b8;
+    font-size: 12px;
 }
 
-.value {
-    font-weight: bold;
-    margin-bottom: 6px;
+.numero {
+    color: #38bdf8;
 }
 
 .ambo {
     color: #22c55e;
-    font-size: 16px;
+    font-weight: bold;
 }
 
 .ciclo {
@@ -70,6 +68,9 @@ h1 {
     color: #38bdf8;
 }
 
+.indice {
+    color: #f43f5e;
+}
 </style>
 </head>
 
@@ -77,48 +78,50 @@ h1 {
 
 <h1>🔥 Lotto Evolution PRO MAX</h1>
 
-<div class="box-top">
-    <h3>🔥 Migliori Giocate</h3>
-    <div id="top"></div>
-</div>
+<div class="box-top" id="top"></div>
 
-<div class="container" id="contenuto"></div>
+<div class="container" id="grid"></div>
 
 <script>
-
 fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
     // 🔥 TOP GIOCATE
-    let topHTML = "";
-    if (data.giocate_top) {
-        data.giocate_top.forEach(g => {
-            topHTML += `<div>${g.ruota} → ${g.ambo}</div>`;
-        });
-    }
-    document.getElementById("top").innerHTML = topHTML;
+    let topHtml = "<h3>🔥 Migliori Giocate</h3>";
+
+    data.giocate_top.forEach(g => {
+        topHtml += `<div>${g.ruota} → ${g.ambo}</div>`;
+    });
+
+    document.getElementById("top").innerHTML = topHtml;
 
     // 🔥 RUOTE
-    let html = "";
+    let grid = "";
 
     data.ruote.forEach(r => {
 
-        html += `
+        grid += `
         <div class="card">
-            <h3>${r.ruota}</h3>
+
+            <div class="ruota">${r.ruota}</div>
 
             <div class="label">Ultima</div>
-            <div class="value">${(r.ultima || []).join(" - ")}</div>
+            <div>${r.ultima ? r.ultima.join(" - ") : "-"}</div>
 
             <div class="label">Caldi</div>
-            <div class="value">${(r.numeri_caldi || []).join(" - ")}</div>
+            <div class="numero">
+                ${r.numeri_caldi ? r.numeri_caldi.join(" - ") : "-"}
+            </div>
 
             <div class="label">Ambo</div>
             <div class="ambo">${r.ambo_forte || "-"}</div>
 
             <div class="label">Ciclo</div>
             <div class="ciclo">${r.ciclometria || "-"}</div>
+
+            <div class="label">Indice</div>
+            <div class="indice">${r.indice || "-"}</div>
 
             <div class="label">Saturazione</div>
             <div class="sat">${r.saturazione || "-"}</div>
@@ -127,13 +130,12 @@ fetch("risultati.json")
         `;
     });
 
-    document.getElementById("contenuto").innerHTML = html;
+    document.getElementById("grid").innerHTML = grid;
 
 })
 .catch(err => {
-    document.getElementById("contenuto").innerHTML = "Errore caricamento dati";
+    document.body.innerHTML += "<p>Errore caricamento dati</p>";
 });
-
 </script>
 
 </body>
