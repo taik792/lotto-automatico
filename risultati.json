@@ -14,11 +14,8 @@
                 1
             ],
             "ambo_forte": "49-1",
-            "ciclometria": [
-                5,
-                4
-            ],
-            "saturazione": 0.35
+            "ciclometria": "5 | 4",
+            "saturazione": 2.94
         },
         {
             "ruota": "Cagliari",
@@ -34,11 +31,8 @@
                 31
             ],
             "ambo_forte": "90-31",
-            "ciclometria": [
-                3,
-                9
-            ],
-            "saturazione": 0.33
+            "ciclometria": "3 | 9",
+            "saturazione": 3.0
         },
         {
             "ruota": "Firenze",
@@ -54,11 +48,8 @@
                 1
             ],
             "ambo_forte": "21-1",
-            "ciclometria": [
-                2,
-                4
-            ],
-            "saturazione": 0.34
+            "ciclometria": "2 | 4",
+            "saturazione": 2.94
         },
         {
             "ruota": "Genova",
@@ -74,11 +65,8 @@
                 43
             ],
             "ambo_forte": "18-43",
-            "ciclometria": [
-                4,
-                5
-            ],
-            "saturazione": 0.32
+            "ciclometria": "4 | 5",
+            "saturazione": 3.0
         },
         {
             "ruota": "Milano",
@@ -94,11 +82,8 @@
                 21
             ],
             "ambo_forte": "86-21",
-            "ciclometria": [
-                4,
-                7
-            ],
-            "saturazione": 0.38
+            "ciclometria": "4 | 7",
+            "saturazione": 2.85
         },
         {
             "ruota": "Napoli",
@@ -114,11 +99,8 @@
                 6
             ],
             "ambo_forte": "9-6",
-            "ciclometria": [
-                21,
-                7
-            ],
-            "saturazione": 0.35
+            "ciclometria": "21 | 7",
+            "saturazione": 2.74
         },
         {
             "ruota": "Palermo",
@@ -134,11 +116,8 @@
                 25
             ],
             "ambo_forte": "62-25",
-            "ciclometria": [
-                2,
-                39
-            ],
-            "saturazione": 0.37
+            "ciclometria": "2 | 39",
+            "saturazione": 2.9
         },
         {
             "ruota": "Roma",
@@ -154,11 +133,8 @@
                 67
             ],
             "ambo_forte": "57-67",
-            "ciclometria": [
-                2,
-                3
-            ],
-            "saturazione": 0.35
+            "ciclometria": "2 | 3",
+            "saturazione": 2.84
         },
         {
             "ruota": "Torino",
@@ -174,11 +150,8 @@
                 27
             ],
             "ambo_forte": "59-27",
-            "ciclometria": [
-                25,
-                18
-            ],
-            "saturazione": 0.35
+            "ciclometria": "25 | 18",
+            "saturazione": 2.94
         },
         {
             "ruota": "Venezia",
@@ -194,11 +167,8 @@
                 66
             ],
             "ambo_forte": "45-66",
-            "ciclometria": [
-                7,
-                2
-            ],
-            "saturazione": 0.33
+            "ciclometria": "7 | 2",
+            "saturazione": 2.72
         }
     ],
     "giocate_top": [
@@ -211,8 +181,8 @@
             "ambo": "45-66"
         },
         {
-            "ruota": "Firenze",
-            "ambo": "21-1"
+            "ruota": "Genova",
+            "ambo": "18-43"
         }
     ],
     "segnali_cross": [
