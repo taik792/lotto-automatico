@@ -8,7 +8,6 @@ def genera_giocata_top(ruote):
         except:
             continue
 
-    # 🔥 ORDINA CORRETTAMENTE
     top = sorted(classifica, key=lambda x: x[0], reverse=True)[:3]
 
     risultato = []
