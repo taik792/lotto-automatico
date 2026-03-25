@@ -7,6 +7,7 @@ def analizza_ruote(dati):
 
     for ruota, estrazioni in dati.items():
 
+        # 🔥 PRENDI SOLO LE ULTIME
         estrazioni = prendi_ultime_estrazioni(estrazioni)
 
         if len(estrazioni) < 2:
@@ -14,16 +15,22 @@ def analizza_ruote(dati):
 
         ultima = estrazioni[-1]
 
+        # 🔢 FLATTEN NUMERI
         numeri = [n for estr in estrazioni for n in estr]
 
+        # 📊 FREQUENZA
         freq = Counter(numeri)
 
+        # 🔥 ORDINA PER FREQUENZA
         ordinati = sorted(freq, key=freq.get, reverse=True)
 
+        # ❌ ESCLUDI NUMERI APPENA USCITI
         numeri_caldissimi = [n for n in ordinati if n not in ultima]
 
+        # 🎯 PRENDI I MIGLIORI 2
         numeri_caldissimi = numeri_caldissimi[:2]
 
+        # 🛟 BACKUP
         if len(numeri_caldissimi) < 2:
             for n in ordinati:
                 if n not in numeri_caldissimi:
@@ -31,8 +38,10 @@ def analizza_ruote(dati):
                 if len(numeri_caldissimi) == 2:
                     break
 
+        # 💣 AMBO
         ambo = f"{numeri_caldissimi[0]}-{numeri_caldissimi[1]}"
 
+        # 🔁 CICLOMETRIA (DISTANZA REALE)
         ciclometria = []
         for num in numeri_caldissimi:
             distanza = 0
@@ -42,8 +51,10 @@ def analizza_ruote(dati):
                     break
             ciclometria.append(distanza)
 
+        # 📉 SATURAZIONE CORRETTA
         valori_freq = [freq[n] for n in numeri_caldissimi]
-        saturazione = round(sum(valori_freq) / len(estrazioni), 2)
+        tot_numeri = len(estrazioni) * 5
+        saturazione = round((sum(valori_freq) / tot_numeri) * 10, 2)
 
         risultato.append({
             "ruota": ruota,
