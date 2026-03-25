@@ -1,5 +1,5 @@
-ULTIME_ESTRAZIONI = 100
-FILTRO_ATTIVITA = 20
+ULTIME_ESTRAZIONI = 300
+FILTRO_ATTIVITA = 150
 
 def prendi_ultime_estrazioni(lista):
     if not lista:
