@@ -15,15 +15,15 @@ body {
 /* TITOLO */
 h1 {
     color: #00ff88;
-    font-size: 38px;
-    margin-top: 20px;
+    font-size: 42px;
+    margin: 20px 0;
 }
 
-/* CONTENITORE */
+/* GRIGLIA */
 .container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* mobile */
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
     padding: 20px;
 }
 
@@ -40,29 +40,54 @@ h1 {
 .card {
     background: #0a162b;
     border: 2px solid #00ff88;
-    border-radius: 15px;
-    padding: 20px;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 0 15px #00ff8840;
 }
 
 /* RUOTA */
 .ruota {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: bold;
     color: #00ff88;
+    margin-bottom: 10px;
+}
+
+/* TESTI */
+.label {
+    font-size: 16px;
+    color: #aaa;
+}
+
+.valori {
+    font-size: 20px;
+    margin-bottom: 10px;
 }
 
 /* AMBO */
 .ambo {
-    font-size: 26px;
-    margin: 10px 0;
+    font-size: 24px;
     color: #00ff88;
+    font-weight: bold;
+}
+
+/* CICLO */
+.ciclo {
+    font-size: 20px;
+    color: orange;
 }
 
 /* INDEX */
 .index {
-    font-size: 30px;
-    font-weight: bold;
+    font-size: 26px;
     color: #ff4d6d;
+    font-weight: bold;
+}
+
+/* SATURAZIONE */
+.sat {
+    font-size: 18px;
+    color: #00cfff;
 }
 </style>
 
@@ -76,10 +101,7 @@ h1 {
 
 <script>
 fetch("./risultati.json")
-.then(res => {
-    if (!res.ok) throw new Error("File risultati.json NON trovato");
-    return res.json();
-})
+.then(res => res.json())
 .then(data => {
 
     const cont = document.getElementById("contenitore");
@@ -92,17 +114,28 @@ fetch("./risultati.json")
         cont.innerHTML += `
             <div class="card">
                 <div class="ruota">${ruota}</div>
+
+                <div class="label">Ultima</div>
+                <div class="valori">${r.ultima.join(" - ")}</div>
+
+                <div class="label">Caldi</div>
+                <div class="valori">${r.caldi.join(" - ")}</div>
+
+                <div class="label">Ambo</div>
                 <div class="ambo">${r.ambo[0]} - ${r.ambo[1]}</div>
+
+                <div class="label">Ciclo</div>
+                <div class="ciclo">${r.ciclo[0]} | ${r.ciclo[1]}</div>
+
+                <div class="label">Indice</div>
                 <div class="index">${r.indice[0]} | ${r.indice[1]}</div>
+
+                <div class="label">Saturazione</div>
+                <div class="sat">${r.saturazione}</div>
             </div>
         `;
     }
 
-})
-.catch(err => {
-    document.getElementById("contenitore").innerHTML =
-        "<span style='color:red'>❌ Errore: risultati.json non trovato</span>";
-    console.error(err);
 });
 </script>
 
