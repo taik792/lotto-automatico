@@ -1,22 +1,26 @@
 import json
 from analisi_ambi import analizza_ruote
-from ambo_engine import genera_giocata_top
 
 def main():
-    with open("estrazioni.json") as f:
+
+    with open("estrazioni.json", "r") as f:
         dati = json.load(f)
 
     ruote = analizza_ruote(dati)
-    top = genera_giocata_top(ruote)
+
+    # 🔥 TOP GIOCATE (le migliori 3)
+    top = sorted(ruote, key=lambda x: x["saturazione"], reverse=True)[:3]
 
     output = {
         "ruote": ruote,
-        "giocate_top": top
+        "giocate_top": [
+            {"ruota": r["ruota"], "ambo": r["ambo_forte"]}
+            for r in top
+        ]
     }
 
     with open("risultati.json", "w") as f:
-        json.dump(output, f, indent=4)
-
+        json.dump(output, f, indent=2)
 
 if __name__ == "__main__":
     main()
