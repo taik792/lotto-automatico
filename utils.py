@@ -1,4 +1,4 @@
-ULTIME_ESTRAZIONI = 300  # puoi mettere anche 500
+ULTIME_ESTRAZIONI = 300
 
 def prendi_ultime_estrazioni(lista_estrazioni):
     if not lista_estrazioni:
