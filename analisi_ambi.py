@@ -1,7 +1,6 @@
 from collections import Counter
 from utils import prendi_ultime_estrazioni
 
-# 🔥 NUOVA SATURAZIONE INTELLIGENTE
 def calcola_saturazione(freq, numeri_caldi):
     if not numeri_caldi:
         return 0
@@ -20,7 +19,6 @@ def analizza_ruote(dati):
 
     for ruota, estrazioni in dati.items():
 
-        # 🔥 PRENDI SOLO LE ULTIME
         estrazioni = prendi_ultime_estrazioni(estrazioni)
 
         if len(estrazioni) < 2:
@@ -28,24 +26,23 @@ def analizza_ruote(dati):
 
         ultima = estrazioni[-1]
 
-        # 🔢 FREQUENZA NUMERI
+        # 🔢 Frequenze
         freq = Counter()
-
         for estrazione in estrazioni:
             for n in estrazione:
                 freq[n] += 1
 
-        # 🔥 NUMERI CALDI (escludi ultima)
+        # 🔥 Numeri caldi (senza ultima)
         ordinati = sorted(freq, key=freq.get, reverse=True)
         numeri_caldi = [n for n in ordinati if n not in ultima][:2]
 
         if len(numeri_caldi) < 2:
             numeri_caldi = ordinati[:2]
 
-        # 🎯 AMBO FORTE
+        # 🎯 Ambo
         ambo = f"{numeri_caldi[0]}-{numeri_caldi[1]}"
 
-        # 🔄 CICLOMETRIA (semplice ma stabile)
+        # 🔄 Ciclometria
         ciclometria = []
         for n in numeri_caldi:
             distanza = 0
@@ -57,12 +54,12 @@ def analizza_ruote(dati):
 
         ciclometria_str = f"{ciclometria[0]} | {ciclometria[1]}"
 
-        # 🔥 SATURAZIONE NUOVA
+        # 🔥 Saturazione nuova
         saturazione = calcola_saturazione(freq, numeri_caldi)
 
         risultato.append({
             "ruota": ruota,
-            "ultima": ultima,
+            "ultima": " - ".join(map(str, ultima)),  # 🔥 FIX IMPORTANTE
             "numeri_caldi": numeri_caldi,
             "ambo_forte": ambo,
             "ciclometria": ciclometria_str,
