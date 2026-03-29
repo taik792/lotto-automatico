@@ -2,135 +2,117 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lotto Finale</title>
+<title>Lotto Elite PRO</title>
 
 <style>
 body {
-  background:#020617;
-  color:white;
-  font-family:Arial;
-  text-align:center;
-}
-h1 { color:#00ff99; }
-
-.topbox {
-  border:2px solid #00ff99;
-  border-radius:15px;
-  padding:15px;
-  margin:15px;
+    background:#020617;
+    color:#fff;
+    font-family:Arial;
+    margin:0;
+    padding:20px;
 }
 
-.grid {
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:15px;
-  padding:10px;
+h1 {
+    text-align:center;
+    color:#00ff99;
 }
 
-.card {
-  border:2px solid #00ff99;
-  border-radius:15px;
-  padding:10px;
+.box {
+    border:2px solid #00ff99;
+    border-radius:15px;
+    padding:10px;
+    margin:10px;
+    width:45%;
+    display:inline-block;
+    vertical-align:top;
+}
+
+.title {
+    color:#00ff99;
+    font-weight:bold;
+    font-size:18px;
 }
 
 .green { color:#00ff99; }
 .red { color:#ff4d4d; }
 
-button {
-  margin:10px;
-  padding:10px;
+.top {
+    border:2px solid #00ff99;
+    border-radius:15px;
+    padding:15px;
+    text-align:center;
+    margin-bottom:20px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🔥 LOTTO ELITE</h1>
+<h1>🔥 LOTTO ELITE PRO</h1>
 
-<div class="topbox" id="top">Caricamento...</div>
+<div class="top" id="top"></div>
 
-<button onclick="aggiornaRisultati()">Inserisci risultati</button>
-
-<div class="grid" id="grid"></div>
+<div id="container"></div>
 
 <script>
 
-let performance = JSON.parse(localStorage.getItem("performance")) || {};
+const ordineRuote = [
+    "Bari","Cagliari","Firenze","Genova",
+    "Milano","Napoli","Palermo","Roma",
+    "Torino","Venezia"
+];
 
-fetch("risultati.json")
-.then(r => r.json())
-.then(data => {
+async function load() {
 
-    let valori = Object.values(data || {});
+    const risultati = await fetch("risultati.json").then(r=>r.json());
+    const estrazioni = await fetch("estrazioni.json").then(r=>r.json());
 
-    // sicurezza totale
-    valori = valori.filter(r => r && r.ambo && r.score);
+    const container = document.getElementById("container");
 
-    valori.forEach(r => {
-        let base = Number(r.score) || 0;
-        let bonus = performance[r.ruota] || 0;
-        r.score_finale = base + bonus;
+    let htmlTop = "<h3>🔥 SEGNALI TOP</h3>";
+
+    // TOP 3
+    const top = Object.values(risultati)
+        .sort((a,b)=>b.score - a.score)
+        .slice(0,3);
+
+    top.forEach(t=>{
+        htmlTop += `${t.ruota} → ${t.ambo.join(" - ")}<br>`;
     });
 
-    valori.sort((a,b)=>b.score_finale-a.score_finale);
+    document.getElementById("top").innerHTML = htmlTop;
 
-    let top = valori.slice(0,3);
+    // RUOTE ORDINATE
+    ordineRuote.forEach(ruota => {
 
-    document.getElementById("top").innerHTML =
-        "🔥 SEGNALI TOP<br><br>" +
-        top.map(r => `${r.ruota} → ${r.ambo.join(" - ")}`).join("<br>");
+        const r = risultati[ruota];
+        if (!r) return;
 
-    document.getElementById("grid").innerHTML =
-        valori.map(r => `
-        <div class="card">
-            <b>${r.ruota}</b><br>
-            Ambo: <span class="green">${r.ambo.join(" - ")}</span><br>
-            Score: ${r.score}<br>
-            AI: <span class="red">${r.score_finale.toFixed(2)}</span>
+        const ultima = estrazioni[ruota] || [];
+
+        container.innerHTML += `
+        <div class="box">
+            <div class="title">${ruota}</div>
+
+            <div>Ultima: ${ultima.join(" - ")}</div>
+
+            <div>Caldi: ${r.caldi.join(" - ")}</div>
+
+            <div class="green">
+                Ambo: ${r.ambo.join(" - ")}
+            </div>
+
+            <div class="red">
+                Score: ${r.score}
+            </div>
         </div>
-        `).join("");
-
-    // salva per uso dopo
-    window.risultatiAttuali = valori;
-
-})
-.catch(err => {
-
-    document.getElementById("top").innerHTML =
-        "❌ ERRORE CARICAMENTO DATI";
-
-    console.log(err);
-});
-
-function aggiornaRisultati(){
-
-    if (!window.risultatiAttuali) {
-        alert("Dati non caricati ancora");
-        return;
-    }
-
-    let input = prompt("Numeri usciti (es: 27,51)");
-    if (!input) return;
-
-    let usciti = input.split(",").map(n => parseInt(n));
-
-    window.risultatiAttuali.forEach(r => {
-
-        let hit = r.ambo.filter(n => usciti.includes(n)).length;
-
-        if (!performance[r.ruota]) performance[r.ruota] = 0;
-
-        if (hit >= 2) performance[r.ruota] += 5;
-        else if (hit === 1) performance[r.ruota] += 1;
-        else performance[r.ruota] -= 2;
-
+        `;
     });
 
-    localStorage.setItem("performance", JSON.stringify(performance));
-
-    alert("Sistema aggiornato");
 }
+
+load();
 
 </script>
 
