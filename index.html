@@ -2,137 +2,135 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Lotto ELITE</title>
+<title>Lotto Elite AI</title>
 
 <style>
 body {
-  margin: 0;
-  font-family: Arial;
-  background: #020617;
-  color: white;
-  text-align: center;
+    background: #020617;
+    color: white;
+    font-family: Arial;
+    text-align: center;
 }
 
 h1 {
-  color: #00ff9c;
-  margin-top: 20px;
-}
-
-.box-top {
-  border: 2px solid #00ff9c;
-  border-radius: 20px;
-  padding: 15px;
-  margin: 20px;
+    color: #00ff99;
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 10px;
 }
 
 .card {
-  border: 2px solid #00ff9c;
-  border-radius: 20px;
-  padding: 15px;
-  text-align: left;
+    border: 2px solid #00ff99;
+    border-radius: 15px;
+    padding: 10px;
 }
 
-.titolo {
-  color: #00ff9c;
-  font-weight: bold;
-  font-size: 18px;
-  margin-bottom: 10px;
-}
+.green { color: #00ff99; }
+.red { color: #ff4d4d; }
 
-.label {
-  color: #aaa;
-  font-size: 13px;
-}
-
-.green {
-  color: #00ff9c;
-  font-weight: bold;
-}
-
-.red {
-  color: #ff4d4d;
-  font-weight: bold;
+.topbox {
+    border: 2px solid #00ff99;
+    border-radius: 15px;
+    padding: 15px;
+    margin: 15px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🔥 LOTTO ELITE</h1>
+<h1>🔥 LOTTO ELITE AI</h1>
 
-<div id="top" class="box-top">Caricamento...</div>
+<div class="topbox" id="top"></div>
 
-<div id="grid" class="grid"></div>
+<div class="grid" id="grid"></div>
 
 <script>
-fetch("risultati.json")
-.then(res => {
-  if (!res.ok) throw new Error("JSON non trovato");
-  return res.json();
-})
-.then(data => {
 
-  const ordine = [
-    "Bari","Cagliari","Firenze","Genova",
-    "Milano","Napoli","Palermo","Roma",
-    "Torino","Venezia","Nazionale"
-  ];
+// 🔥 DATI (simulazione)
+let data = {
+    Bari: {ultima:[53,4,1,11,9], caldi:[75,51]},
+    Milano: {ultima:[7,79,84,28,37], caldi:[34,77]},
+    Roma: {ultima:[81,66,45,53,8], caldi:[78,66]},
+    Torino: {ultima:[29,47,55,78,71], caldi:[80,21]},
+    Firenze: {ultima:[13,48,58,39,15], caldi:[67,19]},
+    Venezia: {ultima:[7,29,76,14,15], caldi:[85,69]},
+    Napoli: {ultima:[26,90,68,82,67], caldi:[80,85]},
+    Palermo: {ultima:[38,57,65,20,56], caldi:[88,84]},
+    Genova: {ultima:[52,87,51,79,67], caldi:[2,19]},
+    Cagliari: {ultima:[67,19,47,35,64], caldi:[23,47]}
+};
 
-  let valori = Object.values(data);
+// 🔥 STORAGE
+let storico = JSON.parse(localStorage.getItem("storico")) || [];
 
-  // 🔥 FILTRO PROFIT (SOLO SCORE ALTI)
-  let forti = valori.filter(r => r.score > 15);
+// 🔥 CALCOLO SCORE
+function calcolaScore(caldi, ultima) {
+    let score = 0;
 
-  // 🔥 ORDINE RUOTE
-  forti.sort((a,b) =>
-    ordine.indexOf(a.ruota) - ordine.indexOf(b.ruota)
-  );
+    caldi.forEach(n => {
+        if (!ultima.includes(n)) score += 5;
+        if (n % 2 === 0) score += 2;
+    });
 
-  // 🔥 TOP 3 REALI
-  let top = [...forti]
-    .sort((a,b) => b.score - a.score)
-    .slice(0,3);
+    return score.toFixed(2);
+}
 
-  document.getElementById("top").innerHTML =
-    "<b>🔥 SEGNALI TOP</b><br><br>" +
-    top.map(r =>
-      `${r.ruota} → ${r.ambo.join(" - ")}`
-    ).join("<br>");
+// 🔥 CREA PREVISIONI
+let risultati = [];
 
-  // 🔥 MOSTRA SOLO I MIGLIORI (MAX 3)
-  document.getElementById("grid").innerHTML = forti
-    .slice(0,3)
-    .map(r => `
-    <div class="card">
-      <div class="titolo">${r.ruota}</div>
+for (let ruota in data) {
 
-      <div class="label">Ultima</div>
-      ${r.ultima.join(" - ")}
+    let caldi = data[ruota].caldi;
+    let ultima = data[ruota].ultima;
 
-      <div class="label">Caldi</div>
-      ${r.caldi.join(" - ")}
+    let score = calcolaScore(caldi, ultima);
 
-      <div class="label">Ambo</div>
-      <span class="green">${r.ambo.join(" - ")}</span>
+    risultati.push({
+        ruota,
+        ambo: caldi,
+        score: parseFloat(score)
+    });
+}
 
-      <div class="label">Score</div>
-      <span class="red">${r.score.toFixed(2)}</span>
-    </div>
-  `).join("");
+// 🔥 ORDINA
+risultati.sort((a,b)=>b.score-a.score);
 
-})
-.catch(err => {
-  document.getElementById("top").innerHTML = "Errore caricamento dati";
+// 🔥 TOP 3
+let top = risultati.slice(0,3);
+
+// 🔥 SALVA NELLO STORICO
+storico.push({
+    data: new Date().toLocaleString(),
+    previsioni: risultati
 });
+
+localStorage.setItem("storico", JSON.stringify(storico));
+
+// 🔥 MOSTRA TOP
+let topDiv = document.getElementById("top");
+topDiv.innerHTML = "<h2>🔥 SEGNALI TOP</h2>" +
+top.map(t => `${t.ruota} → ${t.ambo[0]} - ${t.ambo[1]}`).join("<br>");
+
+// 🔥 GRID
+let grid = document.getElementById("grid");
+
+risultati.forEach(r => {
+    grid.innerHTML += `
+    <div class="card">
+        <h3>${r.ruota}</h3>
+        Ultima: ${data[r.ruota].ultima.join(" - ")}<br>
+        Caldi: ${r.ambo.join(" - ")}<br>
+        <span class="green">Ambo: ${r.ambo.join(" - ")}</span><br>
+        Score: <span class="red">${r.score}</span>
+    </div>
+    `;
+});
+
 </script>
 
 </body>
