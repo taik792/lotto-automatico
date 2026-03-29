@@ -2,7 +2,7 @@ def genera_giocata_top(ruote):
     classifica = []
 
     # =========================
-    # COSTRUZIONE FREQUENZA NUMERI
+    # FREQUENZA NUMERI (cross ruote)
     # =========================
     tutti_numeri = []
 
@@ -27,14 +27,18 @@ def genera_giocata_top(ruote):
             ciclo1, ciclo2 = r["ciclo"]
             saturazione = r["saturazione"]
 
-            # BASE
+            # =========================
+            # BASE SCORE
+            # =========================
             score = (
                 ((indice1 + indice2) / 2) * 0.4 +
                 ((ciclo1 + ciclo2) / 2) * 0.2 +
                 (saturazione) * 0.1
             )
 
-            # BONUS RIPETIZIONE (numero compare su più ruote)
+            # =========================
+            # BONUS RIPETIZIONE
+            # =========================
             if frequenza.get(n1, 0) > 1:
                 score += 0.5
             if frequenza.get(n2, 0) > 1:
@@ -43,7 +47,6 @@ def genera_giocata_top(ruote):
             # =========================
             # MIGLIORAMENTO ACCOPPIAMENTO
             # =========================
-
             distanza = abs(n1 - n2)
 
             # Penalità numeri troppo vicini
@@ -58,13 +61,28 @@ def genera_giocata_top(ruote):
             if (n1 % 2) != (n2 % 2):
                 score += 0.3
 
+            # =========================
+            # FILTRO ANTI-SPAZZATURA
+            # =========================
+
+            # indice troppo basso
+            if ((indice1 + indice2) / 2) < 3.5:
+                continue
+
+            # ciclo troppo sbilanciato
+            if abs(ciclo1 - ciclo2) > 1.5:
+                continue
+
+            # =========================
+            # AGGIUNTA CLASSIFICA
+            # =========================
             classifica.append((score, r))
 
         except:
             continue
 
     # =========================
-    # ORDINAMENTO TOP
+    # ORDINAMENTO TOP PICK
     # =========================
     top = sorted(classifica, key=lambda x: x[0], reverse=True)[:3]
 
