@@ -3,67 +3,93 @@ fetch("risultati.json")
   .then(res => res.json())
   .then(data => {
 
+    console.log("DATI:", data);
+
+    if (!data) return;
+
     const topPick = data.top_pick || [];
 
     const ruote = Object.keys(data)
-      .filter(k => k !== "top_pick")
+      .filter(k => k !== "top_pick" && typeof data[k] === "object")
       .map(k => data[k]);
 
     // =========================
-    // TOP PICK (BOX VERDE)
+    // TOP PICK
     // =========================
     const topBox = document.querySelector(".top-pick");
 
-    if (topBox) {
-      topBox.innerHTML = `
-        <h3>🔥 Migliori Giocate</h3>
-        ${topPick.map(t => `${t.ruota} → ${t.ambo.join("-")}`).join("<br>")}
-      `;
+    if (topBox && topPick.length) {
+      let html = "<h3>🔥 Migliori Giocate</h3>";
+
+      topPick.forEach(t => {
+        if (t.ruota && t.ambo) {
+          html += `<div>${t.ruota} → ${t.ambo.join("-")}</div>`;
+        }
+      });
+
+      topBox.innerHTML = html;
     }
+
+    // =========================
+    // CONTAINER SICURO
+    // =========================
+    let container = document.querySelector(".container");
+
+    if (!container) {
+      container = document.createElement("div");
+      document.body.appendChild(container);
+    }
+
+    container.innerHTML = "";
 
     // =========================
     // CARDS
     // =========================
-    const container = document.querySelector(".container");
-
-    if (!container) return;
-
-    container.innerHTML = "";
-
     ruote.forEach(r => {
-      container.innerHTML += `
-        <div class="card">
+
+      if (!r || !r.ruota) return;
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      try {
+        card.innerHTML = `
           <h2>${r.ruota}</h2>
 
           <p>Ultima estrazione<br>
-          ${r.ultima.join(" - ")}</p>
+          ${(r.ultima || []).join(" - ")}</p>
 
           <p>Numeri caldi<br>
-          ${r.caldi.join(" - ")}</p>
+          ${(r.caldi || []).join(" - ")}</p>
 
           <p>Ambo forte<br>
-          <b>${r.ambo.join(" - ")}</b></p>
+          ${(r.ambo || []).join(" - ")}</p>
 
           <p>Ciclometria<br>
-          ${r.ciclo.join(" - ")}</p>
+          ${(r.ciclo || []).join(" - ")}</p>
 
           <p>Indice<br>
-          ${r.indice.join(" - ")}</p>
+          ${(r.indice || []).join(" - ")}</p>
 
           <p>Saturazione<br>
-          ${r.saturazione}</p>
-        </div>
-      `;
+          ${r.saturazione ?? ""}</p>
+        `;
+      } catch (e) {
+        console.log("Errore card:", e);
+      }
+
+      container.appendChild(card);
     });
 
     // =========================
-    // NASCONDI LOADING
+    // STOP LOADING
     // =========================
     const loading = document.querySelector(".loading");
     if (loading) loading.style.display = "none";
 
   })
   .catch(err => {
-    console.error(err);
+    console.error("ERRORE JSON:", err);
+    document.body.innerHTML = "<h2 style='color:white'>Errore caricamento dati</h2>";
   });
 </script>
