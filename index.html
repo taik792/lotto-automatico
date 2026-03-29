@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lotto AI Finale</title>
+
+<title>Lotto Elite Finale</title>
 
 <style>
 body {
@@ -13,7 +14,9 @@ body {
   text-align:center;
 }
 
-h1 { color:#00ff99; }
+h1 {
+  color:#00ff99;
+}
 
 .topbox {
   border:2px solid #00ff99;
@@ -40,107 +43,4 @@ h1 { color:#00ff99; }
 
 button {
   margin:10px;
-  padding:8px;
-}
-</style>
-</head>
-
-<body>
-
-<h1>🔥 LOTTO AI FINALE</h1>
-
-<div class="topbox" id="top">Caricamento...</div>
-
-<button onclick="aggiornaRisultati()">Inserisci risultati reali</button>
-
-<div class="grid" id="grid"></div>
-
-<script>
-
-// 🔥 STORAGE
-let storico = JSON.parse(localStorage.getItem("storico")) || [];
-let performance = JSON.parse(localStorage.getItem("performance")) || {};
-
-// 🔥 FETCH DATI REALI
-fetch("risultati.json")
-.then(r=>r.json())
-.then(data=>{
-
-  let valori = Object.values(data);
-
-  // 🔥 CALCOLO SCORE DINAMICO
-  valori.forEach(r => {
-
-    let base = r.score || 0;
-    let bonus = performance[r.ruota] || 0;
-
-    r.score_finale = base + bonus;
-  });
-
-  // 🔥 FILTRO
-  let forti = valori
-    .filter(r => r.score_finale > 10)
-    .sort((a,b)=>b.score_finale-a.score_finale);
-
-  // 🔥 TOP
-  let top = forti.slice(0,3);
-
-  document.getElementById("top").innerHTML =
-    "<b>🔥 SEGNALI REALI</b><br><br>" +
-    top.map(r =>
-      `${r.ruota} → ${r.ambo.join(" - ")} (${r.score_finale.toFixed(2)})`
-    ).join("<br>");
-
-  // 🔥 GRID
-  document.getElementById("grid").innerHTML =
-    forti.slice(0,5).map(r => `
-      <div class="card">
-        <b>${r.ruota}</b><br>
-        Ambo: <span class="green">${r.ambo.join(" - ")}</span><br>
-        Score: ${r.score.toFixed(2)}<br>
-        AI: <span class="red">${r.score_finale.toFixed(2)}</span>
-      </div>
-    `).join("");
-
-  // 🔥 SALVA STORICO
-  storico.push({
-    data: new Date().toLocaleString(),
-    dati: valori
-  });
-
-  localStorage.setItem("storico", JSON.stringify(storico));
-
-  window.risultatiAttuali = valori;
-
-});
-
-// 🔥 INSERIMENTO RISULTATI REALI
-function aggiornaRisultati() {
-
-  let input = prompt("Inserisci numeri usciti (es: 27,51)");
-
-  if (!input) return;
-
-  let usciti = input.split(",").map(n => parseInt(n));
-
-  window.risultatiAttuali.forEach(r => {
-
-    let hit = r.ambo.filter(n => usciti.includes(n)).length;
-
-    if (!performance[r.ruota]) performance[r.ruota] = 0;
-
-    if (hit >= 2) performance[r.ruota] += 6;
-    else if (hit === 1) performance[r.ruota] += 2;
-    else performance[r.ruota] -= 3;
-
-  });
-
-  localStorage.setItem("performance", JSON.stringify(performance));
-
-  alert("🧠 Sistema aggiornato: apprendimento applicato");
-}
-
-</script>
-
-</body>
-</html>
+  padding:
