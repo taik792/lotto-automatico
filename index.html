@@ -2,102 +2,145 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Lotto Elite PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lotto AI Finale</title>
 
 <style>
 body {
-    background: #020617;
-    color: white;
-    font-family: Arial;
-    text-align: center;
+  background:#020617;
+  color:white;
+  font-family:Arial;
+  text-align:center;
 }
 
-h1 { color: #00ff99; }
+h1 { color:#00ff99; }
+
+.topbox {
+  border:2px solid #00ff99;
+  border-radius:15px;
+  padding:15px;
+  margin:15px;
+}
 
 .grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    padding: 10px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+  padding:10px;
 }
 
 .card {
-    border: 2px solid #00ff99;
-    border-radius: 15px;
-    padding: 10px;
+  border:2px solid #00ff99;
+  border-radius:15px;
+  padding:10px;
 }
 
-.green { color: #00ff99; }
-.red { color: #ff4d4d; }
-
-.topbox {
-    border: 2px solid #00ff99;
-    border-radius: 15px;
-    padding: 15px;
-    margin: 15px;
-}
+.green { color:#00ff99; }
+.red { color:#ff4d4d; }
 
 button {
-    margin: 5px;
-    padding: 5px 10px;
+  margin:10px;
+  padding:8px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🔥 LOTTO ELITE PRO</h1>
+<h1>🔥 LOTTO AI FINALE</h1>
 
-<div class="topbox" id="top"></div>
+<div class="topbox" id="top">Caricamento...</div>
 
-<button onclick="inserisciRisultati()">Inserisci Risultati</button>
+<button onclick="aggiornaRisultati()">Inserisci risultati reali</button>
 
 <div class="grid" id="grid"></div>
 
 <script>
 
-// 🔥 DATI
-let data = {
-    Bari: {ultima:[53,4,1,11,9], caldi:[75,51]},
-    Milano: {ultima:[7,79,84,28,37], caldi:[34,77]},
-    Roma: {ultima:[81,66,45,53,8], caldi:[78,66]},
-    Torino: {ultima:[29,47,55,78,71], caldi:[80,21]},
-    Firenze: {ultima:[13,48,58,39,15], caldi:[67,19]},
-    Venezia: {ultima:[7,29,76,14,15], caldi:[85,69]},
-    Napoli: {ultima:[26,90,68,82,67], caldi:[80,85]},
-    Palermo: {ultima:[38,57,65,20,56], caldi:[88,84]},
-    Genova: {ultima:[52,87,51,79,67], caldi:[2,19]},
-    Cagliari: {ultima:[67,19,47,35,64], caldi:[23,47]}
-};
-
 // 🔥 STORAGE
 let storico = JSON.parse(localStorage.getItem("storico")) || [];
 let performance = JSON.parse(localStorage.getItem("performance")) || {};
 
-// 🔥 SCORE DINAMICO
-function calcolaScore(ruota, caldi, ultima) {
+// 🔥 FETCH DATI REALI
+fetch("risultati.json")
+.then(r=>r.json())
+.then(data=>{
 
-    let base = 0;
+  let valori = Object.values(data);
 
-    caldi.forEach(n => {
-        if (!ultima.includes(n)) base += 5;
-        if (n % 2 === 0) base += 2;
-    });
+  // 🔥 CALCOLO SCORE DINAMICO
+  valori.forEach(r => {
 
-    // 🔥 APPRENDIMENTO
-    let bonus = performance[ruota] || 0;
+    let base = r.score || 0;
+    let bonus = performance[r.ruota] || 0;
 
-    return (base + bonus).toFixed(2);
+    r.score_finale = base + bonus;
+  });
+
+  // 🔥 FILTRO
+  let forti = valori
+    .filter(r => r.score_finale > 10)
+    .sort((a,b)=>b.score_finale-a.score_finale);
+
+  // 🔥 TOP
+  let top = forti.slice(0,3);
+
+  document.getElementById("top").innerHTML =
+    "<b>🔥 SEGNALI REALI</b><br><br>" +
+    top.map(r =>
+      `${r.ruota} → ${r.ambo.join(" - ")} (${r.score_finale.toFixed(2)})`
+    ).join("<br>");
+
+  // 🔥 GRID
+  document.getElementById("grid").innerHTML =
+    forti.slice(0,5).map(r => `
+      <div class="card">
+        <b>${r.ruota}</b><br>
+        Ambo: <span class="green">${r.ambo.join(" - ")}</span><br>
+        Score: ${r.score.toFixed(2)}<br>
+        AI: <span class="red">${r.score_finale.toFixed(2)}</span>
+      </div>
+    `).join("");
+
+  // 🔥 SALVA STORICO
+  storico.push({
+    data: new Date().toLocaleString(),
+    dati: valori
+  });
+
+  localStorage.setItem("storico", JSON.stringify(storico));
+
+  window.risultatiAttuali = valori;
+
+});
+
+// 🔥 INSERIMENTO RISULTATI REALI
+function aggiornaRisultati() {
+
+  let input = prompt("Inserisci numeri usciti (es: 27,51)");
+
+  if (!input) return;
+
+  let usciti = input.split(",").map(n => parseInt(n));
+
+  window.risultatiAttuali.forEach(r => {
+
+    let hit = r.ambo.filter(n => usciti.includes(n)).length;
+
+    if (!performance[r.ruota]) performance[r.ruota] = 0;
+
+    if (hit >= 2) performance[r.ruota] += 6;
+    else if (hit === 1) performance[r.ruota] += 2;
+    else performance[r.ruota] -= 3;
+
+  });
+
+  localStorage.setItem("performance", JSON.stringify(performance));
+
+  alert("🧠 Sistema aggiornato: apprendimento applicato");
 }
 
-// 🔥 CREA PREVISIONI
-let risultati = [];
+</script>
 
-for (let ruota in data) {
-
-    let caldi = data[ruota].caldi;
-    let ultima = data[ruota].ultima;
-
-    let score = calcolaScore(ruota, caldi, ultima);
-
-    risultati.push({
+</body>
+</html>
