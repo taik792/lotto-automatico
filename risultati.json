@@ -16,19 +16,16 @@
       27,
       51
     ],
-    "ambo_forte": [
-      27,
-      51
-    ],
     "ciclo": [
       1.04,
       0.53
     ],
     "indice": [
-      4.39,
-      4.79
+      3.48,
+      2.26
     ],
-    "saturazione": 0.77
+    "saturazione": 0.65,
+    "score": 5.87
   },
   "Cagliari": {
     "ruota": "Cagliari",
@@ -47,19 +44,16 @@
       23,
       2
     ],
-    "ambo_forte": [
-      23,
-      2
-    ],
     "ciclo": [
       0.29,
       0.51
     ],
     "indice": [
-      3.44,
-      3.27
+      1.78,
+      2.22
     ],
-    "saturazione": 0.82
+    "saturazione": 0.6,
+    "score": 3.8
   },
   "Firenze": {
     "ruota": "Firenze",
@@ -78,19 +72,16 @@
       25,
       50
     ],
-    "ambo_forte": [
-      25,
-      50
-    ],
     "ciclo": [
       1.74,
       0.48
     ],
     "indice": [
-      4.28,
-      2.89
+      4.48,
+      1.96
     ],
-    "saturazione": 0.82
+    "saturazione": 0.5,
+    "score": 7.05
   },
   "Genova": {
     "ruota": "Genova",
@@ -109,19 +100,16 @@
       19,
       26
     ],
-    "ambo_forte": [
-      19,
-      26
-    ],
     "ciclo": [
       0.26,
       0.91
     ],
     "indice": [
-      3.56,
-      3.2
+      1.52,
+      2.62
     ],
-    "saturazione": 0.82
+    "saturazione": 0.45,
+    "score": 4.28
   },
   "Milano": {
     "ruota": "Milano",
@@ -140,19 +128,16 @@
       89,
       31
     ],
-    "ambo_forte": [
-      89,
-      31
-    ],
     "ciclo": [
       0.8,
       0.98
     ],
     "indice": [
-      3.37,
-      4.14
+      2.6,
+      2.96
     ],
-    "saturazione": 0.79
+    "saturazione": 0.5,
+    "score": 5.95
   },
   "Napoli": {
     "ruota": "Napoli",
@@ -171,19 +156,16 @@
       7,
       54
     ],
-    "ambo_forte": [
-      7,
-      54
-    ],
     "ciclo": [
       1.29,
       0.65
     ],
     "indice": [
-      4.44,
-      2.81
+      3.78,
+      2.1
     ],
-    "saturazione": 0.81
+    "saturazione": 0.5,
+    "score": 6.35
   },
   "Palermo": {
     "ruota": "Palermo",
@@ -202,19 +184,16 @@
       57,
       38
     ],
-    "ambo_forte": [
-      57,
-      38
-    ],
     "ciclo": [
       0.16,
       0.12
     ],
     "indice": [
-      2.91,
-      2.85
+      1.32,
+      1.24
     ],
-    "saturazione": 0.89
+    "saturazione": 0.5,
+    "score": 2.2
   },
   "Roma": {
     "ruota": "Roma",
@@ -233,19 +212,16 @@
       66,
       44
     ],
-    "ambo_forte": [
-      66,
-      44
-    ],
     "ciclo": [
       0.22,
       0.25
     ],
     "indice": [
-      4.33,
-      3.88
+      1.64,
+      1.7
     ],
-    "saturazione": 0.8
+    "saturazione": 0.6,
+    "score": 2.98
   },
   "Torino": {
     "ruota": "Torino",
@@ -264,19 +240,16 @@
       73,
       4
     ],
-    "ambo_forte": [
-      73,
-      4
-    ],
     "ciclo": [
       1.73,
       0.83
     ],
     "indice": [
-      4.26,
-      3.41
+      4.46,
+      2.66
     ],
-    "saturazione": 0.79
+    "saturazione": 0.5,
+    "score": 7.9
   },
   "Venezia": {
     "ruota": "Venezia",
@@ -295,44 +268,15 @@
       66,
       29
     ],
-    "ambo_forte": [
-      66,
-      29
-    ],
     "ciclo": [
       0.74,
       0.14
     ],
     "indice": [
-      4.11,
-      3.21
+      2.68,
+      1.48
     ],
-    "saturazione": 0.86
-  },
-  "top_pick": [
-    {
-      "ruota": "Venezia",
-      "ambo": [
-        66,
-        29
-      ],
-      "score": 2.94
-    },
-    {
-      "ruota": "Roma",
-      "ambo": [
-        66,
-        44
-      ],
-      "score": 2.77
-    },
-    {
-      "ruota": "Bari",
-      "ambo": [
-        27,
-        51
-      ],
-      "score": 2.57
-    }
-  ]
+    "saturazione": 0.6,
+    "score": 4.0
+  }
 }
