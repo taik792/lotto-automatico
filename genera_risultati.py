@@ -1,6 +1,6 @@
 import json
 from statistics import mean
-from ambo_engine import genera_giocata_top  # 🔥 nuovo motore
+from ambo_engine import genera_giocata_top
 
 # ---------------------------
 # CONFIG
@@ -83,19 +83,14 @@ for ruota, estr_list in estrazioni.items():
 
     ultima = estr_list[-1]
 
-    # frequenze
     conteggi = {}
     for estr in estr_list[-WINDOW_FREQ:]:
         for n in estr:
             conteggi[n] = conteggi.get(n, 0) + 1
 
-    # numeri caldi
     caldi = sorted(conteggi, key=conteggi.get, reverse=True)[:2]
-
-    # ambo forte
     ambo = caldi
 
-    # calcoli
     ciclo_vals = [ciclometria(estr_list, n) for n in ambo]
     indice_vals = [indice(n, estr_list) for n in ambo]
 
@@ -103,8 +98,8 @@ for ruota, estr_list in estrazioni.items():
         "ruota": ruota,
         "ultima": ultima,
         "caldi": caldi,
-        "ambo": ambo,  # per il sito
-        "ambo_forte": ambo,  # 🔥 per il motore
+        "ambo": ambo,
+        "ambo_forte": ambo,  # per il motore
         "ciclo": ciclo_vals,
         "indice": indice_vals,
         "saturazione": saturazione(estr_list)
@@ -119,18 +114,20 @@ ruote_list = list(risultati.values())
 top_pick = genera_giocata_top(ruote_list)
 
 # =========================
-# OUTPUT FINALE
+# SALVATAGGIO COMPATIBILE SITO
 # =========================
 
-output = {
-    "top_pick": top_pick,
-    "ruote": risultati
-}
+# aggiungiamo top_pick senza rompere il sito
+risultati["top_pick"] = top_pick
 
 with open("risultati.json", "w") as f:
-    json.dump(output, f, indent=2)
+    json.dump(risultati, f, indent=2)
 
-print("🔥 NUOVO MOTORE COLLEGATO 🔥")
+# =========================
+# DEBUG
+# =========================
+
+print("🔥 NUOVO MOTORE ATTIVO 🔥")
 print("TOP PICK:")
 for t in top_pick:
     print(t)
