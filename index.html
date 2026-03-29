@@ -1,142 +1,55 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<title>Lotto Evolution PRO MAX</title>
-
-<style>
-body {
-    background: #050b1a;
-    font-family: Arial;
-    color: white;
-    text-align: center;
-}
-
-/* TITOLO */
-h1 {
-    color: #00ff88;
-    font-size: 42px;
-    margin: 20px 0;
-}
-
-/* BOX MIGLIORI */
-.topbox {
-    border: 2px solid #00ff88;
-    margin: 20px auto;
-    padding: 15px;
-    border-radius: 12px;
-    max-width: 600px;
-}
-
-/* GRIGLIA */
-.container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 25px;
-    padding: 20px;
-}
-
-/* PC */
-@media (min-width: 900px) {
-    .container {
-        grid-template-columns: repeat(4, 1fr);
-        max-width: 1400px;
-        margin: auto;
-    }
-}
-
-/* CARD */
-.card {
-    background: #0a162b;
-    border: 2px solid #00ff88;
-    border-radius: 18px;
-    padding: 25px;
-    box-shadow: 0 0 15px #00ff8840;
-}
-
-/* TESTI */
-.ruota { font-size: 26px; color: #00ff88; font-weight: bold; }
-.label { font-size: 16px; color: #aaa; }
-.valori { font-size: 20px; margin-bottom: 10px; }
-.ambo { font-size: 24px; color: #00ff88; font-weight: bold; }
-.ciclo { font-size: 20px; color: orange; }
-.index { font-size: 26px; color: #ff4d6d; font-weight: bold; }
-.sat { font-size: 18px; color: #00cfff; }
-</style>
-
-</head>
-
-<body>
-
-<h1>🔥 Lotto Evolution PRO MAX</h1>
-
-<div id="top" class="topbox">Caricamento...</div>
-<div id="contenitore" class="container"></div>
-
 <script>
-fetch("./risultati.json")
-.then(res => res.json())
-.then(data => {
+fetch("risultati.json")
+  .then(res => res.json())
+  .then(data => {
 
-    const cont = document.getElementById("contenitore");
-    const topDiv = document.getElementById("top");
+    // 🔥 FIX: separiamo top_pick
+    const topPick = data.top_pick || [];
 
-    cont.innerHTML = "";
-    let migliori = [];
+    // 🔥 FIX: prendiamo solo le ruote
+    const ruote = Object.keys(data)
+      .filter(k => k !== "top_pick")
+      .map(k => data[k]);
 
-    for (let ruota in data) {
+    // =========================
+    // MOSTRA TOP PICK (UGUALE A PRIMA)
+    // =========================
+    const topContainer = document.querySelector(".top-pick");
 
-        let r = data[ruota];
-
-        // FORZA = MEDIA INDEX
-        let forza = (r.indice[0] + r.indice[1]) / 2;
-
-        migliori.push({
-            ruota: ruota,
-            ambo: r.ambo,
-            forza: forza
-        });
-
-        cont.innerHTML += `
-            <div class="card">
-                <div class="ruota">${ruota}</div>
-
-                <div class="label">Ultima</div>
-                <div class="valori">${r.ultima.join(" - ")}</div>
-
-                <div class="label">Caldi</div>
-                <div class="valori">${r.caldi.join(" - ")}</div>
-
-                <div class="label">Ambo</div>
-                <div class="ambo">${r.ambo[0]} - ${r.ambo[1]}</div>
-
-                <div class="label">Ciclo</div>
-                <div class="ciclo">${r.ciclo[0]} | ${r.ciclo[1]}</div>
-
-                <div class="label">Indice</div>
-                <div class="index">${r.indice[0]} | ${r.indice[1]}</div>
-
-                <div class="label">Saturazione</div>
-                <div class="sat">${r.saturazione}</div>
-            </div>
-        `;
+    if (topContainer) {
+      topContainer.innerHTML = topPick.map(t => {
+        return `<div>${t.ruota} → ${t.ambo.join("-")}</div>`;
+      }).join("");
     }
 
-    // 🔥 ORDINA MIGLIORI
-    migliori.sort((a, b) => b.forza - a.forza);
+    // =========================
+    // MOSTRA RUOTE (UGUALE)
+    // =========================
+    const container = document.querySelector(".container");
 
-    let top3 = migliori.slice(0, 3);
+    container.innerHTML = "";
 
-    topDiv.innerHTML = `
-        <h2 style="color:#00ff88">🔥 Migliori Giocate</h2>
-        ${top3.map(g => `
-            <div style="font-size:22px; margin:6px;">
-                ${g.ruota} → ${g.ambo[0]}-${g.ambo[1]}
-            </div>
-        `).join("")}
-    `;
-});
+    ruote.forEach(r => {
+
+      container.innerHTML += `
+        <div class="card">
+          <h2>${r.ruota}</h2>
+          <p>Ultima estrazione<br>${r.ultima.join(" - ")}</p>
+          <p>Numeri caldi<br>${r.caldi.join(" - ")}</p>
+          <p>Ambo forte<br>${r.ambo.join(" - ")}</p>
+          <p>Ciclometria<br>${r.ciclo.join(" - ")}</p>
+          <p>Indice<br>${r.indice.join(" - ")}</p>
+          <p>Saturazione<br>${r.saturazione}</p>
+        </div>
+      `;
+    });
+
+    // 🔥 STOP LOADING
+    const loading = document.querySelector(".loading");
+    if (loading) loading.style.display = "none";
+
+  })
+  .catch(err => {
+    console.error("Errore:", err);
+  });
 </script>
-
-</body>
-</html>
