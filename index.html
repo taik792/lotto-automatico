@@ -3,53 +3,71 @@ fetch("risultati.json")
   .then(res => res.json())
   .then(data => {
 
-    // 🔥 FIX: separiamo top_pick
+    console.log("DATI:", data);
+
     const topPick = data.top_pick || [];
 
-    // 🔥 FIX: prendiamo solo le ruote
     const ruote = Object.keys(data)
       .filter(k => k !== "top_pick")
       .map(k => data[k]);
 
     // =========================
-    // MOSTRA TOP PICK (UGUALE A PRIMA)
+    // TOP PICK
     // =========================
     const topContainer = document.querySelector(".top-pick");
 
-    if (topContainer) {
-      topContainer.innerHTML = topPick.map(t => {
-        return `<div>${t.ruota} → ${t.ambo.join("-")}</div>`;
-      }).join("");
+    if (topContainer && topPick.length > 0) {
+      topContainer.innerHTML = "";
+
+      topPick.forEach(t => {
+        const div = document.createElement("div");
+        div.textContent = `${t.ruota} → ${t.ambo.join("-")}`;
+        topContainer.appendChild(div);
+      });
     }
 
     // =========================
-    // MOSTRA RUOTE (UGUALE)
+    // RUOTE
     // =========================
-    const container = document.querySelector(".container");
+    const container =
+      document.querySelector(".container") ||
+      document.querySelector(".cards") ||
+      document.body; // fallback
 
     container.innerHTML = "";
 
     ruote.forEach(r => {
 
-      container.innerHTML += `
-        <div class="card">
-          <h2>${r.ruota}</h2>
-          <p>Ultima estrazione<br>${r.ultima.join(" - ")}</p>
-          <p>Numeri caldi<br>${r.caldi.join(" - ")}</p>
-          <p>Ambo forte<br>${r.ambo.join(" - ")}</p>
-          <p>Ciclometria<br>${r.ciclo.join(" - ")}</p>
-          <p>Indice<br>${r.indice.join(" - ")}</p>
-          <p>Saturazione<br>${r.saturazione}</p>
-        </div>
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <h2>${r.ruota}</h2>
+        <p>Ultima estrazione<br>${r.ultima.join(" - ")}</p>
+        <p>Numeri caldi<br>${r.caldi.join(" - ")}</p>
+        <p>Ambo forte<br>${r.ambo.join(" - ")}</p>
+        <p>Ciclometria<br>${r.ciclo.join(" - ")}</p>
+        <p>Indice<br>${r.indice.join(" - ")}</p>
+        <p>Saturazione<br>${r.saturazione}</p>
       `;
+
+      container.appendChild(card);
     });
 
-    // 🔥 STOP LOADING
-    const loading = document.querySelector(".loading");
-    if (loading) loading.style.display = "none";
+    // =========================
+    // STOP LOADING
+    // =========================
+    const loading =
+      document.querySelector(".loading") ||
+      document.querySelector(".loader");
+
+    if (loading) {
+      loading.style.display = "none";
+    }
 
   })
   .catch(err => {
-    console.error("Errore:", err);
+    console.error("ERRORE:", err);
+    document.body.innerHTML = "<h2 style='color:white'>Errore caricamento dati</h2>";
   });
 </script>
