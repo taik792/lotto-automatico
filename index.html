@@ -1,7 +1,75 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lotto Evolution PRO MAX</title>
+
+<style>
+body {
+  background: #0b0f1a;
+  color: white;
+  font-family: Arial;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #00ff99;
+}
+
+.top-pick {
+  border: 1px solid #00ff99;
+  padding: 15px;
+  margin: 20px auto;
+  max-width: 500px;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.card {
+  border: 1px solid #00ff99;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.highlight {
+  color: #00ff99;
+  font-weight: bold;
+}
+
+.red {
+  color: #ff4d4d;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 30px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 Lotto Evolution PRO MAX</h1>
+
+<div class="top-pick loading">Caricamento...</div>
+
+<div class="container"></div>
+
 <script>
 fetch("risultati.json")
   .then(res => res.json())
   .then(data => {
+
+    const safe = (arr) => Array.isArray(arr) ? arr.join(" - ") : "";
 
     const topPick = data.top_pick || [];
 
@@ -14,28 +82,25 @@ fetch("risultati.json")
     // =========================
     const topBox = document.querySelector(".top-pick");
 
-    if (topBox) {
-      topBox.innerHTML = `
-        <div class="top-title">🔥 Migliori Giocate del Giorno</div>
-        ${topPick.map(t => `
-          <div>${t.ruota} → ${t.ambo.join("-")}</div>
-        `).join("")}
-      `;
-    }
+    let htmlTop = "<h3>🔥 Migliori Giocate</h3>";
+
+    topPick.forEach(t => {
+      if (t.ruota && t.ambo) {
+        htmlTop += `<div>${t.ruota} → ${safe(t.ambo)}</div>`;
+      }
+    });
+
+    topBox.innerHTML = htmlTop;
 
     // =========================
-    // CONTAINER ORIGINALE
+    // CARDS
     // =========================
     const container = document.querySelector(".container");
-
-    if (!container) return;
-
     container.innerHTML = "";
 
-    // =========================
-    // CARDS BELLE
-    // =========================
     ruote.forEach(r => {
+
+      if (!r || !r.ruota) return;
 
       const card = document.createElement("div");
       card.className = "card";
@@ -43,48 +108,28 @@ fetch("risultati.json")
       card.innerHTML = `
         <h2>${r.ruota}</h2>
 
-        <div class="info">
-          <div>Ultima estrazione</div>
-          <div>${r.ultima.join(" - ")}</div>
-        </div>
+        <p>Ultima estrazione<br>${safe(r.ultima)}</p>
 
-        <div class="info">
-          <div>Numeri caldi</div>
-          <div>${r.caldi.join(" - ")}</div>
-        </div>
+        <p>Numeri caldi<br>${safe(r.caldi)}</p>
 
-        <div class="info">
-          <div>Ambo forte</div>
-          <div class="highlight">${r.ambo.join(" - ")}</div>
-        </div>
+        <p>Ambo forte<br><span class="highlight">${safe(r.ambo)}</span></p>
 
-        <div class="info">
-          <div>Ciclometria</div>
-          <div>${r.ciclo.join(" - ")}</div>
-        </div>
+        <p>Ciclometria<br>${safe(r.ciclo)}</p>
 
-        <div class="info">
-          <div>Indice</div>
-          <div class="highlight-red">${r.indice.join(" - ")}</div>
-        </div>
+        <p>Indice<br><span class="red">${safe(r.indice)}</span></p>
 
-        <div class="info">
-          <div>Saturazione</div>
-          <div>${r.saturazione}</div>
-        </div>
+        <p>Saturazione<br>${r.saturazione ?? ""}</p>
       `;
 
       container.appendChild(card);
     });
 
-    // =========================
-    // NASCONDI LOADING
-    // =========================
-    const loading = document.querySelector(".loading");
-    if (loading) loading.style.display = "none";
-
   })
   .catch(err => {
     console.error(err);
+    document.body.innerHTML = "<h2 style='color:white'>Errore caricamento dati</h2>";
   });
 </script>
+
+</body>
+</html>
