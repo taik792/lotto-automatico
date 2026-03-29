@@ -1,8 +1,10 @@
 def genera_giocata_top(ruote):
+    print("🔥 NUOVO MOTORE ATTIVO 🔥")  # <-- TEST
+
     classifica = []
 
     # =========================
-    # FREQUENZA NUMERI (cross ruote)
+    # FREQUENZA NUMERI
     # =========================
     tutti_numeri = []
 
@@ -27,18 +29,14 @@ def genera_giocata_top(ruote):
             ciclo1, ciclo2 = r["ciclo"]
             saturazione = r["saturazione"]
 
-            # =========================
-            # BASE SCORE
-            # =========================
+            # BASE
             score = (
                 ((indice1 + indice2) / 2) * 0.4 +
                 ((ciclo1 + ciclo2) / 2) * 0.2 +
                 (saturazione) * 0.1
             )
 
-            # =========================
             # BONUS RIPETIZIONE
-            # =========================
             if frequenza.get(n1, 0) > 1:
                 score += 0.5
             if frequenza.get(n2, 0) > 1:
@@ -49,40 +47,31 @@ def genera_giocata_top(ruote):
             # =========================
             distanza = abs(n1 - n2)
 
-            # Penalità numeri troppo vicini
             if distanza < 5:
                 score -= 0.5
 
-            # Bonus distanza buona
             if 10 < distanza < 60:
                 score += 0.5
 
-            # Bonus pari/dispari
             if (n1 % 2) != (n2 % 2):
                 score += 0.3
 
             # =========================
             # FILTRO ANTI-SPAZZATURA
             # =========================
-
-            # indice troppo basso
             if ((indice1 + indice2) / 2) < 3.5:
                 continue
 
-            # ciclo troppo sbilanciato
             if abs(ciclo1 - ciclo2) > 1.5:
                 continue
 
-            # =========================
-            # AGGIUNTA CLASSIFICA
-            # =========================
             classifica.append((score, r))
 
         except:
             continue
 
     # =========================
-    # ORDINAMENTO TOP PICK
+    # ORDINAMENTO
     # =========================
     top = sorted(classifica, key=lambda x: x[0], reverse=True)[:3]
 
@@ -94,5 +83,7 @@ def genera_giocata_top(ruote):
             "ambo": r["ambo_forte"],
             "score": round(score, 2)
         })
+
+    print("TOP CALCOLATI:", risultato)  # <-- TEST
 
     return risultato
