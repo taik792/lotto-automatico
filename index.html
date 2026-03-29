@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Lotto Elite Finale</title>
+<title>Lotto Finale</title>
 
 <style>
 body {
@@ -13,10 +12,7 @@ body {
   font-family:Arial;
   text-align:center;
 }
-
-h1 {
-  color:#00ff99;
-}
+h1 { color:#00ff99; }
 
 .topbox {
   border:2px solid #00ff99;
@@ -43,4 +39,100 @@ h1 {
 
 button {
   margin:10px;
-  padding:
+  padding:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 LOTTO ELITE</h1>
+
+<div class="topbox" id="top">Caricamento...</div>
+
+<button onclick="aggiornaRisultati()">Inserisci risultati</button>
+
+<div class="grid" id="grid"></div>
+
+<script>
+
+let performance = JSON.parse(localStorage.getItem("performance")) || {};
+
+fetch("risultati.json")
+.then(r => r.json())
+.then(data => {
+
+    let valori = Object.values(data || {});
+
+    // sicurezza totale
+    valori = valori.filter(r => r && r.ambo && r.score);
+
+    valori.forEach(r => {
+        let base = Number(r.score) || 0;
+        let bonus = performance[r.ruota] || 0;
+        r.score_finale = base + bonus;
+    });
+
+    valori.sort((a,b)=>b.score_finale-a.score_finale);
+
+    let top = valori.slice(0,3);
+
+    document.getElementById("top").innerHTML =
+        "🔥 SEGNALI TOP<br><br>" +
+        top.map(r => `${r.ruota} → ${r.ambo.join(" - ")}`).join("<br>");
+
+    document.getElementById("grid").innerHTML =
+        valori.map(r => `
+        <div class="card">
+            <b>${r.ruota}</b><br>
+            Ambo: <span class="green">${r.ambo.join(" - ")}</span><br>
+            Score: ${r.score}<br>
+            AI: <span class="red">${r.score_finale.toFixed(2)}</span>
+        </div>
+        `).join("");
+
+    // salva per uso dopo
+    window.risultatiAttuali = valori;
+
+})
+.catch(err => {
+
+    document.getElementById("top").innerHTML =
+        "❌ ERRORE CARICAMENTO DATI";
+
+    console.log(err);
+});
+
+function aggiornaRisultati(){
+
+    if (!window.risultatiAttuali) {
+        alert("Dati non caricati ancora");
+        return;
+    }
+
+    let input = prompt("Numeri usciti (es: 27,51)");
+    if (!input) return;
+
+    let usciti = input.split(",").map(n => parseInt(n));
+
+    window.risultatiAttuali.forEach(r => {
+
+        let hit = r.ambo.filter(n => usciti.includes(n)).length;
+
+        if (!performance[r.ruota]) performance[r.ruota] = 0;
+
+        if (hit >= 2) performance[r.ruota] += 5;
+        else if (hit === 1) performance[r.ruota] += 1;
+        else performance[r.ruota] -= 2;
+
+    });
+
+    localStorage.setItem("performance", JSON.stringify(performance));
+
+    alert("Sistema aggiornato");
+}
+
+</script>
+
+</body>
+</html>
