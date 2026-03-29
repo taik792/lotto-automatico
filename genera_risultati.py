@@ -1,5 +1,6 @@
 import json
 from statistics import mean
+from ambo_engine import genera_giocata_top  # 🔥 nuovo motore
 
 # ---------------------------
 # CONFIG
@@ -58,7 +59,6 @@ def indice(numero, estrazioni):
     c = ciclometria(estrazioni, numero)
     r = recente(estrazioni, numero)
 
-    # formula PRO
     score = (c * 1.5) + (f * 10) + (r * 0.5)
     return round(score, 2)
 
@@ -83,7 +83,7 @@ for ruota, estr_list in estrazioni.items():
 
     ultima = estr_list[-1]
 
-    # conteggio frequenze
+    # frequenze
     conteggi = {}
     for estr in estr_list[-WINDOW_FREQ:]:
         for n in estr:
@@ -92,7 +92,7 @@ for ruota, estr_list in estrazioni.items():
     # numeri caldi
     caldi = sorted(conteggi, key=conteggi.get, reverse=True)[:2]
 
-    # ambo
+    # ambo forte
     ambo = caldi
 
     # calcoli
@@ -103,17 +103,34 @@ for ruota, estr_list in estrazioni.items():
         "ruota": ruota,
         "ultima": ultima,
         "caldi": caldi,
-        "ambo": ambo,
+        "ambo": ambo,  # per il sito
+        "ambo_forte": ambo,  # 🔥 per il motore
         "ciclo": ciclo_vals,
         "indice": indice_vals,
         "saturazione": saturazione(estr_list)
     }
 
-# ---------------------------
-# SALVA FILE
-# ---------------------------
+# =========================
+# 🔥 NUOVO MOTORE TOP PICK
+# =========================
+
+ruote_list = list(risultati.values())
+
+top_pick = genera_giocata_top(ruote_list)
+
+# =========================
+# OUTPUT FINALE
+# =========================
+
+output = {
+    "top_pick": top_pick,
+    "ruote": risultati
+}
 
 with open("risultati.json", "w") as f:
-    json.dump(risultati, f, indent=2)
+    json.dump(output, f, indent=2)
 
-print("✅ risultati.json generato correttamente")
+print("🔥 NUOVO MOTORE COLLEGATO 🔥")
+print("TOP PICK:")
+for t in top_pick:
+    print(t)
