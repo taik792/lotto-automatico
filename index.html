@@ -3,60 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Lotto Evolution PRO MAX</title>
 
 <style>
 body {
+  margin: 0;
+  font-family: Arial;
   background: #020617;
   color: white;
-  font-family: Arial;
-  margin: 0;
-  padding: 15px;
+  text-align: center;
 }
 
 h1 {
-  text-align: center;
-  color: #00ff99;
+  color: #00ff9c;
+  margin-top: 20px;
 }
 
-.top {
-  border: 2px solid #00ff99;
-  border-radius: 12px;
-  padding: 12px;
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 18px;
+.box-top {
+  border: 2px solid #00ff9c;
+  border-radius: 20px;
+  padding: 15px;
+  margin: 20px;
 }
 
-.container {
+.grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
-}
-
-@media (min-width: 768px) {
-  .container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1200px) {
-  .container {
-    grid-template-columns: repeat(5, 1fr);
-  }
+  padding: 15px;
 }
 
 .card {
-  border: 1px solid #00ff99;
-  border-radius: 12px;
-  padding: 12px;
-  background: #020617;
+  border: 2px solid #00ff9c;
+  border-radius: 20px;
+  padding: 15px;
+  text-align: left;
 }
 
-.title {
+.titolo {
+  color: #00ff9c;
+  font-weight: bold;
   font-size: 18px;
-  color: #00ff99;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .label {
@@ -64,22 +53,14 @@ h1 {
   font-size: 13px;
 }
 
-.value {
-  margin-bottom: 6px;
-}
-
 .green {
-  color: #00ff99;
+  color: #00ff9c;
+  font-weight: bold;
 }
 
 .red {
   color: #ff4d4d;
-}
-
-.empty {
-  text-align: center;
-  margin-top: 40px;
-  color: #888;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -88,92 +69,76 @@ h1 {
 
 <h1>🔥 Lotto Evolution PRO MAX</h1>
 
-<div class="top" id="top">Analisi in corso...</div>
+<div id="top" class="box-top">Caricamento...</div>
 
-<div class="container" id="cards"></div>
+<div id="grid" class="grid"></div>
 
 <script>
 fetch("risultati.json")
-.then(res => {
-  if (!res.ok) throw new Error("JSON non trovato");
-  return res.json();
-})
+.then(res => res.json())
 .then(data => {
 
-  let valori = Object.values(data).filter(r => r);
+  const ordine = [
+    "Bari","Cagliari","Firenze","Genova",
+    "Milano","Napoli","Palermo","Roma",
+    "Torino","Venezia","Nazionale"
+  ];
 
-  // 🔥 CALCOLO SCORE PRO
+  let valori = Object.values(data);
+
+  // 🔥 CALCOLO SCORE
   valori.forEach(r => {
-
     let indice = r.indice || [0,0];
     let ciclo = r.ciclo || [0,0];
     let sat = r.saturazione || 0;
 
-    let score =
+    r.score =
       (indice[0] + indice[1]) * 0.4 +
       (ciclo[0] + ciclo[1]) * 0.3 +
       sat * 10;
-
-    r.score = score;
   });
 
-  // 🔥 FILTRO SECCO (CORE DEL SISTEMA)
+  // 🔥 SOLO BUONI
   let forti = valori.filter(r => r.score > 6);
 
-  // 🔥 TOP SOLO TRA I FORTI
-  let top = forti
+  // 🔥 ORDINE RUOTE CORRETTO
+  forti.sort((a,b) =>
+    ordine.indexOf(a.ruota) - ordine.indexOf(b.ruota)
+  );
+
+  // 🔥 TOP 3
+  let top = [...forti]
     .sort((a,b) => b.score - a.score)
     .slice(0,3);
 
-  // 🔥 TOP UI
-  let topHTML = "<b>🔥 SEGNALI ATTIVI</b><br><br>";
+  document.getElementById("top").innerHTML =
+    "<b>🔥 SEGNALI ATTIVI</b><br><br>" +
+    top.map(r =>
+      `${r.ruota} → ${r.ambo.join(" - ")}`
+    ).join("<br>");
 
-  if (top.length === 0) {
-    topHTML += "❌ Nessuna giocata valida";
-  } else {
-    top.forEach(t => {
-      topHTML += `${t.ruota} → ${t.ambo?.[0]} - ${t.ambo?.[1]}<br>`;
-    });
-  }
+  // 🔥 GRIGLIA
+  document.getElementById("grid").innerHTML = forti.map(r => `
+    <div class="card">
+      <div class="titolo">${r.ruota}</div>
 
-  document.getElementById("top").innerHTML = topHTML;
+      <div class="label">Ultima estrazione</div>
+      ${r.ultima.join(" - ")}
 
-  // 🔥 CARDS SOLO FORTI
-  let html = "";
+      <div class="label">Numeri caldi</div>
+      ${r.caldi.join(" - ")}
 
-  if (forti.length === 0) {
-    html = `<div class="empty">⚠️ Nessun ambo forte oggi</div>`;
-  } else {
+      <div class="label">Ambo forte</div>
+      <span class="green">${r.ambo.join(" - ")}</span>
 
-    forti.forEach(r => {
-
-      html += `
-        <div class="card">
-          <div class="title">${r.ruota}</div>
-
-          <div class="label">Ultima estrazione</div>
-          <div class="value">${r.ultima.join(" - ")}</div>
-
-          <div class="label">Numeri caldi</div>
-          <div class="value">${r.caldi.join(" - ")}</div>
-
-          <div class="label">Ambo forte</div>
-          <div class="value green">${r.ambo.join(" - ")}</div>
-
-          <div class="label">Score</div>
-          <div class="value">${r.score.toFixed(2)}</div>
-        </div>
-      `;
-    });
-
-  }
-
-  document.getElementById("cards").innerHTML = html;
+      <div class="label">Score</div>
+      <span class="red">${r.score.toFixed(2)}</span>
+    </div>
+  `).join("");
 
 })
-.catch(err => {
-  console.error(err);
-  document.getElementById("top").innerHTML = "❌ Errore caricamento dati";
+.catch(() => {
+  document.getElementById("top").innerHTML = "Errore caricamento dati";
 });
 </script>
 
