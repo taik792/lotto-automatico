@@ -3,14 +3,10 @@ fetch("risultati.json")
   .then(res => res.json())
   .then(data => {
 
-    console.log("DATI:", data);
-
-    if (!data) return;
-
     const topPick = data.top_pick || [];
 
     const ruote = Object.keys(data)
-      .filter(k => k !== "top_pick" && typeof data[k] === "object")
+      .filter(k => k !== "top_pick")
       .map(k => data[k]);
 
     // =========================
@@ -18,78 +14,77 @@ fetch("risultati.json")
     // =========================
     const topBox = document.querySelector(".top-pick");
 
-    if (topBox && topPick.length) {
-      let html = "<h3>🔥 Migliori Giocate</h3>";
-
-      topPick.forEach(t => {
-        if (t.ruota && t.ambo) {
-          html += `<div>${t.ruota} → ${t.ambo.join("-")}</div>`;
-        }
-      });
-
-      topBox.innerHTML = html;
+    if (topBox) {
+      topBox.innerHTML = `
+        <div class="top-title">🔥 Migliori Giocate del Giorno</div>
+        ${topPick.map(t => `
+          <div>${t.ruota} → ${t.ambo.join("-")}</div>
+        `).join("")}
+      `;
     }
 
     // =========================
-    // CONTAINER SICURO
+    // CONTAINER ORIGINALE
     // =========================
-    let container = document.querySelector(".container");
+    const container = document.querySelector(".container");
 
-    if (!container) {
-      container = document.createElement("div");
-      document.body.appendChild(container);
-    }
+    if (!container) return;
 
     container.innerHTML = "";
 
     // =========================
-    // CARDS
+    // CARDS BELLE
     // =========================
     ruote.forEach(r => {
-
-      if (!r || !r.ruota) return;
 
       const card = document.createElement("div");
       card.className = "card";
 
-      try {
-        card.innerHTML = `
-          <h2>${r.ruota}</h2>
+      card.innerHTML = `
+        <h2>${r.ruota}</h2>
 
-          <p>Ultima estrazione<br>
-          ${(r.ultima || []).join(" - ")}</p>
+        <div class="info">
+          <div>Ultima estrazione</div>
+          <div>${r.ultima.join(" - ")}</div>
+        </div>
 
-          <p>Numeri caldi<br>
-          ${(r.caldi || []).join(" - ")}</p>
+        <div class="info">
+          <div>Numeri caldi</div>
+          <div>${r.caldi.join(" - ")}</div>
+        </div>
 
-          <p>Ambo forte<br>
-          ${(r.ambo || []).join(" - ")}</p>
+        <div class="info">
+          <div>Ambo forte</div>
+          <div class="highlight">${r.ambo.join(" - ")}</div>
+        </div>
 
-          <p>Ciclometria<br>
-          ${(r.ciclo || []).join(" - ")}</p>
+        <div class="info">
+          <div>Ciclometria</div>
+          <div>${r.ciclo.join(" - ")}</div>
+        </div>
 
-          <p>Indice<br>
-          ${(r.indice || []).join(" - ")}</p>
+        <div class="info">
+          <div>Indice</div>
+          <div class="highlight-red">${r.indice.join(" - ")}</div>
+        </div>
 
-          <p>Saturazione<br>
-          ${r.saturazione ?? ""}</p>
-        `;
-      } catch (e) {
-        console.log("Errore card:", e);
-      }
+        <div class="info">
+          <div>Saturazione</div>
+          <div>${r.saturazione}</div>
+        </div>
+      `;
 
       container.appendChild(card);
     });
 
     // =========================
-    // STOP LOADING
+    // NASCONDI LOADING
     // =========================
     const loading = document.querySelector(".loading");
     if (loading) loading.style.display = "none";
 
   })
   .catch(err => {
-    console.error("ERRORE JSON:", err);
-    document.body.innerHTML = "<h2 style='color:white'>Errore caricamento dati</h2>";
+    console.error(err);
   });
 </script>
