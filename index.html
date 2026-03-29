@@ -25,7 +25,7 @@ fetch("risultati.json")
 .then(data=>{
 
   let arr = Object.values(data)
-    .filter(x => x.score > 5)
+    .filter(x => x.score > 15)
     .sort((a,b)=>b.score-a.score);
 
   document.getElementById("top").innerHTML =
