@@ -22,9 +22,10 @@ h1 {
 .top {
   border: 2px solid #00ff99;
   border-radius: 12px;
-  padding: 10px;
+  padding: 12px;
   text-align: center;
   margin-bottom: 20px;
+  font-size: 18px;
 }
 
 .container {
@@ -49,6 +50,7 @@ h1 {
   border: 1px solid #00ff99;
   border-radius: 12px;
   padding: 12px;
+  background: #020617;
 }
 
 .title {
@@ -73,6 +75,12 @@ h1 {
 .red {
   color: #ff4d4d;
 }
+
+.empty {
+  text-align: center;
+  margin-top: 40px;
+  color: #888;
+}
 </style>
 </head>
 
@@ -80,7 +88,7 @@ h1 {
 
 <h1>🔥 Lotto Evolution PRO MAX</h1>
 
-<div class="top" id="top">Caricamento...</div>
+<div class="top" id="top">Analisi in corso...</div>
 
 <div class="container" id="cards"></div>
 
@@ -94,7 +102,7 @@ fetch("risultati.json")
 
   let valori = Object.values(data).filter(r => r);
 
-  // 🔥 MOTORE PRO (score intelligente)
+  // 🔥 CALCOLO SCORE PRO
   valori.forEach(r => {
 
     let indice = r.indice || [0,0];
@@ -109,48 +117,56 @@ fetch("risultati.json")
     r.score = score;
   });
 
-  // 🔥 TOP PICK REALI
-  let top = valori
+  // 🔥 FILTRO SECCO (CORE DEL SISTEMA)
+  let forti = valori.filter(r => r.score > 6);
+
+  // 🔥 TOP SOLO TRA I FORTI
+  let top = forti
     .sort((a,b) => b.score - a.score)
     .slice(0,3);
 
-  let topHTML = "<b>🔥 Migliori Giocate</b><br>";
+  // 🔥 TOP UI
+  let topHTML = "<b>🔥 SEGNALI ATTIVI</b><br><br>";
 
-  top.forEach(t => {
-    topHTML += `${t.ruota} → ${t.ambo?.[0]} - ${t.ambo?.[1]}<br>`;
-  });
+  if (top.length === 0) {
+    topHTML += "❌ Nessuna giocata valida";
+  } else {
+    top.forEach(t => {
+      topHTML += `${t.ruota} → ${t.ambo?.[0]} - ${t.ambo?.[1]}<br>`;
+    });
+  }
 
   document.getElementById("top").innerHTML = topHTML;
 
-  // 🔥 CARDS
+  // 🔥 CARDS SOLO FORTI
   let html = "";
 
-  valori.forEach(r => {
+  if (forti.length === 0) {
+    html = `<div class="empty">⚠️ Nessun ambo forte oggi</div>`;
+  } else {
 
-    html += `
-      <div class="card">
-        <div class="title">${r.ruota || "-"}</div>
+    forti.forEach(r => {
 
-        <div class="label">Ultima estrazione</div>
-        <div class="value">${(r.ultima || []).join(" - ")}</div>
+      html += `
+        <div class="card">
+          <div class="title">${r.ruota}</div>
 
-        <div class="label">Numeri caldi</div>
-        <div class="value">${(r.caldi || []).join(" - ")}</div>
+          <div class="label">Ultima estrazione</div>
+          <div class="value">${r.ultima.join(" - ")}</div>
 
-        <div class="label">Ambo forte</div>
-        <div class="value green">${(r.ambo || []).join(" - ")}</div>
+          <div class="label">Numeri caldi</div>
+          <div class="value">${r.caldi.join(" - ")}</div>
 
-        <div class="label">Ciclometria</div>
-        <div class="value">${(r.ciclo || []).join(" - ")}</div>
+          <div class="label">Ambo forte</div>
+          <div class="value green">${r.ambo.join(" - ")}</div>
 
-        <div class="label">Indice</div>
-        <div class="value red">${(r.indice || []).join(" - ")}</div>
+          <div class="label">Score</div>
+          <div class="value">${r.score.toFixed(2)}</div>
+        </div>
+      `;
+    });
 
-        <div class="label">Saturazione</div>
-        <div class="value">${r.saturazione ?? "-"}</div>
-      </div>
-    `;
-  });
+  }
 
   document.getElementById("cards").innerHTML = html;
 
