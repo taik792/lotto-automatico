@@ -1,4 +1,314 @@
 {
+  "Bari": {
+    "ruota": "Bari",
+    "ultima": [
+      53,
+      4,
+      1,
+      11,
+      9
+    ],
+    "caldi": [
+      27,
+      51
+    ],
+    "ambo": [
+      27,
+      51
+    ],
+    "ambo_forte": [
+      27,
+      51
+    ],
+    "ciclo": [
+      1.04,
+      0.53
+    ],
+    "indice": [
+      4.39,
+      4.79
+    ],
+    "saturazione": 0.77
+  },
+  "Cagliari": {
+    "ruota": "Cagliari",
+    "ultima": [
+      67,
+      19,
+      47,
+      35,
+      64
+    ],
+    "caldi": [
+      23,
+      2
+    ],
+    "ambo": [
+      23,
+      2
+    ],
+    "ambo_forte": [
+      23,
+      2
+    ],
+    "ciclo": [
+      0.29,
+      0.51
+    ],
+    "indice": [
+      3.44,
+      3.27
+    ],
+    "saturazione": 0.82
+  },
+  "Firenze": {
+    "ruota": "Firenze",
+    "ultima": [
+      13,
+      48,
+      58,
+      39,
+      15
+    ],
+    "caldi": [
+      25,
+      50
+    ],
+    "ambo": [
+      25,
+      50
+    ],
+    "ambo_forte": [
+      25,
+      50
+    ],
+    "ciclo": [
+      1.74,
+      0.48
+    ],
+    "indice": [
+      4.28,
+      2.89
+    ],
+    "saturazione": 0.82
+  },
+  "Genova": {
+    "ruota": "Genova",
+    "ultima": [
+      52,
+      87,
+      51,
+      79,
+      67
+    ],
+    "caldi": [
+      19,
+      26
+    ],
+    "ambo": [
+      19,
+      26
+    ],
+    "ambo_forte": [
+      19,
+      26
+    ],
+    "ciclo": [
+      0.26,
+      0.91
+    ],
+    "indice": [
+      3.56,
+      3.2
+    ],
+    "saturazione": 0.82
+  },
+  "Milano": {
+    "ruota": "Milano",
+    "ultima": [
+      7,
+      79,
+      84,
+      28,
+      37
+    ],
+    "caldi": [
+      89,
+      31
+    ],
+    "ambo": [
+      89,
+      31
+    ],
+    "ambo_forte": [
+      89,
+      31
+    ],
+    "ciclo": [
+      0.8,
+      0.98
+    ],
+    "indice": [
+      3.37,
+      4.14
+    ],
+    "saturazione": 0.79
+  },
+  "Napoli": {
+    "ruota": "Napoli",
+    "ultima": [
+      26,
+      90,
+      68,
+      82,
+      67
+    ],
+    "caldi": [
+      7,
+      54
+    ],
+    "ambo": [
+      7,
+      54
+    ],
+    "ambo_forte": [
+      7,
+      54
+    ],
+    "ciclo": [
+      1.29,
+      0.65
+    ],
+    "indice": [
+      4.44,
+      2.81
+    ],
+    "saturazione": 0.81
+  },
+  "Palermo": {
+    "ruota": "Palermo",
+    "ultima": [
+      38,
+      57,
+      65,
+      20,
+      56
+    ],
+    "caldi": [
+      57,
+      38
+    ],
+    "ambo": [
+      57,
+      38
+    ],
+    "ambo_forte": [
+      57,
+      38
+    ],
+    "ciclo": [
+      0.16,
+      0.12
+    ],
+    "indice": [
+      2.91,
+      2.85
+    ],
+    "saturazione": 0.89
+  },
+  "Roma": {
+    "ruota": "Roma",
+    "ultima": [
+      81,
+      66,
+      45,
+      53,
+      8
+    ],
+    "caldi": [
+      66,
+      44
+    ],
+    "ambo": [
+      66,
+      44
+    ],
+    "ambo_forte": [
+      66,
+      44
+    ],
+    "ciclo": [
+      0.22,
+      0.25
+    ],
+    "indice": [
+      4.33,
+      3.88
+    ],
+    "saturazione": 0.8
+  },
+  "Torino": {
+    "ruota": "Torino",
+    "ultima": [
+      29,
+      47,
+      55,
+      78,
+      71
+    ],
+    "caldi": [
+      73,
+      4
+    ],
+    "ambo": [
+      73,
+      4
+    ],
+    "ambo_forte": [
+      73,
+      4
+    ],
+    "ciclo": [
+      1.73,
+      0.83
+    ],
+    "indice": [
+      4.26,
+      3.41
+    ],
+    "saturazione": 0.79
+  },
+  "Venezia": {
+    "ruota": "Venezia",
+    "ultima": [
+      7,
+      29,
+      76,
+      14,
+      15
+    ],
+    "caldi": [
+      66,
+      29
+    ],
+    "ambo": [
+      66,
+      29
+    ],
+    "ambo_forte": [
+      66,
+      29
+    ],
+    "ciclo": [
+      0.74,
+      0.14
+    ],
+    "indice": [
+      4.11,
+      3.21
+    ],
+    "saturazione": 0.86
+  },
   "top_pick": [
     {
       "ruota": "Venezia",
@@ -24,317 +334,5 @@
       ],
       "score": 2.57
     }
-  ],
-  "ruote": {
-    "Bari": {
-      "ruota": "Bari",
-      "ultima": [
-        53,
-        4,
-        1,
-        11,
-        9
-      ],
-      "caldi": [
-        27,
-        51
-      ],
-      "ambo": [
-        27,
-        51
-      ],
-      "ambo_forte": [
-        27,
-        51
-      ],
-      "ciclo": [
-        1.04,
-        0.53
-      ],
-      "indice": [
-        4.39,
-        4.79
-      ],
-      "saturazione": 0.77
-    },
-    "Cagliari": {
-      "ruota": "Cagliari",
-      "ultima": [
-        67,
-        19,
-        47,
-        35,
-        64
-      ],
-      "caldi": [
-        23,
-        2
-      ],
-      "ambo": [
-        23,
-        2
-      ],
-      "ambo_forte": [
-        23,
-        2
-      ],
-      "ciclo": [
-        0.29,
-        0.51
-      ],
-      "indice": [
-        3.44,
-        3.27
-      ],
-      "saturazione": 0.82
-    },
-    "Firenze": {
-      "ruota": "Firenze",
-      "ultima": [
-        13,
-        48,
-        58,
-        39,
-        15
-      ],
-      "caldi": [
-        25,
-        50
-      ],
-      "ambo": [
-        25,
-        50
-      ],
-      "ambo_forte": [
-        25,
-        50
-      ],
-      "ciclo": [
-        1.74,
-        0.48
-      ],
-      "indice": [
-        4.28,
-        2.89
-      ],
-      "saturazione": 0.82
-    },
-    "Genova": {
-      "ruota": "Genova",
-      "ultima": [
-        52,
-        87,
-        51,
-        79,
-        67
-      ],
-      "caldi": [
-        19,
-        26
-      ],
-      "ambo": [
-        19,
-        26
-      ],
-      "ambo_forte": [
-        19,
-        26
-      ],
-      "ciclo": [
-        0.26,
-        0.91
-      ],
-      "indice": [
-        3.56,
-        3.2
-      ],
-      "saturazione": 0.82
-    },
-    "Milano": {
-      "ruota": "Milano",
-      "ultima": [
-        7,
-        79,
-        84,
-        28,
-        37
-      ],
-      "caldi": [
-        89,
-        31
-      ],
-      "ambo": [
-        89,
-        31
-      ],
-      "ambo_forte": [
-        89,
-        31
-      ],
-      "ciclo": [
-        0.8,
-        0.98
-      ],
-      "indice": [
-        3.37,
-        4.14
-      ],
-      "saturazione": 0.79
-    },
-    "Napoli": {
-      "ruota": "Napoli",
-      "ultima": [
-        26,
-        90,
-        68,
-        82,
-        67
-      ],
-      "caldi": [
-        7,
-        54
-      ],
-      "ambo": [
-        7,
-        54
-      ],
-      "ambo_forte": [
-        7,
-        54
-      ],
-      "ciclo": [
-        1.29,
-        0.65
-      ],
-      "indice": [
-        4.44,
-        2.81
-      ],
-      "saturazione": 0.81
-    },
-    "Palermo": {
-      "ruota": "Palermo",
-      "ultima": [
-        38,
-        57,
-        65,
-        20,
-        56
-      ],
-      "caldi": [
-        57,
-        38
-      ],
-      "ambo": [
-        57,
-        38
-      ],
-      "ambo_forte": [
-        57,
-        38
-      ],
-      "ciclo": [
-        0.16,
-        0.12
-      ],
-      "indice": [
-        2.91,
-        2.85
-      ],
-      "saturazione": 0.89
-    },
-    "Roma": {
-      "ruota": "Roma",
-      "ultima": [
-        81,
-        66,
-        45,
-        53,
-        8
-      ],
-      "caldi": [
-        66,
-        44
-      ],
-      "ambo": [
-        66,
-        44
-      ],
-      "ambo_forte": [
-        66,
-        44
-      ],
-      "ciclo": [
-        0.22,
-        0.25
-      ],
-      "indice": [
-        4.33,
-        3.88
-      ],
-      "saturazione": 0.8
-    },
-    "Torino": {
-      "ruota": "Torino",
-      "ultima": [
-        29,
-        47,
-        55,
-        78,
-        71
-      ],
-      "caldi": [
-        73,
-        4
-      ],
-      "ambo": [
-        73,
-        4
-      ],
-      "ambo_forte": [
-        73,
-        4
-      ],
-      "ciclo": [
-        1.73,
-        0.83
-      ],
-      "indice": [
-        4.26,
-        3.41
-      ],
-      "saturazione": 0.79
-    },
-    "Venezia": {
-      "ruota": "Venezia",
-      "ultima": [
-        7,
-        29,
-        76,
-        14,
-        15
-      ],
-      "caldi": [
-        66,
-        29
-      ],
-      "ambo": [
-        66,
-        29
-      ],
-      "ambo_forte": [
-        66,
-        29
-      ],
-      "ciclo": [
-        0.74,
-        0.14
-      ],
-      "indice": [
-        4.11,
-        3.21
-      ],
-      "saturazione": 0.86
-    }
-  }
+  ]
 }
