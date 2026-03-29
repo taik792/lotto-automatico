@@ -1,144 +1,50 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Lotto Evolution PRO MAX</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #020617;
-  color: white;
-  text-align: center;
-}
-
-h1 {
-  color: #00ff9c;
-  margin-top: 20px;
-}
-
-.box-top {
-  border: 2px solid #00ff9c;
-  border-radius: 20px;
-  padding: 15px;
-  margin: 20px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  padding: 15px;
-}
-
-.card {
-  border: 2px solid #00ff9c;
-  border-radius: 20px;
-  padding: 15px;
-  text-align: left;
-}
-
-.titolo {
-  color: #00ff9c;
-  font-weight: bold;
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-.label {
-  color: #aaa;
-  font-size: 13px;
-}
-
-.green {
-  color: #00ff9c;
-  font-weight: bold;
-}
-
-.red {
-  color: #ff4d4d;
-  font-weight: bold;
-}
+body {background:#020617;color:white;font-family:Arial;text-align:center;}
+h1 {color:#00ff9c;}
+.grid {display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding:15px;}
+.card {border:2px solid #00ff9c;border-radius:15px;padding:10px;text-align:left;}
+.green {color:#00ff9c;}
+.red {color:#ff4d4d;}
 </style>
 </head>
 
 <body>
 
-<h1>🔥 Lotto Evolution PRO MAX</h1>
+<h1>🔥 LOTTO ELITE</h1>
 
-<div id="top" class="box-top">Caricamento...</div>
-
-<div id="grid" class="grid"></div>
+<div id="top"></div>
+<div class="grid" id="grid"></div>
 
 <script>
 fetch("risultati.json")
-.then(res => res.json())
-.then(data => {
+.then(r=>r.json())
+.then(data=>{
 
-  const ordine = [
-    "Bari","Cagliari","Firenze","Genova",
-    "Milano","Napoli","Palermo","Roma",
-    "Torino","Venezia","Nazionale"
-  ];
-
-  let valori = Object.values(data);
-
-  // 🔥 CALCOLO SCORE
-  valori.forEach(r => {
-    let indice = r.indice || [0,0];
-    let ciclo = r.ciclo || [0,0];
-    let sat = r.saturazione || 0;
-
-    r.score =
-      (indice[0] + indice[1]) * 0.4 +
-      (ciclo[0] + ciclo[1]) * 0.3 +
-      sat * 10;
-  });
-
-  // 🔥 SOLO BUONI
-  let forti = valori.filter(r => r.score > 6);
-
-  // 🔥 ORDINE RUOTE CORRETTO
-  forti.sort((a,b) =>
-    ordine.indexOf(a.ruota) - ordine.indexOf(b.ruota)
-  );
-
-  // 🔥 TOP 3
-  let top = [...forti]
-    .sort((a,b) => b.score - a.score)
-    .slice(0,3);
+  let arr = Object.values(data)
+    .filter(x => x.score > 5)
+    .sort((a,b)=>b.score-a.score);
 
   document.getElementById("top").innerHTML =
-    "<b>🔥 SEGNALI ATTIVI</b><br><br>" +
-    top.map(r =>
-      `${r.ruota} → ${r.ambo.join(" - ")}`
+    "<h3>🔥 SEGNALI TOP</h3>" +
+    arr.slice(0,3).map(x =>
+      `${x.ruota} → ${x.ambo.join(" - ")}`
     ).join("<br>");
 
-  // 🔥 GRIGLIA
-  document.getElementById("grid").innerHTML = forti.map(r => `
-    <div class="card">
-      <div class="titolo">${r.ruota}</div>
+  document.getElementById("grid").innerHTML =
+    arr.map(r=>`
+      <div class="card">
+        <b>${r.ruota}</b><br>
+        Ultima: ${r.ultima.join(" - ")}<br>
+        Caldi: ${r.caldi.join(" - ")}<br>
+        Ambo: <span class="green">${r.ambo.join(" - ")}</span><br>
+        Score: <span class="red">${r.score}</span>
+      </div>
+    `).join("");
 
-      <div class="label">Ultima estrazione</div>
-      ${r.ultima.join(" - ")}
-
-      <div class="label">Numeri caldi</div>
-      ${r.caldi.join(" - ")}
-
-      <div class="label">Ambo forte</div>
-      <span class="green">${r.ambo.join(" - ")}</span>
-
-      <div class="label">Score</div>
-      <span class="red">${r.score.toFixed(2)}</span>
-    </div>
-  `).join("");
-
-})
-.catch(() => {
-  document.getElementById("top").innerHTML = "Errore caricamento dati";
 });
 </script>
 
