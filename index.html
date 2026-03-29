@@ -92,18 +92,26 @@ fetch("risultati.json")
 })
 .then(data => {
 
-  console.log("DATI:", data);
+  let valori = Object.values(data).filter(r => r);
 
-  let valori = Object.values(data);
+  // 🔥 MOTORE PRO (score intelligente)
+  valori.forEach(r => {
 
-  // 🔥 TOP PICK
+    let indice = r.indice || [0,0];
+    let ciclo = r.ciclo || [0,0];
+    let sat = r.saturazione || 0;
+
+    let score =
+      (indice[0] + indice[1]) * 0.4 +
+      (ciclo[0] + ciclo[1]) * 0.3 +
+      sat * 10;
+
+    r.score = score;
+  });
+
+  // 🔥 TOP PICK REALI
   let top = valori
-    .filter(r => r.indice && r.ambo)
-    .sort((a,b) => {
-      let aScore = (a.indice?.[0] || 0) + (a.indice?.[1] || 0);
-      let bScore = (b.indice?.[0] || 0) + (b.indice?.[1] || 0);
-      return bScore - aScore;
-    })
+    .sort((a,b) => b.score - a.score)
     .slice(0,3);
 
   let topHTML = "<b>🔥 Migliori Giocate</b><br>";
@@ -118,8 +126,6 @@ fetch("risultati.json")
   let html = "";
 
   valori.forEach(r => {
-
-    if (!r) return;
 
     html += `
       <div class="card">
