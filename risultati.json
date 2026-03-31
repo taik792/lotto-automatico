@@ -1,9 +1,9 @@
 {
   "top": [
     "Bari",
-    "Roma",
-    "Cagliari",
     "Firenze",
+    "Milano",
+    "Napoli",
     "Palermo"
   ],
   "ruote": {
@@ -16,10 +16,10 @@
         9
       ],
       "ambo": [
-        51,
-        21
+        41,
+        67
       ],
-      "score": 11
+      "score": 82
     },
     "Cagliari": {
       "ultima": [
@@ -30,10 +30,10 @@
         64
       ],
       "ambo": [
-        23,
-        49
+        41,
+        26
       ],
-      "score": 8
+      "score": 71
     },
     "Firenze": {
       "ultima": [
@@ -44,10 +44,10 @@
         15
       ],
       "ambo": [
-        46,
-        72
+        47,
+        90
       ],
-      "score": 8
+      "score": 81
     },
     "Genova": {
       "ultima": [
@@ -58,10 +58,10 @@
         67
       ],
       "ambo": [
-        19,
-        58
+        70,
+        28
       ],
-      "score": 7
+      "score": 71
     },
     "Milano": {
       "ultima": [
@@ -72,10 +72,10 @@
         37
       ],
       "ambo": [
-        21,
-        58
+        45,
+        85
       ],
-      "score": 7
+      "score": 79
     },
     "Napoli": {
       "ultima": [
@@ -86,10 +86,10 @@
         67
       ],
       "ambo": [
-        66,
-        31
+        40,
+        28
       ],
-      "score": 7
+      "score": 78
     },
     "Palermo": {
       "ultima": [
@@ -100,10 +100,10 @@
         56
       ],
       "ambo": [
-        88,
-        85
+        46,
+        45
       ],
-      "score": 8
+      "score": 76
     },
     "Roma": {
       "ultima": [
@@ -114,10 +114,10 @@
         8
       ],
       "ambo": [
-        89,
-        44
+        80,
+        17
       ],
-      "score": 9
+      "score": 69
     },
     "Torino": {
       "ultima": [
@@ -128,10 +128,10 @@
         71
       ],
       "ambo": [
-        85,
-        4
+        65,
+        49
       ],
-      "score": 8
+      "score": 58
     },
     "Venezia": {
       "ultima": [
@@ -142,10 +142,10 @@
         15
       ],
       "ambo": [
-        66,
-        69
+        65,
+        59
       ],
-      "score": 8
+      "score": 66
     }
   }
 }
