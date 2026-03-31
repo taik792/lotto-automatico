@@ -37,6 +37,7 @@ h1 { color:#00ff99; }
 
 .green { color:#00ff99; }
 .red { color:#ff4d4d; }
+.small { font-size:14px; opacity:0.8; }
 </style>
 </head>
 
@@ -48,35 +49,58 @@ h1 { color:#00ff99; }
 <div id="ruote" class="grid"></div>
 
 <script>
-fetch("risultati.json")
-.then(res => res.json())
-.then(data => {
+Promise.all([
+    fetch("risultati.json").then(r => r.json()),
+    fetch("estrazioni.json").then(r => r.json())
+])
+.then(([risultati, estrazioni]) => {
 
-    const topBox = document.getElementById("top");
     const container = document.getElementById("ruote");
+    const topBox = document.getElementById("top");
 
-    let tutte = Object.values(data);
+    let tutte = Object.values(risultati);
 
-    // 🔥 ORDINA
-    tutte.sort((a, b) => b.score - a.score);
+    // 🔥 ORDINA PER SCORE
+    tutte.sort((a,b) => b.score - a.score);
 
-    // 🔝 TOP
-    let top = tutte.slice(0, 3);
+    // 🔝 TOP 3
+    let top = tutte.slice(0,3);
 
     topBox.innerHTML = `
         <h2>🔥 TOP GIOCATE</h2>
         ${top.map(r => `${r.ruota} → ${r.ambo[0]} - ${r.ambo[1]}`).join("<br>")}
     `;
 
-    // 🔥 MOSTRA TUTTE (senza errori)
+    // 🔁 PRENDI ULTIMA ESTRAZIONE (dal fondo!)
+    function getUltima(ruota){
+        let dati = estrazioni[ruota];
+        if(!dati || dati.length === 0) return [];
+
+        let ultima = dati[dati.length - 1]; // 🔥 ultima estrazione
+        return ultima;
+    }
+
     container.innerHTML = "";
 
     tutte.forEach(r => {
+
+        let ultima = getUltima(r.ruota);
+
         container.innerHTML += `
             <div class="card">
                 <h3>${r.ruota}</h3>
-                <p class="green">Ambo: ${r.ambo[0]} - ${r.ambo[1]}</p>
-                <p class="red">Score: ${r.score}</p>
+
+                <p class="small">
+                    Ultima: ${ultima.join(" - ")}
+                </p>
+
+                <p class="green">
+                    Ambo: ${r.ambo[0]} - ${r.ambo[1]}
+                </p>
+
+                <p class="red">
+                    Score: ${r.score}
+                </p>
             </div>
         `;
     });
