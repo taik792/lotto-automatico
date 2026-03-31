@@ -18,9 +18,52 @@ def analizza_ruota(estrazioni_ruota):
             "score": 0
         }
 
-    # ultime 5 estrazioni (dal più recente)
     ultime_estrazioni = estrazioni_ruota[-5:]
     ultima = ultime_estrazioni[-1]
 
-    # frequenze ultime 20 estrazioni
-    storico = estrazioni_ruota[-20]
+    storico = estrazioni_ruota[-20:]
+    numeri = [n for estr in storico for n in estr]
+
+    freq = Counter(numeri)
+    numeri_ordinati = [n for n, _ in freq.most_common()]
+
+    candidati = [n for n in numeri_ordinati if n not in ultima]
+
+    if len(candidati) < 2:
+        candidati = numeri_ordinati
+
+    if len(candidati) < 2:
+        candidati = list(range(1, 91))
+
+    ambo = candidati[:2]
+
+    score = freq[ambo[0]] + freq[ambo[1]]
+
+    return {
+        "ultima": ultima,
+        "ambo": ambo,
+        "score": score
+    }
+
+def genera():
+    dati = carica_estrazioni()
+    risultati = {}
+
+    for ruota in RUOTE:
+        estrazioni_ruota = dati.get(ruota, [])
+        risultati[ruota] = analizza_ruota(estrazioni_ruota)
+
+    top = sorted(risultati.items(), key=lambda x: x[1]["score"], reverse=True)[:5]
+
+    output = {
+        "top": [r[0] for r in top],
+        "ruote": risultati
+    }
+
+    with open("risultati.json", "w") as f:
+        json.dump(output, f, indent=2)
+
+    print("OK generato")
+
+if __name__ == "__main__":
+    genera()
