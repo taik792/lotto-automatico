@@ -1,63 +1,82 @@
 import json
+from collections import Counter
 
-# Carica dati
-with open("estrazioni.json") as f:
-    estrazioni = json.load(f)
+RUOTE = [
+    "Bari","Cagliari","Firenze","Genova",
+    "Milano","Napoli","Palermo","Roma",
+    "Torino","Venezia"
+]
 
-risultati = {}
+ULTIME_ESTRAZIONI_ANALISI = 30  # puoi aumentare
 
-def frequenza(num, storico):
-    count = 0
-    for estr in storico[-20:]:
-        if num in estr:
-            count += 1
-    return count
+def carica_estrazioni():
+    with open("estrazioni.json", "r") as f:
+        return json.load(f)
 
-def ritardo(num, storico):
-    for i, estr in enumerate(reversed(storico)):
-        if num in estr:
-            return i + 1
-    return 50
+def analizza_ruota(ruota, dati):
+    if ruota not in dati or len(dati[ruota]) == 0:
+        return {
+            "ruota": ruota,
+            "ambo": [1, 2],
+            "score": 0
+        }
 
-for ruota, storico in estrazioni.items():
+    estrazioni = dati[ruota]
 
-    ultima = storico[-1]
+    # prendi ultime N estrazioni
+    ultime = estrazioni[-ULTIME_ESTRAZIONI_ANALISI:]
 
-    # numeri candidati (ultimi 3 concorsi)
-    candidati = []
-    for estr in storico[-3:]:
-        candidati.extend(estr)
+    # numeri appena usciti (ultima estrazione)
+    ultimi_usciti = set(estrazioni[-1])
 
-    candidati = list(set(candidati))
+    # conta frequenze
+    freq = Counter()
+    for estr in ultime:
+        freq.update(estr)
 
-    migliori = []
+    # ordina per frequenza
+    numeri_ordinati = [n for n, _ in freq.most_common()]
 
-    for n in candidati:
-        f = frequenza(n, storico)
-        r = ritardo(n, storico)
+    # filtra numeri appena usciti
+    candidati = [n for n in numeri_ordinati if n not in ultimi_usciti]
 
-        score = (f * 2) + r
+    # fallback se troppo pochi
+    if len(candidati) < 2:
+        candidati = numeri_ordinati
 
-        migliori.append((n, score))
+    # scegli ambo
+    ambo = candidati[:2]
 
-    migliori.sort(key=lambda x: x[1], reverse=True)
+    # score = somma frequenze + bonus ritardo
+    score = freq[ambo[0]] + freq[ambo[1]]
 
-    # prendi top 2 numeri
-    top2 = [migliori[0][0], migliori[1][0]]
-    score_finale = migliori[0][1] + migliori[1][1]
+    # piccolo bonus se non usciti recentemente
+    bonus = 0
+    for n in ambo:
+        if n not in ultimi_usciti:
+            bonus += 2
 
-    risultati[ruota] = {
+    score += bonus
+
+    return {
         "ruota": ruota,
-        "ambo": top2,
-        "score": round(score_finale, 2)
+        "ambo": ambo,
+        "score": round(score, 2)
     }
 
-# 🔥 FILTRO FORTE
-filtrati = dict(
-    sorted(risultati.items(), key=lambda x: x[1]["score"], reverse=True)[:5]
-)
+def genera():
+    dati = carica_estrazioni()
 
-with open("risultati.json", "w") as f:
-    json.dump(filtrati, f, indent=2)
+    risultati = {}
 
-print("\n--- SEGNALI TOP ---\n")
+    for ruota in RUOTE:
+        risultati[ruota] = analizza_ruota(ruota, dati)
+
+    # salva
+    with open("risultati.json", "w") as f:
+        json.dump(risultati, f, indent=2)
+
+    print("✅ risultati.json generato correttamente")
+
+if __name__ == "__main__":
+    genera()
