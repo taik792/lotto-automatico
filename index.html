@@ -9,22 +9,19 @@
 body {
     background: #020617;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     text-align: center;
 }
 
 h1 {
     color: #00ff99;
-    margin-top: 20px;
 }
 
 .box {
     border: 2px solid #00ff99;
     border-radius: 12px;
     padding: 15px;
-    margin: 20px auto;
-    width: 90%;
-    max-width: 600px;
+    margin: 20px;
 }
 
 .grid {
@@ -40,22 +37,16 @@ h1 {
     padding: 10px;
 }
 
-.green {
-    color: #00ff99;
-}
-
-.red {
-    color: #ff4d4d;
-}
+.green { color:#00ff99; }
+.red { color:#ff4d4d; }
 </style>
-
 </head>
+
 <body>
 
 <h1>🔥 LOTTO ELITE PRO</h1>
 
 <div id="top" class="box"></div>
-
 <div id="ruote" class="grid"></div>
 
 <script>
@@ -63,39 +54,42 @@ fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    const container = document.getElementById("ruote");
     const topBox = document.getElementById("top");
+    const container = document.getElementById("ruote");
 
     container.innerHTML = "";
 
-    // 🔥 prendi tutte le ruote
-    let tutte = Object.values(data);
+    // 🔥 SE ESISTE ARRAY RUOTE
+    let tutte = data.ruote || Object.values(data);
 
-    // 🔥 ordina per score
+    // 🔥 ORDINA
     tutte.sort((a, b) => b.score - a.score);
 
-    // 🔝 top 3
-    let top = tutte.slice(0, 3);
+    // 🔝 TOP
+    let top = data.top || tutte.slice(0, 3);
 
-    // 🔥 mostra top
     topBox.innerHTML = `
         <h2>🔥 TOP GIOCATE</h2>
         ${top.map(r => `${r.ruota} → ${r.ambo[0]} - ${r.ambo[1]}`).join("<br>")}
     `;
 
-    // 🔥 mostra tutte le ruote
+    // 🔥 CREA CARD
     tutte.forEach(r => {
+        if (!r.ambo || !r.ultima) return;
+
         container.innerHTML += `
             <div class="card">
                 <h3>${r.ruota}</h3>
                 <p>Ultima: ${r.ultima.join(" - ")}</p>
-                <p>Caldi: ${r.caldi.join(" - ")}</p>
                 <p class="green">Ambo: ${r.ambo[0]} - ${r.ambo[1]}</p>
                 <p class="red">Score: ${r.score}</p>
             </div>
         `;
     });
 
+})
+.catch(err => {
+    console.log("Errore:", err);
 });
 </script>
 
