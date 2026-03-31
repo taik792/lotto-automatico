@@ -2,24 +2,37 @@ import json
 
 RUOTE = ["Bari","Cagliari","Firenze","Genova","Milano","Napoli","Palermo","Roma","Torino","Venezia"]
 
-with open("estrazioni.json") as f:
+# ===== CARICA DATI =====
+with open("estrazioni.json", encoding="utf-8") as f:
     estrazioni = json.load(f)
 
-risultati = {"top": [], "ruote": {}}
+risultati = {
+    "top": [],
+    "ruote": {}
+}
 
+# ===== CICLO RUOTE =====
 for ruota in RUOTE:
-    estrazioni_ruota = [e[ruota] for e in estrazioni if ruota in e]
 
+    if ruota not in estrazioni:
+        continue
+
+    estrazioni_ruota = estrazioni[ruota]
+
+    if not isinstance(estrazioni_ruota, list) or len(estrazioni_ruota) == 0:
+        continue
+
+    # ultime estrazioni
     ultime = estrazioni_ruota[-1]
-    storico = estrazioni_ruota[-20:]
+    storico = estrazioni_ruota[-20:]  # ultime 20
 
-    # frequenze
+    # ===== FREQUENZE =====
     freq = {}
     for estr in storico:
         for n in estr:
             freq[n] = freq.get(n, 0) + 1
 
-    # ritardi
+    # ===== RITARDI =====
     ritardi = {}
     for n in range(1, 91):
         ritardo = 0
@@ -29,15 +42,14 @@ for ruota in RUOTE:
             ritardo += 1
         ritardi[n] = ritardo
 
-    # score combinato
+    # ===== SCORE =====
     score_num = {}
-    for n in freq:
-        score_num[n] = freq[n] + (ritardi[n] / 2)
+    for n in range(1, 91):
+        score_num[n] = freq.get(n, 0) + (ritardi[n] / 2)
 
-    # togli numeri usciti
-    candidati = [n for n in score_num if n not in ultime]
+    # ===== FILTRO =====
+    candidati = [n for n in range(1, 91) if n not in ultime]
 
-    # ordina
     candidati.sort(key=lambda x: score_num[x], reverse=True)
 
     if len(candidati) >= 2:
@@ -53,9 +65,17 @@ for ruota in RUOTE:
         "score": score
     }
 
-# TOP 5 reali
-top = sorted(risultati["ruote"].items(), key=lambda x: x[1]["score"], reverse=True)
-risultati["top"] = [t[0] for t in top[:5]]
+# ===== TOP 5 =====
+top_sorted = sorted(
+    risultati["ruote"].items(),
+    key=lambda x: x[1]["score"],
+    reverse=True
+)
 
-with open("risultati.json", "w") as f:
+risultati["top"] = [t[0] for t in top_sorted[:5]]
+
+# ===== SALVA =====
+with open("risultati.json", "w", encoding="utf-8") as f:
     json.dump(risultati, f, indent=2)
+
+print("✅ RISULTATI GENERATI")
