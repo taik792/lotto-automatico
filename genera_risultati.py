@@ -60,4 +60,4 @@ filtrati = dict(
 with open("risultati.json", "w") as f:
     json.dump(filtrati, f, indent=2)
 
-print("
+print("\n--- SEGNALI TOP ---\n")
