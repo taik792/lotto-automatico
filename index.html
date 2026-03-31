@@ -33,7 +33,7 @@ h1 { color:#00ff99; }
 .card {
     border:2px solid #00ff99;
     border-radius:10px;
-    padding:10px;
+    padding:12px;
 }
 
 .green { color:#00ff99; }
@@ -66,30 +66,42 @@ Promise.all([
     const container = document.getElementById("ruote");
     const topBox = document.getElementById("top");
 
-    let tutte = Object.values(risultati);
+    // 🔥 CREA ARRAY COMPLETO (10 RUOTE SEMPRE)
+    let tutte = ordineRuote.map(nome => {
 
-    // 🔥 TOP 3 (per score)
-    let top = [...tutte].sort((a,b)=>b.score-a.score).slice(0,3);
+        let r = risultati[nome];
+
+        if(!r){
+            return {
+                ruota: nome,
+                ambo: ["-", "-"],
+                score: 0
+            };
+        }
+
+        return r;
+    });
+
+    // 🔥 TOP 3
+    let top = [...tutte]
+        .sort((a,b)=>b.score-a.score)
+        .slice(0,3);
 
     topBox.innerHTML = `
         <h2>🔥 TOP GIOCATE</h2>
         ${top.map(r => `${r.ruota} → ${r.ambo[0]} - ${r.ambo[1]}`).join("<br>")}
     `;
 
-    // 🔁 PRENDE ULTIMA ESTRAZIONE
+    // 🔁 PRENDE ULTIMA ESTRAZIONE (ULTIMA DEL FILE)
     function getUltima(ruota){
         let dati = estrazioni[ruota];
         if(!dati || dati.length === 0) return [];
         return dati[dati.length - 1];
     }
 
-    // 🔥 ORDINA PER RUOTA (NON SCORE)
-    tutte.sort((a,b)=>{
-        return ordineRuote.indexOf(a.ruota) - ordineRuote.indexOf(b.ruota);
-    });
-
     container.innerHTML = "";
 
+    // 🔥 LOOP ORDINATO
     tutte.forEach(r => {
 
         let ultima = getUltima(r.ruota);
@@ -99,7 +111,7 @@ Promise.all([
                 <h3>${r.ruota}</h3>
 
                 <p class="small">
-                    Ultima: ${ultima.join(" - ")}
+                    Ultima: ${ultima.length ? ultima.join(" - ") : "-"}
                 </p>
 
                 <p class="green">
