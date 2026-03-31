@@ -1,61 +1,61 @@
 import json
-from collections import Counter
 
-RUOTE = [
-    "Bari","Cagliari","Firenze","Genova","Milano",
-    "Napoli","Palermo","Roma","Torino","Venezia"
-]
+RUOTE = ["Bari","Cagliari","Firenze","Genova","Milano","Napoli","Palermo","Roma","Torino","Venezia"]
 
-def carica():
-    with open("estrazioni.json", "r") as f:
-        return json.load(f)
+with open("estrazioni.json") as f:
+    estrazioni = json.load(f)
 
-def analizza(estrazioni):
-    if not estrazioni:
-        return {"ultima": [], "ambo": [0,0], "score": 0}
+risultati = {"top": [], "ruote": {}}
 
-    ultima = estrazioni[-1]
-    storico = estrazioni[-20:]
+for ruota in RUOTE:
+    estrazioni_ruota = [e[ruota] for e in estrazioni if ruota in e]
 
-    numeri = [n for estr in storico for n in estr]
-    freq = Counter(numeri)
+    ultime = estrazioni_ruota[-1]
+    storico = estrazioni_ruota[-20:]
 
-    ordinati = [n for n,_ in freq.most_common()]
-    candidati = [n for n in ordinati if n not in ultima]
+    # frequenze
+    freq = {}
+    for estr in storico:
+        for n in estr:
+            freq[n] = freq.get(n, 0) + 1
 
-    if len(candidati) < 2:
-        candidati = ordinati
+    # ritardi
+    ritardi = {}
+    for n in range(1, 91):
+        ritardo = 0
+        for estr in reversed(estrazioni_ruota):
+            if n in estr:
+                break
+            ritardo += 1
+        ritardi[n] = ritardo
 
-    if len(candidati) < 2:
-        candidati = list(range(1,91))
+    # score combinato
+    score_num = {}
+    for n in freq:
+        score_num[n] = freq[n] + (ritardi[n] / 2)
 
-    ambo = candidati[:2]
-    score = freq.get(ambo[0],0) + freq.get(ambo[1],0)
+    # togli numeri usciti
+    candidati = [n for n in score_num if n not in ultime]
 
-    return {
-        "ultima": ultima,
+    # ordina
+    candidati.sort(key=lambda x: score_num[x], reverse=True)
+
+    if len(candidati) >= 2:
+        ambo = [candidati[0], candidati[1]]
+        score = round(score_num[ambo[0]] + score_num[ambo[1]])
+    else:
+        ambo = []
+        score = 0
+
+    risultati["ruote"][ruota] = {
+        "ultima": ultime,
         "ambo": ambo,
         "score": score
     }
 
-def main():
-    dati = carica()
-    risultati = {}
+# TOP 5 reali
+top = sorted(risultati["ruote"].items(), key=lambda x: x[1]["score"], reverse=True)
+risultati["top"] = [t[0] for t in top[:5]]
 
-    for r in RUOTE:
-        risultati[r] = analizza(dati.get(r, []))
-
-    top = sorted(risultati.items(), key=lambda x: x[1]["score"], reverse=True)[:5]
-
-    output = {
-        "top": [t[0] for t in top],
-        "ruote": risultati
-    }
-
-    with open("risultati.json", "w") as f:
-        json.dump(output, f, indent=2)
-
-    print("OK")
-
-if __name__ == "__main__":
-    main()
+with open("risultati.json", "w") as f:
+    json.dump(risultati, f, indent=2)
