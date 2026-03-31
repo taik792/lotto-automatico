@@ -1,51 +1,17 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Lotto Elite PRO</title>
-
 <style>
-body {
-    background:#020617;
-    color:#fff;
-    font-family:Arial;
-    margin:0;
-    padding:20px;
-}
-
-h1 {
-    text-align:center;
-    color:#00ff99;
-}
-
-.top {
-    border:2px solid #00ff99;
-    border-radius:15px;
-    padding:15px;
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.container {
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-}
-
+body { background:#020617; color:white; font-family:Arial; text-align:center; }
 .box {
     border:2px solid #00ff99;
-    border-radius:15px;
+    border-radius:12px;
     padding:10px;
     margin:10px;
-    width:280px;
+    display:inline-block;
+    width:220px;
 }
-
-.title {
-    color:#00ff99;
-    font-weight:bold;
-    font-size:18px;
-}
-
 .green { color:#00ff99; }
 .red { color:#ff4d4d; }
 </style>
@@ -55,66 +21,42 @@ h1 {
 
 <h1>🔥 LOTTO ELITE PRO</h1>
 
-<div class="top" id="top"></div>
-
-<div class="container" id="container"></div>
+<div id="top"></div>
+<div id="container"></div>
 
 <script>
 
-const ordineRuote = [
-    "Bari","Cagliari","Firenze","Genova",
-    "Milano","Napoli","Palermo","Roma",
-    "Torino","Venezia"
-];
+async function load(){
 
-async function load() {
+const res = await fetch("risultati.json").then(r=>r.json());
+const est = await fetch("estrazioni.json").then(r=>r.json());
 
-    const risultati = await fetch("risultati.json").then(r=>r.json());
-    const estrazioni = await fetch("estrazioni.json").then(r=>r.json());
+let topHTML = "<h3>TOP GIOCATE</h3>";
 
-    const container = document.getElementById("container");
+Object.values(res).slice(0,3).forEach(r=>{
+    topHTML += `${r.ruota} → ${r.ambo.join(" - ")}<br>`;
+});
 
-    // 🔥 TOP 3
-    let htmlTop = "<h3>🔥 SEGNALI TOP</h3>";
+document.getElementById("top").innerHTML = topHTML;
 
-    const top = Object.values(risultati)
-        .sort((a,b)=>b.score - a.score)
-        .slice(0,3);
+let html = "";
 
-    top.forEach(t=>{
-        htmlTop += `${t.ruota} → ${t.ambo.join(" - ")}<br>`;
-    });
+Object.values(res).forEach(r=>{
 
-    document.getElementById("top").innerHTML = htmlTop;
+    let ultima = est[r.ruota];
+    ultima = ultima[ultima.length - 1];
 
-    // 🔥 RUOTE ORDINATE
-    ordineRuote.forEach(ruota => {
+    html += `
+    <div class="box">
+        <b>${r.ruota}</b><br>
+        Ultima: ${ultima.join(" - ")}<br>
+        <span class="green">Ambo: ${r.ambo.join(" - ")}</span><br>
+        <span class="red">Score: ${r.score}</span>
+    </div>
+    `;
+});
 
-        const r = risultati[ruota];
-        if (!r) return;
-
-        // ✅ PRENDE SOLO L'ULTIMA ESTRAZIONE
-        const lista = estrazioni[ruota] || [];
-        const ultima = lista.length ? lista[lista.length - 1] : [];
-
-        container.innerHTML += `
-        <div class="box">
-            <div class="title">${ruota}</div>
-
-            <div>Ultima: ${ultima.join(" - ")}</div>
-
-            <div>Caldi: ${r.caldi.join(" - ")}</div>
-
-            <div class="green">
-                Ambo: ${r.ambo.join(" - ")}
-            </div>
-
-            <div class="red">
-                Score: ${r.score}
-            </div>
-        </div>
-        `;
-    });
+document.getElementById("container").innerHTML = html;
 
 }
 
