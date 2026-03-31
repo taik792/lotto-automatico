@@ -1,98 +1,63 @@
 import json
-from statistics import mean
-from datetime import datetime
 
-# CONFIG
-WINDOW_CICLO = 60
-WINDOW_FREQ = 30
-WINDOW_RECENTE = 10
-
-# CARICA DATI
+# Carica dati
 with open("estrazioni.json") as f:
     estrazioni = json.load(f)
 
-# CARICA STORICO
-try:
-    with open("storico.json") as f:
-        storico = json.load(f)
-except:
-    storico = []
-
-# FUNZIONI
-def frequenza(estrazioni, numero):
-    return sum(numero in e for e in estrazioni[-WINDOW_FREQ:])
-
-def ciclometria(estrazioni, numero):
-    estr = estrazioni[-WINDOW_CICLO:]
-    pos = [i for i,e in enumerate(estr) if numero in e]
-
-    if len(pos) < 2:
-        return 0
-
-    cicli = [pos[i] - pos[i-1] for i in range(1,len(pos))]
-    ciclo_medio = mean(cicli)
-    ciclo_attuale = len(estr) - pos[-1]
-
-    if ciclo_medio == 0:
-        return 0
-
-    return round(ciclo_attuale / ciclo_medio, 2)
-
-def indice(estrazioni, numero):
-    freq = frequenza(estrazioni, numero)
-    recente = sum(numero in e for e in estrazioni[-WINDOW_RECENTE:])
-    return round(freq * 0.7 + recente * 1.3, 2)
-
-# CALCOLO
 risultati = {}
 
-for ruota, estr in estrazioni.items():
+def frequenza(num, storico):
+    count = 0
+    for estr in storico[-20:]:
+        if num in estr:
+            count += 1
+    return count
 
-    numeri = range(1, 91)
+def ritardo(num, storico):
+    for i, estr in enumerate(reversed(storico)):
+        if num in estr:
+            return i + 1
+    return 50
 
-    score_numeri = []
+for ruota, storico in estrazioni.items():
 
-    for n in numeri:
-        ind = indice(estr, n)
-        ciclo = ciclometria(estr, n)
+    ultima = storico[-1]
 
-        score = ind * 0.6 + ciclo * 0.4
-        score_numeri.append((n, score))
+    # numeri candidati (ultimi 3 concorsi)
+    candidati = []
+    for estr in storico[-3:]:
+        candidati.extend(estr)
 
-    # TOP NUMERI
-    top = sorted(score_numeri, key=lambda x: x[1], reverse=True)[:6]
-    numeri_top = [n for n,_ in top]
+    candidati = list(set(candidati))
 
-    # CREA AMBO MIGLIORE
-    ambo = numeri_top[:2]
+    migliori = []
 
-    # SCORE FINALE
-    score_finale = round(sum([s for _,s in top[:2]]),2)
+    for n in candidati:
+        f = frequenza(n, storico)
+        r = ritardo(n, storico)
+
+        score = (f * 2) + r
+
+        migliori.append((n, score))
+
+    migliori.sort(key=lambda x: x[1], reverse=True)
+
+    # prendi top 2 numeri
+    top2 = [migliori[0][0], migliori[1][0]]
+    score_finale = migliori[0][1] + migliori[1][1]
 
     risultati[ruota] = {
         "ruota": ruota,
-        "ultima": estr[-1],
-        "caldi": numeri_top[:2],
-        "ambo": ambo,
-        "score": score_finale
+        "ambo": top2,
+        "score": round(score_finale, 2)
     }
 
-# SALVA RISULTATI
-with open("risultati.json","w") as f:
-    json.dump(risultati, f, indent=2)
+# 🔥 FILTRO FORTE
+filtrati = dict(
+    sorted(risultati.items(), key=lambda x: x[1]["score"], reverse=True)[:5]
+)
 
-# 🔥 SALVA STORICO (ELITE)
-oggi = datetime.now().strftime("%Y-%m-%d")
+with open("risultati.json", "w") as f:
+    json.dump(filtrati, f, indent=2)
 
-for r in risultati.values():
-    storico.append({
-        "data": oggi,
-        "ruota": r["ruota"],
-        "ambo": r["ambo"],
-        "score": r["score"]
-    })
-
-with open("storico.json","w") as f:
-    json.dump(storico, f, indent=2)
-
-print("ELITE attivo ✔")
+print("
