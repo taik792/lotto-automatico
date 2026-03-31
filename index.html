@@ -1,133 +1,39 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Lotto Elite Pro</title>
-
-<style>
-body {
-    background:#020617;
-    color:white;
-    font-family:Arial;
-    text-align:center;
-}
-
-h1 { color:#00ff99; }
-
-.box {
-    border:2px solid #00ff99;
-    border-radius:12px;
-    padding:15px;
-    margin:20px;
-}
-
-.grid {
-    display:grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap:15px;
-    padding:20px;
-}
-
-.card {
-    border:2px solid #00ff99;
-    border-radius:10px;
-    padding:12px;
-}
-
-.green { color:#00ff99; }
-.red { color:#ff4d4d; }
-.small { font-size:13px; opacity:0.8; }
-</style>
-</head>
-
-<body>
-
-<h1>🔥 LOTTO ELITE PRO</h1>
-
-<div id="top" class="box"></div>
-<div id="ruote" class="grid"></div>
-
 <script>
+fetch("risultati.json")
+  .then(res => res.json())
+  .then(data => {
 
-const ordineRuote = [
-  "Bari","Cagliari","Firenze","Genova",
-  "Milano","Napoli","Palermo","Roma",
-  "Torino","Venezia"
-];
+    const ordine = [
+      "Bari","Cagliari","Firenze","Genova","Milano",
+      "Napoli","Palermo","Roma","Torino","Venezia"
+    ];
 
-Promise.all([
-    fetch("risultati.json").then(r => r.json()),
-    fetch("estrazioni.json").then(r => r.json())
-])
-.then(([risultati, estrazioni]) => {
-
-    const container = document.getElementById("ruote");
+    const container = document.getElementById("grid");
     const topBox = document.getElementById("top");
 
-    // 🔥 CREA ARRAY COMPLETO (10 RUOTE SEMPRE)
-    let tutte = ordineRuote.map(nome => {
+    // TOP GIOCATE
+    topBox.innerHTML = data.top.map(r => {
+      const ruota = data.ruote[r];
+      return `${r} → ${ruota.ambo.join(" - ")}`;
+    }).join("<br>");
 
-        let r = risultati[nome];
+    // TUTTE LE RUOTE
+    ordine.forEach(nome => {
 
-        if(!r){
-            return {
-                ruota: nome,
-                ambo: ["-", "-"],
-                score: 0
-            };
-        }
+      const r = data.ruote[nome];
 
-        return r;
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <h2>${nome}</h2>
+        <p>Ultima: ${r.ultima.join(" - ")}</p>
+        <p class="green">Ambo: ${r.ambo.join(" - ")}</p>
+        <p class="red">Score: ${r.score}</p>
+      `;
+
+      container.appendChild(card);
     });
 
-    // 🔥 TOP 3
-    let top = [...tutte]
-        .sort((a,b)=>b.score-a.score)
-        .slice(0,3);
-
-    topBox.innerHTML = `
-        <h2>🔥 TOP GIOCATE</h2>
-        ${top.map(r => `${r.ruota} → ${r.ambo[0]} - ${r.ambo[1]}`).join("<br>")}
-    `;
-
-    // 🔁 PRENDE ULTIMA ESTRAZIONE (ULTIMA DEL FILE)
-    function getUltima(ruota){
-        let dati = estrazioni[ruota];
-        if(!dati || dati.length === 0) return [];
-        return dati[dati.length - 1];
-    }
-
-    container.innerHTML = "";
-
-    // 🔥 LOOP ORDINATO
-    tutte.forEach(r => {
-
-        let ultima = getUltima(r.ruota);
-
-        container.innerHTML += `
-            <div class="card">
-                <h3>${r.ruota}</h3>
-
-                <p class="small">
-                    Ultima: ${ultima.length ? ultima.join(" - ") : "-"}
-                </p>
-
-                <p class="green">
-                    Ambo: ${r.ambo[0]} - ${r.ambo[1]}
-                </p>
-
-                <p class="red">
-                    Score: ${r.score}
-                </p>
-            </div>
-        `;
-    });
-
-});
-
+  });
 </script>
-
-</body>
-</html>
