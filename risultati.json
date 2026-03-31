@@ -1,42 +1,151 @@
 {
-  "Cagliari": {
-    "ruota": "Cagliari",
-    "ambo": [
-      23,
-      33
-    ],
-    "score": 21
-  },
-  "Roma": {
-    "ruota": "Roma",
-    "ambo": [
-      66,
-      44
-    ],
-    "score": 21
-  },
-  "Bari": {
-    "ruota": "Bari",
-    "ambo": [
-      22,
-      1
-    ],
-    "score": 20
-  },
-  "Firenze": {
-    "ruota": "Firenze",
-    "ambo": [
-      49,
-      15
-    ],
-    "score": 20
-  },
-  "Palermo": {
-    "ruota": "Palermo",
-    "ambo": [
-      38,
-      83
-    ],
-    "score": 20
+  "top": [
+    "Bari",
+    "Roma",
+    "Cagliari",
+    "Firenze",
+    "Palermo"
+  ],
+  "ruote": {
+    "Bari": {
+      "ultima": [
+        53,
+        4,
+        1,
+        11,
+        9
+      ],
+      "ambo": [
+        51,
+        21
+      ],
+      "score": 11
+    },
+    "Cagliari": {
+      "ultima": [
+        67,
+        19,
+        47,
+        35,
+        64
+      ],
+      "ambo": [
+        23,
+        49
+      ],
+      "score": 8
+    },
+    "Firenze": {
+      "ultima": [
+        13,
+        48,
+        58,
+        39,
+        15
+      ],
+      "ambo": [
+        46,
+        72
+      ],
+      "score": 8
+    },
+    "Genova": {
+      "ultima": [
+        52,
+        87,
+        51,
+        79,
+        67
+      ],
+      "ambo": [
+        19,
+        58
+      ],
+      "score": 7
+    },
+    "Milano": {
+      "ultima": [
+        7,
+        79,
+        84,
+        28,
+        37
+      ],
+      "ambo": [
+        21,
+        58
+      ],
+      "score": 7
+    },
+    "Napoli": {
+      "ultima": [
+        26,
+        90,
+        68,
+        82,
+        67
+      ],
+      "ambo": [
+        66,
+        31
+      ],
+      "score": 7
+    },
+    "Palermo": {
+      "ultima": [
+        38,
+        57,
+        65,
+        20,
+        56
+      ],
+      "ambo": [
+        88,
+        85
+      ],
+      "score": 8
+    },
+    "Roma": {
+      "ultima": [
+        81,
+        66,
+        45,
+        53,
+        8
+      ],
+      "ambo": [
+        89,
+        44
+      ],
+      "score": 9
+    },
+    "Torino": {
+      "ultima": [
+        29,
+        47,
+        55,
+        78,
+        71
+      ],
+      "ambo": [
+        85,
+        4
+      ],
+      "score": 8
+    },
+    "Venezia": {
+      "ultima": [
+        7,
+        29,
+        76,
+        14,
+        15
+      ],
+      "ambo": [
+        66,
+        69
+      ],
+      "score": 8
+    }
   }
 }
