@@ -6,38 +6,31 @@ RUOTE = [
     "Napoli","Palermo","Roma","Torino","Venezia"
 ]
 
-def carica_estrazioni():
+def carica():
     with open("estrazioni.json", "r") as f:
         return json.load(f)
 
-def analizza_ruota(estrazioni_ruota):
-    if not estrazioni_ruota or len(estrazioni_ruota) < 2:
-        return {
-            "ultima": [],
-            "ambo": [0, 0],
-            "score": 0
-        }
+def analizza(estrazioni):
+    if not estrazioni:
+        return {"ultima": [], "ambo": [0,0], "score": 0}
 
-    ultime_estrazioni = estrazioni_ruota[-5:]
-    ultima = ultime_estrazioni[-1]
+    ultima = estrazioni[-1]
+    storico = estrazioni[-20:]
 
-    storico = estrazioni_ruota[-20:]
     numeri = [n for estr in storico for n in estr]
-
     freq = Counter(numeri)
-    numeri_ordinati = [n for n, _ in freq.most_common()]
 
-    candidati = [n for n in numeri_ordinati if n not in ultima]
-
-    if len(candidati) < 2:
-        candidati = numeri_ordinati
+    ordinati = [n for n,_ in freq.most_common()]
+    candidati = [n for n in ordinati if n not in ultima]
 
     if len(candidati) < 2:
-        candidati = list(range(1, 91))
+        candidati = ordinati
+
+    if len(candidati) < 2:
+        candidati = list(range(1,91))
 
     ambo = candidati[:2]
-
-    score = freq[ambo[0]] + freq[ambo[1]]
+    score = freq.get(ambo[0],0) + freq.get(ambo[1],0)
 
     return {
         "ultima": ultima,
@@ -45,25 +38,24 @@ def analizza_ruota(estrazioni_ruota):
         "score": score
     }
 
-def genera():
-    dati = carica_estrazioni()
+def main():
+    dati = carica()
     risultati = {}
 
-    for ruota in RUOTE:
-        estrazioni_ruota = dati.get(ruota, [])
-        risultati[ruota] = analizza_ruota(estrazioni_ruota)
+    for r in RUOTE:
+        risultati[r] = analizza(dati.get(r, []))
 
     top = sorted(risultati.items(), key=lambda x: x[1]["score"], reverse=True)[:5]
 
     output = {
-        "top": [r[0] for r in top],
+        "top": [t[0] for t in top],
         "ruote": risultati
     }
 
     with open("risultati.json", "w") as f:
         json.dump(output, f, indent=2)
 
-    print("OK generato")
+    print("OK")
 
 if __name__ == "__main__":
-    genera()
+    main()
