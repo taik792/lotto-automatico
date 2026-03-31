@@ -23,4 +23,4 @@ def analizza_ruota(estrazioni_ruota):
     ultima = ultime_estrazioni[-1]
 
     # frequenze ultime 20 estrazioni
-    storico = estrazioni_ruota[-20
+    storico = estrazioni_ruota[-20]
