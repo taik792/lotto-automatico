@@ -1,67 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
 <meta charset="UTF-8">
-<style>
-body { background:#020617; color:white; font-family:Arial; text-align:center; }
-.box {
-    border:2px solid #00ff99;
-    border-radius:12px;
-    padding:10px;
-    margin:10px;
-    display:inline-block;
-    width:220px;
-}
-.green { color:#00ff99; }
-.red { color:#ff4d4d; }
-</style>
-</head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lotto Elite Pro</title>
 
+<style>
+body {
+    background: #020617;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+h1 {
+    color: #00ff99;
+    margin-top: 20px;
+}
+
+.box {
+    border: 2px solid #00ff99;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 600px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    padding: 20px;
+}
+
+.card {
+    border: 2px solid #00ff99;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.green {
+    color: #00ff99;
+}
+
+.red {
+    color: #ff4d4d;
+}
+</style>
+
+</head>
 <body>
 
 <h1>🔥 LOTTO ELITE PRO</h1>
 
-<div id="top"></div>
-<div id="container"></div>
+<div id="top" class="box"></div>
+
+<div id="ruote" class="grid"></div>
 
 <script>
+fetch("risultati.json")
+.then(res => res.json())
+.then(data => {
 
-async function load(){
+    const container = document.getElementById("ruote");
+    const topBox = document.getElementById("top");
 
-const res = await fetch("risultati.json").then(r=>r.json());
-const est = await fetch("estrazioni.json").then(r=>r.json());
+    container.innerHTML = "";
 
-let topHTML = "<h3>TOP GIOCATE</h3>";
+    // 🔥 prendi tutte le ruote
+    let tutte = Object.values(data);
 
-Object.values(res).slice(0,3).forEach(r=>{
-    topHTML += `${r.ruota} → ${r.ambo.join(" - ")}<br>`;
-});
+    // 🔥 ordina per score
+    tutte.sort((a, b) => b.score - a.score);
 
-document.getElementById("top").innerHTML = topHTML;
+    // 🔝 top 3
+    let top = tutte.slice(0, 3);
 
-let html = "";
-
-Object.values(res).forEach(r=>{
-
-    let ultima = est[r.ruota];
-    ultima = ultima[ultima.length - 1];
-
-    html += `
-    <div class="box">
-        <b>${r.ruota}</b><br>
-        Ultima: ${ultima.join(" - ")}<br>
-        <span class="green">Ambo: ${r.ambo.join(" - ")}</span><br>
-        <span class="red">Score: ${r.score}</span>
-    </div>
+    // 🔥 mostra top
+    topBox.innerHTML = `
+        <h2>🔥 TOP GIOCATE</h2>
+        ${top.map(r => `${r.ruota} → ${r.ambo[0]} - ${r.ambo[1]}`).join("<br>")}
     `;
+
+    // 🔥 mostra tutte le ruote
+    tutte.forEach(r => {
+        container.innerHTML += `
+            <div class="card">
+                <h3>${r.ruota}</h3>
+                <p>Ultima: ${r.ultima.join(" - ")}</p>
+                <p>Caldi: ${r.caldi.join(" - ")}</p>
+                <p class="green">Ambo: ${r.ambo[0]} - ${r.ambo[1]}</p>
+                <p class="red">Score: ${r.score}</p>
+            </div>
+        `;
+    });
+
 });
-
-document.getElementById("container").innerHTML = html;
-
-}
-
-load();
-
 </script>
 
 </body>
