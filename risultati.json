@@ -4,7 +4,7 @@
     "Firenze",
     "Milano",
     "Palermo",
-    "Napoli"
+    "Cagliari"
   ],
   "ruote": {
     "Bari": {
@@ -19,7 +19,7 @@
         41,
         67
       ],
-      "score": 84
+      "score": 86
     },
     "Cagliari": {
       "ultima": [
@@ -33,7 +33,7 @@
         41,
         26
       ],
-      "score": 72
+      "score": 77
     },
     "Firenze": {
       "ultima": [
@@ -47,7 +47,7 @@
         47,
         90
       ],
-      "score": 82
+      "score": 85
     },
     "Genova": {
       "ultima": [
@@ -61,7 +61,7 @@
         70,
         66
       ],
-      "score": 66
+      "score": 72
     },
     "Milano": {
       "ultima": [
@@ -75,7 +75,7 @@
         45,
         85
       ],
-      "score": 80
+      "score": 84
     },
     "Napoli": {
       "ultima": [
@@ -89,7 +89,7 @@
         40,
         22
       ],
-      "score": 74
+      "score": 77
     },
     "Palermo": {
       "ultima": [
@@ -100,10 +100,10 @@
         52
       ],
       "ambo": [
-        46,
-        45
+        45,
+        46
       ],
-      "score": 78
+      "score": 82
     },
     "Roma": {
       "ultima": [
@@ -117,7 +117,7 @@
         17,
         63
       ],
-      "score": 58
+      "score": 66
     },
     "Torino": {
       "ultima": [
@@ -131,7 +131,7 @@
         65,
         49
       ],
-      "score": 60
+      "score": 66
     },
     "Venezia": {
       "ultima": [
@@ -145,7 +145,7 @@
         65,
         59
       ],
-      "score": 68
+      "score": 74
     }
   }
 }
