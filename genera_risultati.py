@@ -24,7 +24,7 @@ for ruota in RUOTE:
 
     # ultime estrazioni
     ultime = estrazioni_ruota[-1]
-    storico = estrazioni_ruota[-500:]  # ultime 500
+    storico = estrazioni_ruota[-20:]  # ultime 20
 
     # ===== FREQUENZE =====
     freq = {}
