@@ -12,9 +12,7 @@ body {
     text-align: center;
 }
 
-h1 {
-    color: #00ff99;
-}
+h1 { color: #00ff99; }
 
 .container {
     display: flex;
@@ -27,17 +25,11 @@ h1 {
     border-radius: 10px;
     padding: 15px;
     margin: 10px;
-    width: 200px;
+    width: 220px;
 }
 
-.ambo {
-    color: #00ff99;
-    font-weight: bold;
-}
-
-.score {
-    color: red;
-}
+.ambo { color: #00ff99; font-weight: bold; }
+.score { color: red; }
 </style>
 </head>
 
@@ -55,9 +47,8 @@ fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    // ===== TOP =====
-    const topDiv = document.getElementById("top");
-    topDiv.innerHTML = data.top.map(r => "👉 " + r).join("<br>");
+    document.getElementById("top").innerHTML =
+        data.top.map(r => "👉 " + r).join("<br>");
 
     const grid = document.getElementById("grid");
 
@@ -65,14 +56,18 @@ fetch("risultati.json")
 
         const r = data.ruote[ruota];
 
-        // format ambi
         const ambi = r.ambi.map(a => a.join("-")).join(" | ");
+
+        const giocati = r.giocati
+            .map(a => "👉 " + a.join("-"))
+            .join("<br>");
 
         const card = `
             <div class="card">
                 <h3>${ruota}</h3>
                 <div>Ultima: ${r.ultima.join(" - ")}</div>
-                <div class="ambo">Ambi: ${ambi}</div>
+                <div class="ambo">🎯 Giocati:<br>${giocati}</div>
+                <div style="font-size:12px;">Altri: ${ambi}</div>
                 <div class="score">Score: ${r.score}</div>
             </div>
         `;
