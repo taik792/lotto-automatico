@@ -6,37 +6,48 @@
 
 <style>
 body {
-  background: #050816;
-  color: white;
-  font-family: Arial;
-  text-align: center;
+    background: #0b0f1a;
+    color: white;
+    font-family: Arial;
+    text-align: center;
 }
 
-h1 { color: #00ff99; }
+h1 {
+    color: #00ff99;
+}
 
 .container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
-  gap: 15px;
-  padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .card {
-  border: 2px solid #00ff99;
-  border-radius: 15px;
-  padding: 15px;
+    border: 2px solid #00ff99;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    width: 200px;
 }
 
-.green { color:#00ff99; }
-.red { color:#ff4d4d; }
-</style>
+.ambo {
+    color: #00ff99;
+    font-weight: bold;
+}
 
+.score {
+    color: red;
+}
+</style>
 </head>
+
 <body>
 
 <h1>🔥 LOTTO ELITE PRO</h1>
 
+<h2>🔥 TOP GIOCATE</h2>
 <div id="top"></div>
+
 <div class="container" id="grid"></div>
 
 <script>
@@ -44,56 +55,31 @@ fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-  if (!data || !data.ruote) {
-    document.body.innerHTML = "❌ ERRORE JSON";
-    return;
-  }
+    // ===== TOP =====
+    const topDiv = document.getElementById("top");
+    topDiv.innerHTML = data.top.map(r => "👉 " + r).join("<br>");
 
-  const ordine = [
-    "Bari","Cagliari","Firenze","Genova","Milano",
-    "Napoli","Palermo","Roma","Torino","Venezia"
-  ];
+    const grid = document.getElementById("grid");
 
-  const grid = document.getElementById("grid");
-  const topBox = document.getElementById("top");
+    for (let ruota in data.ruote) {
 
-  // 🔥 TOP SICURO
-  const topArray = data.top || [];
+        const r = data.ruote[ruota];
 
-  topBox.innerHTML = `
-    <h2>🔥 TOP GIOCATE</h2>
-    ${topArray.map(r => {
-      const ruota = data.ruote[r];
-      if (!ruota) return "";
-      return `${r} → ${ruota.ambo.join(" - ")}`;
-    }).join("<br>")}
-  `;
+        // format ambi
+        const ambi = r.ambi.map(a => a.join("-")).join(" | ");
 
-  // 🔥 TUTTE LE RUOTE
-  ordine.forEach(nome => {
+        const card = `
+            <div class="card">
+                <h3>${ruota}</h3>
+                <div>Ultima: ${r.ultima.join(" - ")}</div>
+                <div class="ambo">Ambi: ${ambi}</div>
+                <div class="score">Score: ${r.score}</div>
+            </div>
+        `;
 
-    const r = data.ruote[nome];
+        grid.innerHTML += card;
+    }
 
-    const ultima = r?.ultima?.length ? r.ultima.join(" - ") : "-";
-    const ambo = r?.ambo?.length ? r.ambo.join(" - ") : "-";
-    const score = r?.score ?? 0;
-
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <h3>${nome}</h3>
-      <p>Ultima: ${ultima}</p>
-      <p class="green">Ambo: ${ambo}</p>
-      <p class="red">Score: ${score}</p>
-    `;
-
-    grid.appendChild(card);
-  });
-
-})
-.catch(err => {
-  document.body.innerHTML = "❌ JS ERROR: " + err;
 });
 </script>
 
