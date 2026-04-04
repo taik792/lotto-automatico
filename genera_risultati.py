@@ -24,7 +24,7 @@ for ruota in RUOTE:
         continue
 
     estrazioni_ruota = estrazioni[ruota]
-    if len(estrazioni_ruota) < 10:
+    if len(estrazioni_ruota) < 20:
         continue
 
     ultime = estrazioni_ruota[-1]
@@ -51,39 +51,39 @@ for ruota in RUOTE:
 
     for n in range(1, 91):
 
-        # penalità recenti
-        penalita = 0
-        if n in ultime:
-            penalita = 10
+        # penalità se appena uscito
+        penalita = 10 if n in ultime else 0
 
-        # presenza ultime 5
+        # ultime 5 estrazioni
         ultime_5 = estrazioni_ruota[-5:]
         presenze_recenti = sum(1 for estr in ultime_5 if n in estr)
 
-        # vicinanza numeri
-        vicini = [n-1, n+1]
-        bonus_vicini = sum(1 for v in vicini if v in ultime)
+        # numeri vicini
+        bonus_vicini = 0
+        if n-1 in ultime or n+1 in ultime:
+            bonus_vicini = 1
 
+        # ===== SCORE BILANCIATO =====
         score = (
-            freq_breve.get(n, 0) * 4 +
-            freq_medio.get(n, 0) * 2 +
-            freq_lungo.get(n, 0) * 1.5 +
-            (ritardi[n] ** 1.3) * 0.8 +
-            presenze_recenti * 3 +
-            bonus_vicini * 2 -
+            freq_breve.get(n, 0) * 3 +
+            freq_medio.get(n, 0) * 1.5 +
+            freq_lungo.get(n, 0) * 1 +
+            (ritardi[n] ** 1.2) * 0.5 +
+            presenze_recenti * 2 +
+            bonus_vicini * 1 -
             penalita
         )
 
-        # boost ritardi forti
+        # boost ritardi alti
         if ritardi[n] > 20:
-            score += ritardi[n] * 0.5
+            score += ritardi[n] * 0.3
 
-        # spike (numero forte breve + lungo)
+        # spike (forte breve + lungo)
         if freq_breve.get(n,0) > 2 and freq_lungo.get(n,0) > 15:
-            score += 10
+            score += 5
 
         # random leggero
-        score += random.uniform(0, 1.5)
+        score += random.uniform(0, 0.5)
 
         score_num[n] = score
 
@@ -91,16 +91,25 @@ for ruota in RUOTE:
     candidati = [n for n in range(1, 91) if n not in ultime]
     candidati.sort(key=lambda x: score_num[x], reverse=True)
 
-    top6 = candidati[:6]
+    # ===== GENERAZIONE 3 AMBI DIVERSI =====
+    top10 = candidati[:10]
+    ambi = []
+    usati = set()
 
-    # ===== 3 AMBI =====
-    ambi = [
-        [top6[0], top6[1]],  # forte
-        [top6[2], top6[3]],  # medio
-        [top6[4], top6[5]]   # copertura
-    ]
+    for n in top10:
+        if n in usati:
+            continue
+        for m in top10:
+            if m != n and m not in usati:
+                ambi.append([n, m])
+                usati.add(n)
+                usati.add(m)
+                break
+        if len(ambi) == 3:
+            break
 
-    score_finale = round(sum(score_num[n] for n in top6[:2]), 2)
+    # score ruota (solo primo ambo)
+    score_finale = round(score_num[ambi[0][0]] + score_num[ambi[0][1]], 2)
 
     risultati["ruote"][ruota] = {
         "ultima": ultime,
@@ -117,7 +126,8 @@ top_sorted = sorted(
 
 risultati["top"] = [t[0] for t in top_sorted[:5]]
 
+# ===== SALVATAGGIO =====
 with open("risultati.json", "w", encoding="utf-8") as f:
     json.dump(risultati, f, indent=2)
 
-print("🔥 ELITE MODE ATTIVO")
+print("🔥 ELITE COMPLETO ATTIVO")
