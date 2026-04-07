@@ -27,3 +27,57 @@ body {
 
 .ultima {
     font-size:12px;
+    color:#ccc;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 LOTTO ELITE PRO</h1>
+
+<h2>🎯 GIOCATE CONSIGLIATE</h2>
+<div id="giocate">Caricamento...</div>
+
+<h2>💣 JOLLY</h2>
+<div id="jolly"></div>
+
+<script>
+fetch("risultati.json")
+.then(res => res.json())
+.then(data => {
+
+    let html = "";
+
+    data.giocate.forEach(g => {
+
+        const ultima = data.ruote[g.ruota].ultima.join(" - ");
+
+        html += `
+        <div class="card">
+            <strong>${g.ruota}</strong><br>
+            <div class="ultima">Ultima: ${ultima}</div><br>
+            <div class="ambo">${g.ambo.join("-")}</div>
+        </div>
+        `;
+    });
+
+    document.getElementById("giocate").innerHTML = html;
+
+    const ultimaJolly = data.ruote[data.jolly.ruota].ultima.join(" - ");
+
+    document.getElementById("jolly").innerHTML = `
+        <div class="card">
+            <strong>${data.jolly.ruota}</strong><br>
+            <div class="ultima">Ultima: ${ultimaJolly}</div><br>
+            <div class="ambo">${data.jolly.ambo.join("-")}</div>
+        </div>
+    `;
+})
+.catch(err => {
+    document.body.innerHTML = "<h2 style='color:red'>Errore: " + err + "</h2>";
+});
+</script>
+
+</body>
+</html>
