@@ -5,43 +5,25 @@
 <title>Lotto Elite Pro</title>
 
 <style>
-body { background:#0b0f1a; color:white; text-align:center; font-family:Arial;}
-.card { border:2px solid #00ff99; margin:10px; padding:10px; border-radius:10px;}
-.ambo { color:#00ff99; font-weight:bold;}
-</style>
-</head>
+body {
+    background:#0b0f1a;
+    color:white;
+    text-align:center;
+    font-family:Arial;
+}
 
-<body>
+.card {
+    border:2px solid #00ff99;
+    margin:10px;
+    padding:12px;
+    border-radius:10px;
+}
 
-<h1>🔥 LOTTO ELITE PRO</h1>
+.ambo {
+    color:#00ff99;
+    font-weight:bold;
+    font-size:18px;
+}
 
-<h2>🎯 GIOCATE CONSIGLIATE</h2>
-<div id="giocate"></div>
-
-<h2>💣 JOLLY</h2>
-<div id="jolly"></div>
-
-<script>
-fetch("risultati.json")
-.then(res => res.json())
-.then(data => {
-
-    const g = data.giocate.map(x =>
-        `<div class="card">
-            ${x.ruota}<br>
-            <span class="ambo">${x.ambo.join("-")}</span>
-        </div>`
-    ).join("");
-
-    document.getElementById("giocate").innerHTML = g;
-
-    document.getElementById("jolly").innerHTML =
-        `<div class="card">
-            Roma<br>
-            <span class="ambo">${data.jolly.ambo.join("-")}</span>
-        </div>`;
-});
-</script>
-
-</body>
-</html>
+.ultima {
+    font-size:12px;
