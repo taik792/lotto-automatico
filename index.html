@@ -8,26 +8,49 @@
 body {
     background:#0b0f1a;
     color:white;
-    text-align:center;
     font-family:Arial;
+    text-align:center;
 }
 
+/* TOP */
+.top {
+    margin:20px;
+}
+
+.top span {
+    display:block;
+    color:#ffd700;
+    font-weight:bold;
+}
+
+/* GRID */
+.grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap:15px;
+    padding:10px;
+}
+
+/* CARD */
 .card {
     border:2px solid #00ff99;
-    margin:10px;
-    padding:12px;
+    padding:10px;
     border-radius:10px;
 }
 
 .ambo {
     color:#00ff99;
     font-weight:bold;
-    font-size:18px;
 }
 
 .ultima {
     font-size:12px;
     color:#ccc;
+}
+
+.score {
+    color:red;
+    font-size:12px;
 }
 </style>
 </head>
@@ -36,43 +59,53 @@ body {
 
 <h1>🔥 LOTTO ELITE PRO</h1>
 
-<h2>🎯 GIOCATE CONSIGLIATE</h2>
-<div id="giocate">Caricamento...</div>
+<div class="top">
+    <h2>🎯 GIOCATE CONSIGLIATE</h2>
+    <div id="top"></div>
 
-<h2>💣 JOLLY</h2>
-<div id="jolly"></div>
+    <h2>💣 JOLLY</h2>
+    <div id="jolly"></div>
+</div>
+
+<div class="grid" id="grid"></div>
 
 <script>
 fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    let html = "";
+    // ===== TOP =====
+    let topHtml = "";
 
     data.giocate.forEach(g => {
+        topHtml += `<span>👉 ${g.ruota} → ${g.ambo.join("-")}</span>`;
+    });
 
-        const ultima = data.ruote[g.ruota].ultima.join(" - ");
+    document.getElementById("top").innerHTML = topHtml;
 
-        html += `
+    // ===== JOLLY =====
+    document.getElementById("jolly").innerHTML =
+        `<span>💣 ${data.jolly.ruota} → ${data.jolly.ambo.join("-")}</span>`;
+
+    // ===== GRID RUOTE =====
+    let gridHtml = "";
+
+    Object.entries(data.ruote).forEach(([ruota, r]) => {
+
+        const ultima = r.ultima.join(" - ");
+
+        gridHtml += `
         <div class="card">
-            <strong>${g.ruota}</strong><br>
+            <strong>${ruota}</strong><br>
             <div class="ultima">Ultima: ${ultima}</div><br>
-            <div class="ambo">${g.ambo.join("-")}</div>
+            <div class="ambo">${r.ambo.join("-")}</div>
+            <div class="score">Score: ${r.score.toFixed(2)}</div>
         </div>
         `;
     });
 
-    document.getElementById("giocate").innerHTML = html;
+    document.getElementById("grid").innerHTML = gridHtml;
 
-    const ultimaJolly = data.ruote[data.jolly.ruota].ultima.join(" - ");
-
-    document.getElementById("jolly").innerHTML = `
-        <div class="card">
-            <strong>${data.jolly.ruota}</strong><br>
-            <div class="ultima">Ultima: ${ultimaJolly}</div><br>
-            <div class="ambo">${data.jolly.ambo.join("-")}</div>
-        </div>
-    `;
 })
 .catch(err => {
     document.body.innerHTML = "<h2 style='color:red'>Errore: " + err + "</h2>";
