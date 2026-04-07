@@ -33,7 +33,6 @@ for ruota in RUOTE:
     if len(estrazioni_ruota) < 20:
         continue
 
-    # ultima estrazione (dato che il file è ordinato dal più vecchio al più recente)
     ultime = estrazioni_ruota[-1]
 
     breve = estrazioni_ruota[-20:]
@@ -44,7 +43,7 @@ for ruota in RUOTE:
     freq_medio = calcola_freq(medio)
     freq_lungo = calcola_freq(lungo)
 
-    # ===== CALCOLO RITARDI =====
+    # ===== RITARDI =====
     ritardi = {}
     for n in range(1, 91):
         ritardo = 0
@@ -54,7 +53,6 @@ for ruota in RUOTE:
             ritardo += 1
         ritardi[n] = ritardo
 
-    # ===== SCORE NUMERI =====
     score_num = {}
 
     ultime_5 = estrazioni_ruota[-5:]
@@ -100,7 +98,7 @@ for ruota in RUOTE:
         "score": score_ambo
     }
 
-# ===== TOP 3 RUOTE =====
+# ===== TOP 3 =====
 top_sorted = sorted(
     risultati["ruote"].items(),
     key=lambda x: x[1]["score"],
@@ -120,7 +118,9 @@ for ruota, dati in top3:
 
 risultati["giocate"] = giocate
 
-# ===== JOLLY =====
+# ===== JOLLY DINAMICO =====
+
+# 1. ambo più forte globale
 miglior_ambo = None
 miglior_score = 0
 
@@ -129,13 +129,33 @@ for ruota, dati in risultati["ruote"].items():
         miglior_score = dati["score"]
         miglior_ambo = dati["ambo"]
 
+# 2. calcolo attività ruote (ultime 10 estrazioni)
+attivita_ruote = {}
+
+for ruota in RUOTE:
+    if ruota not in estrazioni:
+        continue
+
+    estrazioni_ruota = estrazioni[ruota]
+    ultime_10 = estrazioni_ruota[-10:]
+
+    count = 0
+    for estr in ultime_10:
+        count += len(estr)
+
+    attivita_ruote[ruota] = count
+
+# 3. scegli ruota più attiva
+ruota_jolly = max(attivita_ruote, key=attivita_ruote.get)
+
+# 4. assegna jolly
 risultati["jolly"] = {
-    "ruota": "Roma",
+    "ruota": ruota_jolly,
     "ambo": miglior_ambo
 }
 
-# ===== SALVA FILE =====
+# ===== SALVA =====
 with open("risultati.json", "w", encoding="utf-8") as f:
     json.dump(risultati, f, indent=2)
 
-print("🔥 AUTO TOTALE OK")
+print("🔥 AUTO TOTALE + JOLLY DINAMICO ATTIVO")
