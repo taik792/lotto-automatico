@@ -5,31 +5,9 @@
 <title>Lotto Elite Pro</title>
 
 <style>
-body {
-    background: #0b0f1a;
-    color: white;
-    font-family: Arial;
-    text-align: center;
-}
-
-h1 { color: #00ff99; }
-
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.card {
-    border: 2px solid #00ff99;
-    border-radius: 10px;
-    padding: 15px;
-    margin: 10px;
-    width: 220px;
-}
-
-.ambo { color: #00ff99; font-weight: bold; }
-.score { color: red; }
+body { background:#0b0f1a; color:white; text-align:center; font-family:Arial;}
+.card { border:2px solid #00ff99; margin:10px; padding:10px; border-radius:10px;}
+.ambo { color:#00ff99; font-weight:bold;}
 </style>
 </head>
 
@@ -37,44 +15,31 @@ h1 { color: #00ff99; }
 
 <h1>🔥 LOTTO ELITE PRO</h1>
 
-<h2>🔥 TOP GIOCATE</h2>
-<div id="top"></div>
+<h2>🎯 GIOCATE CONSIGLIATE</h2>
+<div id="giocate"></div>
 
-<div class="container" id="grid"></div>
+<h2>💣 JOLLY</h2>
+<div id="jolly"></div>
 
 <script>
 fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    document.getElementById("top").innerHTML =
-        data.top.map(r => "👉 " + r).join("<br>");
+    const g = data.giocate.map(x =>
+        `<div class="card">
+            ${x.ruota}<br>
+            <span class="ambo">${x.ambo.join("-")}</span>
+        </div>`
+    ).join("");
 
-    const grid = document.getElementById("grid");
+    document.getElementById("giocate").innerHTML = g;
 
-    for (let ruota in data.ruote) {
-
-        const r = data.ruote[ruota];
-
-        const ambi = r.ambi.map(a => a.join("-")).join(" | ");
-
-        const giocati = r.giocati
-            .map(a => "👉 " + a.join("-"))
-            .join("<br>");
-
-        const card = `
-            <div class="card">
-                <h3>${ruota}</h3>
-                <div>Ultima: ${r.ultima.join(" - ")}</div>
-                <div class="ambo">🎯 Giocati:<br>${giocati}</div>
-                <div style="font-size:12px;">Altri: ${ambi}</div>
-                <div class="score">Score: ${r.score}</div>
-            </div>
-        `;
-
-        grid.innerHTML += card;
-    }
-
+    document.getElementById("jolly").innerHTML =
+        `<div class="card">
+            Roma<br>
+            <span class="ambo">${data.jolly.ambo.join("-")}</span>
+        </div>`;
 });
 </script>
 
