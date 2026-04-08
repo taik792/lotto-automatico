@@ -2,74 +2,105 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Lotto Elite Pro</title>
 
 <style>
 body {
-    background: #020617;
-    color: white;
-    font-family: Arial;
-    text-align: center;
+    background:#020617;
+    color:white;
+    font-family:Arial;
+    text-align:center;
 }
 
+/* TITOLI */
 h1 {
-    color: #00ffa2;
+    color:#00ffaa;
+    margin-top:20px;
 }
 
+h2 {
+    color:#ffaa00;
+}
+
+/* TOP GIOCATE */
 .top-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px;
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:10px;
 }
 
 .top-box {
-    border: 2px solid gold;
-    padding: 10px;
-    border-radius: 10px;
-    min-width: 90px;
+    border:2px solid #ffaa00;
+    border-radius:10px;
+    padding:10px 20px;
+    font-size:22px;
+    font-weight:bold;
 }
 
-.jolly {
-    margin: 15px;
-    padding: 10px;
-    border: 2px solid red;
-    display: inline-block;
-    border-radius: 10px;
+/* JOLLY */
+.jolly-box {
+    border:2px solid red;
+    border-radius:10px;
+    padding:10px 20px;
+    display:inline-block;
+    margin:10px 0;
+    font-size:20px;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    padding: 20px;
+/* GRIGLIA */
+.container {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    padding:20px;
 }
 
+/* CARD */
 .card {
-    border: 2px solid #00ffa2;
-    border-radius: 12px;
-    padding: 10px;
+    border:1px solid #00ffaa;
+    border-radius:12px;
+    padding:15px;
+    box-shadow:0 0 8px rgba(0,255,170,0.15);
 }
 
-.ball {
-    display: inline-block;
-    background: #444;
-    border-radius: 50%;
-    padding: 6px 10px;
-    margin: 3px;
+/* NUMERI ULTIMA ESTRAZIONE */
+.numbers span {
+    display:inline-block;
+    width:32px;
+    height:32px;
+    line-height:32px;
+    border-radius:50%;
+    margin:2px;
+    font-weight:bold;
+    font-size:14px;
+
+    /* GIALLO SOFT */
+    background:rgba(255, 200, 0, 0.25);
+    border:1px solid rgba(255, 200, 0, 0.35);
 }
 
-.ambo {
-    margin-top: 10px;
-    font-size: 20px;
-    color: #00ffa2;
+/* AMBI (FIX SFUOCATURA) */
+.ambo-box span {
+    display:inline-block;
+    background:#00c78c;
+    color:#02120c;
+    padding:6px 12px;
+    border-radius:6px;
+    margin:3px;
+    font-weight:700;
+    font-size:20px;
+
+    box-shadow:none;
+    border:1px solid rgba(0,255,150,0.4);
 }
 
+/* SCORE */
 .score {
-    font-size: 12px;
-    color: red;
+    color:#ff4444;
+    margin-top:5px;
+    font-size:13px;
 }
 </style>
 </head>
@@ -77,64 +108,67 @@ h1 {
 <body>
 
 <h1>🔥 LOTTO ELITE PRO</h1>
-
 <h2>🎯 GIOCATE CONSIGLIATE</h2>
 
-<div id="top" class="top-container"></div>
+<div class="top-container" id="top"></div>
 
-<div>
-    <h3>💣 JOLLY</h3>
-    <div id="jolly" class="jolly"></div>
-</div>
+<div id="jolly"></div>
 
-<div id="grid" class="grid"></div>
+<div class="container" id="grid"></div>
 
 <script>
-fetch('risultati.json')
+fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    // TOP
-    const topDiv = document.getElementById("top");
-    topDiv.innerHTML = "";
+    /* TOP GIOCATE */
+    let topDiv = document.getElementById("top");
 
-    data.top.forEach(r => {
-        const ambo = data.ruote[r].ambo;
-        topDiv.innerHTML += `
-            <div class="top-box">
-                <b>${r}</b><br>
-                ${ambo[0]} - ${ambo[1]}
-            </div>
-        `;
+    data.top.forEach(ruota => {
+        let r = data.ruote[ruota];
+
+        let div = document.createElement("div");
+        div.className = "top-box";
+        div.innerHTML = `${ruota}<br>${r.ambo[0]} - ${r.ambo[1]}`;
+        topDiv.appendChild(div);
     });
 
-    // JOLLY
-    const j = data.jolly;
-    const jAmbo = data.ruote[j].ambo;
+    /* JOLLY */
+    let jollyRuota = data.jolly.ruota;
+    let jollyAmbo = data.jolly.ambo;
 
-    document.getElementById("jolly").innerHTML =
-        `<b>${j}</b><br>${jAmbo[0]} - ${jAmbo[1]}`;
+    document.getElementById("jolly").innerHTML = `
+        <h2>💣 JOLLY</h2>
+        <div class="jolly-box">
+            ${jollyRuota}<br>${jollyAmbo[0]} - ${jollyAmbo[1]}
+        </div>
+    `;
 
-    // GRIGLIA
-    const grid = document.getElementById("grid");
-    grid.innerHTML = "";
+    /* GRIGLIA */
+    let grid = document.getElementById("grid");
 
-    Object.keys(data.ruote).forEach(r => {
+    Object.keys(data.ruote).forEach(nome => {
+        let r = data.ruote[nome];
 
-        const ruota = data.ruote[r];
+        let card = document.createElement("div");
+        card.className = "card";
 
-        const balls = ruota.ultima.map(n =>
-            `<span class="ball">${n}</span>`
-        ).join("");
+        let numeri = r.ultima.map(n => `<span>${n}</span>`).join("");
 
-        grid.innerHTML += `
-            <div class="card">
-                <h3>${r}</h3>
-                <div>${balls}</div>
-                <div class="ambo">${ruota.ambo[0]} - ${ruota.ambo[1]}</div>
-                <div class="score">Score: ${ruota.score}</div>
+        card.innerHTML = `
+            <h3>${nome}</h3>
+
+            <div class="numbers">${numeri}</div>
+
+            <div class="ambo-box">
+                <span>${r.ambo[0]}</span>
+                <span>${r.ambo[1]}</span>
             </div>
+
+            <div class="score">Score: ${r.score.toFixed(2)}</div>
         `;
+
+        grid.appendChild(card);
     });
 
 });
