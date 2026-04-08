@@ -6,7 +6,7 @@
 
 <style>
 body {
-    background: linear-gradient(180deg, #0b0f1a, #05070d);
+    background:#020617;
     color:white;
     font-family:Arial;
     text-align:center;
@@ -14,115 +14,93 @@ body {
 
 /* TITOLI */
 h1 {
+    color:#00ffaa;
     margin-top:20px;
 }
 
-/* ===== TOP ===== */
+h2 {
+    color:#ffaa00;
+}
+
+/* TOP GIOCATE */
 .top-container {
-    margin:20px;
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:10px;
 }
 
-.top-grid {
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap:10px;
-}
-
-.top-card {
-    border:2px solid gold;
-    border-radius:12px;
-    padding:10px;
-    background:#111;
-}
-
-.top-ruota {
-    color:gold;
-    font-size:14px;
-}
-
-.top-ambo {
-    font-size:26px;
-    font-weight:bold;
-}
-
-/* JOLLY */
-.jolly {
-    margin-top:15px;
-    border:2px solid red;
-    border-radius:12px;
-    padding:10px;
-    display:inline-block;
-}
-
-.jolly .ambo {
+.top-box {
+    border:2px solid #ffaa00;
+    border-radius:10px;
+    padding:10px 20px;
     font-size:22px;
     font-weight:bold;
 }
 
-/* ===== GRID ===== */
-.grid {
+/* JOLLY */
+.jolly-box {
+    border:2px solid red;
+    border-radius:10px;
+    padding:10px 20px;
+    display:inline-block;
+    margin:10px 0;
+    font-size:20px;
+}
+
+/* GRIGLIA */
+.container {
     display:grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns:repeat(3,1fr);
     gap:15px;
-    padding:10px;
+    padding:20px;
 }
 
+/* CARD */
 .card {
-    border:2px solid #00ff99;
+    border:1px solid #00ffaa;
     border-radius:12px;
-    padding:10px;
-    background:#0e1628;
+    padding:15px;
+    box-shadow:0 0 8px rgba(0,255,170,0.15);
 }
 
-/* NUMERI */
-.ball {
+/* NUMERI ULTIMA ESTRAZIONE */
+.numbers span {
     display:inline-block;
-    width:30px;
-    height:30px;
-    line-height:30px;
+    width:32px;
+    height:32px;
+    line-height:32px;
     border-radius:50%;
-    margin:3px;
-    font-size:13px;
-    font-weight:bold;
-}
-
-/* COLORI BASE */
-.caldo { background:#ff3b3b; }
-.freddo { background:#00aaff; color:black; }
-.normale { background:#1e2a44; }
-
-/* ⭐ ULTIMA ESTRAZIONE SOFT */
-.ultima {
-    background: rgba(255, 215, 0, 0.25);
-    color: #ffd700;
-    border: 1px solid #ffd700;
-}
-
-/* 💎 AMBI ELEGANTI */
-.ambo-box span {
-    display:inline-block;
-    background:#00b377;
-    color:white;
-    padding:6px 12px;
-    border-radius:8px;
     margin:2px;
     font-weight:bold;
+    font-size:14px;
+
+    /* GIALLO SOFT */
+    background:rgba(255, 200, 0, 0.25);
+    border:1px solid rgba(255, 200, 0, 0.35);
+}
+
+/* AMBI (FIX SFUOCATURA) */
+.ambo-box span {
+    display:inline-block;
+    background:#00c78c;
+    color:#02120c;
+    padding:6px 12px;
+    border-radius:6px;
+    margin:3px;
+    font-weight:700;
     font-size:20px;
-    box-shadow:0 0 6px rgba(0,179,119,0.4);
+
+    box-shadow:none;
+    border:1px solid rgba(0,255,150,0.4);
 }
 
 /* SCORE */
 .score {
-    font-size:11px;
-    color:#ff4d4d;
-    opacity:0.6;
-}
-
-/* MOBILE */
-@media (max-width:600px){
-    .grid, .top-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    color:#ff4444;
+    margin-top:5px;
+    font-size:13px;
 }
 </style>
 </head>
@@ -130,83 +108,69 @@ h1 {
 <body>
 
 <h1>🔥 LOTTO ELITE PRO</h1>
+<h2>🎯 GIOCATE CONSIGLIATE</h2>
 
-<!-- TOP -->
-<div class="top-container">
-    <h2>🎯 GIOCATE CONSIGLIATE</h2>
-    <div class="top-grid" id="top"></div>
+<div class="top-container" id="top"></div>
 
-    <h2>💣 JOLLY</h2>
-    <div id="jolly"></div>
-</div>
+<div id="jolly"></div>
 
-<!-- GRID -->
-<div class="grid" id="grid"></div>
+<div class="container" id="grid"></div>
 
 <script>
 fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    // ===== TOP =====
-    let topHtml = "";
-    data.giocate.forEach(g => {
-        topHtml += `
-        <div class="top-card">
-            <div class="top-ruota">${g.ruota}</div>
-            <div class="top-ambo">${g.ambo.join(" — ")}</div>
-        </div>
-        `;
-    });
-    document.getElementById("top").innerHTML = topHtml;
+    /* TOP GIOCATE */
+    let topDiv = document.getElementById("top");
 
-    // ===== JOLLY =====
+    data.top.forEach(ruota => {
+        let r = data.ruote[ruota];
+
+        let div = document.createElement("div");
+        div.className = "top-box";
+        div.innerHTML = `${ruota}<br>${r.ambo[0]} - ${r.ambo[1]}`;
+        topDiv.appendChild(div);
+    });
+
+    /* JOLLY */
+    let jollyRuota = data.jolly.ruota;
+    let jollyAmbo = data.jolly.ambo;
+
     document.getElementById("jolly").innerHTML = `
-        <div class="jolly">
-            ${data.jolly.ruota}<br>
-            <div class="ambo">${data.jolly.ambo.join(" — ")}</div>
+        <h2>💣 JOLLY</h2>
+        <div class="jolly-box">
+            ${jollyRuota}<br>${jollyAmbo[0]} - ${jollyAmbo[1]}
         </div>
     `;
 
-    // ===== COLORI =====
-    function coloreNumero(n, ultima){
-        if(ultima.includes(n)) return "ultima";
-        if(n <= 30) return "freddo";
-        if(n >= 60) return "caldo";
-        return "normale";
-    }
+    /* GRIGLIA */
+    let grid = document.getElementById("grid");
 
-    // ===== GRID =====
-    let gridHtml = "";
+    Object.keys(data.ruote).forEach(nome => {
+        let r = data.ruote[nome];
 
-    Object.entries(data.ruote).forEach(([ruota, r]) => {
+        let card = document.createElement("div");
+        card.className = "card";
 
-        let numeri = r.ultima.map(n =>
-            `<span class="ball ${coloreNumero(n, r.ultima)}">${n}</span>`
-        ).join("");
+        let numeri = r.ultima.map(n => `<span>${n}</span>`).join("");
 
-        let ambo = r.ambo.map(n => `<span>${n}</span>`).join("");
+        card.innerHTML = `
+            <h3>${nome}</h3>
 
-        gridHtml += `
-        <div class="card">
-            <strong>${ruota}</strong>
+            <div class="numbers">${numeri}</div>
 
-            <div>${numeri}</div>
-
-            <div class="ambo-box">${ambo}</div>
-
-            <div class="score">
-                Score: ${r.score.toFixed(2)}
+            <div class="ambo-box">
+                <span>${r.ambo[0]}</span>
+                <span>${r.ambo[1]}</span>
             </div>
-        </div>
+
+            <div class="score">Score: ${r.score.toFixed(2)}</div>
         `;
+
+        grid.appendChild(card);
     });
 
-    document.getElementById("grid").innerHTML = gridHtml;
-
-})
-.catch(err => {
-    document.body.innerHTML = "<h2 style='color:red'>Errore: " + err + "</h2>";
 });
 </script>
 
