@@ -37,7 +37,7 @@ for ruota in RUOTE:
 
     breve = estrazioni_ruota[-20:]
     medio = estrazioni_ruota[-50:]
-    lungo = estrazioni_ruota[-500:]
+    lungo = estrazioni_ruota[-80:]
 
     freq_breve = calcola_freq(breve)
     freq_medio = calcola_freq(medio)
