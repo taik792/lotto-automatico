@@ -38,7 +38,7 @@ for ruota, estrazioni in estrazioni_per_ruota.items():
     freq_ruota[ruota] = freq
 
 # ======================
-# RUOTE GEMELLE (CORRELATE)
+# RUOTE GEMELLE
 # ======================
 def similarita(f1, f2):
     return sum(min(f1[n], f2[n]) for n in range(1, 91))
@@ -64,7 +64,7 @@ for r1 in ruote:
     ruota_gemella[r1] = best
 
 # ======================
-# UNIONE ESTRAZIONI GLOBALI
+# UNIONE ESTRAZIONI
 # ======================
 estrazioni = []
 
@@ -112,12 +112,11 @@ for n in range(1, 91):
     score_num[n] = freq[n]*1.2 + ritardi[n]*0.8
 
 # ======================
-# GENERA AMBI
+# AMBI
 # ======================
 ambi = []
 
 for n1 in range(1, 91):
-
     best = None
     best_score = 0
 
@@ -125,10 +124,7 @@ for n1 in range(1, 91):
         if n1 == n2:
             continue
 
-        score = (
-            freq_coppie[n1][n2]*2 +
-            score_num[n2]
-        )
+        score = freq_coppie[n1][n2]*2 + score_num[n2]
 
         if score > best_score:
             best_score = score
@@ -136,25 +132,52 @@ for n1 in range(1, 91):
 
     if best:
         ambi.append({
-            "ambo": sorted([n1, best]),
-            "raw_score": best_score
+            "numeri": sorted([n1, best]),
+            "raw": best_score
         })
 
 # ======================
-# NORMALIZZA PROBABILITÀ
+# NORMALIZZA
 # ======================
-max_score = max(a["raw_score"] for a in ambi)
+max_score = max(a["raw"] for a in ambi)
 
 for a in ambi:
-    a["prob"] = round((a["raw_score"] / max_score) * 100, 2)
+    a["prob"] = round((a["raw"] / max_score) * 100, 2)
 
-# ======================
-# ORDINA
-# ======================
 ambi.sort(key=lambda x: x["prob"], reverse=True)
 
-top = ambi[:3]
-ambi = ambi[:20]
+top_ambi = ambi[:2]
+
+# ======================
+# TERNI
+# ======================
+terni = []
+
+for a in top_ambi:
+    n1, n2 = a["numeri"]
+
+    best_n3 = None
+    best_score = 0
+
+    for n3 in range(1, 91):
+        if n3 in [n1, n2]:
+            continue
+
+        score = (
+            freq_coppie[n1][n3] +
+            freq_coppie[n2][n3] +
+            score_num[n3]
+        )
+
+        if score > best_score:
+            best_score = score
+            best_n3 = n3
+
+    if best_n3:
+        terni.append({
+            "numeri": sorted([n1, n2, best_n3]),
+            "prob": round((best_score / max_score) * 100, 2)
+        })
 
 # ======================
 # OUTPUT
@@ -162,11 +185,11 @@ ambi = ambi[:20]
 output = {
     "ultime_estrazioni": ultime,
     "ruote_gemelle": ruota_gemella,
-    "top": top,
-    "ambi": ambi
+    "top_ambi": top_ambi,
+    "top_terni": terni
 }
 
 with open(file_output, "w") as f:
     json.dump(output, f, indent=2)
 
-print("✅ Sistema PRO reale attivo")
+print("✅ VERSIONE COMPATTA ATTIVA")
