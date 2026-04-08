@@ -2,9 +2,15 @@ fetch("risultati.json")
   .then(res => res.json())
   .then(data => {
 
-    // ESTRAZIONI
     const estrDiv = document.getElementById("estrazioni");
+    const ambiDiv = document.getElementById("ambi");
+    const terniDiv = document.getElementById("terni");
 
+    estrDiv.innerHTML = "";
+    ambiDiv.innerHTML = "";
+    terniDiv.innerHTML = "";
+
+    // ESTRAZIONI
     for (const r in data.ultime_estrazioni) {
       estrDiv.innerHTML += `
         <div class="card">
@@ -14,9 +20,7 @@ fetch("risultati.json")
       `;
     }
 
-    // AMBI TOP (CON RUOTA)
-    const ambiDiv = document.getElementById("ambi");
-
+    // AMBI
     data.top_ambi.forEach(a => {
       ambiDiv.innerHTML += `
         <div class="card top">
@@ -27,9 +31,7 @@ fetch("risultati.json")
       `;
     });
 
-    // RUOTA JOLLY
-    const terniDiv = document.getElementById("terni");
-
+    // JOLLY
     terniDiv.innerHTML = `
       <div class="card">
         🎯 RUOTA JOLLY<br>
