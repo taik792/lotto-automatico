@@ -25,18 +25,36 @@ GEMELLE = {
     "Venezia": "Torino"
 }
 
-
-# 📥 carica estrazioni
+# =========================
+# 📥 CARICAMENTO SICURO DATI
+# =========================
 with open("estrazioni.json") as f:
-    data = json.load(f)
+    raw = json.load(f)
 
-estrazioni = data[-LUNGO:]  # prendiamo ultime N
+# 🔥 SUPPORTA TUTTI I FORMATI
+if isinstance(raw, list):
+    estrazioni = raw
+elif isinstance(raw, dict):
+    if "estrazioni" in raw:
+        estrazioni = raw["estrazioni"]
+    else:
+        # caso tipo {"2024-01-01": {...}}
+        estrazioni = list(raw.values())
+else:
+    raise Exception("Formato estrazioni.json non valido")
+
+# ordina per sicurezza (dal più vecchio al più nuovo)
+estrazioni = list(estrazioni)
+
+# prendi ultime
+estrazioni = estrazioni[-LUNGO:]
 
 
-# 🔢 calcolo ritardi
+# =========================
+# 🔢 CALCOLO RITARDI
+# =========================
 def calcola_ritardi(ruota, window):
     ritardi = {n: 0 for n in range(1, 91)}
-
     subset = estrazioni[-window:]
 
     for numero in range(1, 91):
@@ -50,7 +68,9 @@ def calcola_ritardi(ruota, window):
     return ritardi
 
 
-# 🔗 frequenze coppie
+# =========================
+# 🔗 FREQUENZE COPPIE
+# =========================
 def frequenze_coppie(ruota):
     c = Counter()
     for estr in estrazioni:
@@ -64,6 +84,9 @@ def frequenze_coppie(ruota):
 risultati = {}
 ranking = []
 
+# =========================
+# 🚀 LOOP PRINCIPALE
+# =========================
 for ruota in RUOTE:
 
     r_lungo = calcola_ritardi(ruota, LUNGO)
@@ -79,13 +102,13 @@ for ruota in RUOTE:
             r_breve[n] * PESO_BREVE
         )
 
-    # 🔝 top numeri
+    # 🔝 numeri forti
     numeri = sorted(score, key=score.get, reverse=True)[:12]
 
     # 🔗 coppie
     c = frequenze_coppie(ruota)
 
-    # 🎯 selezione AMBO REALISTICO
+    # 🎯 AMBO REALISTICO
     best_ambo = None
     best_score = -999
 
@@ -97,7 +120,7 @@ for ruota in RUOTE:
 
             pair_score = score[a] + score[b]
 
-            # bonus coppia vista
+            # bonus coppie viste
             pair_score += c.get((a, b), 0) * 4
 
             # distanza ideale
@@ -106,7 +129,7 @@ for ruota in RUOTE:
             else:
                 pair_score -= 20
 
-            # troppo vicini
+            # evita numeri troppo vicini
             if distanza < 3:
                 pair_score -= 10
 
@@ -118,7 +141,7 @@ for ruota in RUOTE:
                 best_score = pair_score
                 best_ambo = (a, b)
 
-    # 📊 score ruota
+    # score ruota
     score_ruota = sum(score[n] for n in numeri[:5])
 
     ranking.append((ruota, score_ruota))
@@ -130,16 +153,19 @@ for ruota in RUOTE:
     }
 
 
-# 🏆 TOP 3
+# =========================
+# 🏆 TOP + JOLLY
+# =========================
 top3 = sorted(ranking, key=lambda x: x[1], reverse=True)[:3]
 top3_ruote = [r[0] for r in top3]
 
-# 💣 JOLLY = gemella della prima
 prima = top3_ruote[0]
 jolly = GEMELLE.get(prima, top3_ruote[1])
 
 
-# 💾 salva JSON
+# =========================
+# 💾 OUTPUT
+# =========================
 output = {
     "top": top3_ruote,
     "jolly": jolly,
@@ -149,4 +175,4 @@ output = {
 with open("risultati.json", "w") as f:
     json.dump(output, f, indent=2)
 
-print("✅ Generato PRO V3")
+print("✅ GENERATO PRO V3 FIXED")
