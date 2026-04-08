@@ -2,44 +2,58 @@ fetch("risultati.json")
   .then(res => res.json())
   .then(data => {
 
-    // ESTRAZIONI
+    // ESTRAZIONI (CARD)
     const estrDiv = document.getElementById("estrazioni");
-    estrDiv.innerHTML = "<h3>Ultime Estrazioni</h3>";
 
     for (const r in data.ultime_estrazioni) {
-      estrDiv.innerHTML += `<p>${r}: ${data.ultime_estrazioni[r].join(" - ")}</p>`;
+      const div = document.createElement("div");
+      div.className = "card";
+
+      div.innerHTML = `
+        <div class="small">${r}</div>
+        <div>${data.ultime_estrazioni[r].join(" - ")}</div>
+      `;
+
+      estrDiv.appendChild(div);
     }
 
-    // GEMELLE
+    // GEMELLE (COMPATTE)
     const gemDiv = document.getElementById("gemelle");
-    gemDiv.innerHTML = "<h3>Ruote Gemelle</h3>";
 
+    let txt = "";
     for (const r in data.ruote_gemelle) {
-      gemDiv.innerHTML += `<p>${r} → ${data.ruote_gemelle[r]}</p>`;
+      txt += `${r} → ${data.ruote_gemelle[r]}<br>`;
     }
+    gemDiv.innerHTML = txt;
 
     // AMBI
     const ambiDiv = document.getElementById("ambi");
 
     data.top_ambi.forEach(a => {
-      ambiDiv.innerHTML += `
-        <div class="card top">
-          ${a.numeri.join(" - ")}<br>
-          ${a.prob}%
-        </div>
+      const div = document.createElement("div");
+      div.className = "card top";
+
+      div.innerHTML = `
+        <div class="highlight">${a.numeri.join(" - ")}</div>
+        <div class="small">${a.prob}%</div>
       `;
+
+      ambiDiv.appendChild(div);
     });
 
     // TERNI
     const terniDiv = document.getElementById("terni");
 
     data.top_terni.forEach(t => {
-      terniDiv.innerHTML += `
-        <div class="card">
-          ${t.numeri.join(" - ")}<br>
-          ${t.prob}%
-        </div>
+      const div = document.createElement("div");
+      div.className = "card";
+
+      div.innerHTML = `
+        <div class="highlight">${t.numeri.join(" - ")}</div>
+        <div class="small">${t.prob}%</div>
       `;
+
+      terniDiv.appendChild(div);
     });
 
   });
