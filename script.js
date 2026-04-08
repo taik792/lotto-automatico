@@ -2,53 +2,44 @@ fetch("risultati.json")
   .then(res => res.json())
   .then(data => {
 
-    // 🔥 ESTRAZIONI PER RUOTA
-    const estrDiv = document.getElementById("estrazione");
-    estrDiv.innerHTML = "<h3>🧾 Ultime Estrazioni</h3>";
+    // ESTRAZIONI
+    const estrDiv = document.getElementById("estrazioni");
+    estrDiv.innerHTML = "<h3>Ultime Estrazioni</h3>";
 
-    for (const ruota in data.ultime_estrazioni) {
-
-      const numeri = data.ultime_estrazioni[ruota];
-
-      const div = document.createElement("div");
-      div.className = "estrazione";
-
-      div.innerHTML = `
-        <strong>${ruota}</strong><br>
-        ${numeri.join(" - ")}
-      `;
-
-      estrDiv.appendChild(div);
+    for (const r in data.ultime_estrazioni) {
+      estrDiv.innerHTML += `<p>${r}: ${data.ultime_estrazioni[r].join(" - ")}</p>`;
     }
 
-    // ⭐ TOP
-    const topDiv = document.getElementById("top");
+    // GEMELLE
+    const gemDiv = document.getElementById("gemelle");
+    gemDiv.innerHTML = "<h3>Ruote Gemelle</h3>";
 
-    data.top.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "card top";
+    for (const r in data.ruote_gemelle) {
+      gemDiv.innerHTML += `<p>${r} → ${data.ruote_gemelle[r]}</p>`;
+    }
 
-      div.innerHTML = `
-        <h2>🔥 ${item.ambo[0]} - ${item.ambo[1]}</h2>
-        <p>Score: ${item.score}</p>
+    // AMBI
+    const ambiDiv = document.getElementById("ambi");
+
+    data.top_ambi.forEach(a => {
+      ambiDiv.innerHTML += `
+        <div class="card top">
+          ${a.numeri.join(" - ")}<br>
+          ${a.prob}%
+        </div>
       `;
-
-      topDiv.appendChild(div);
     });
 
-    // 🎯 AMBI
-    const container = document.getElementById("giocate");
+    // TERNI
+    const terniDiv = document.getElementById("terni");
 
-    data.ambi.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "card";
-
-      div.innerHTML = `
-        <h3>${item.ambo[0]} - ${item.ambo[1]}</h3>
-        <p>Score: ${item.score}</p>
+    data.top_terni.forEach(t => {
+      terniDiv.innerHTML += `
+        <div class="card">
+          ${t.numeri.join(" - ")}<br>
+          ${t.prob}%
+        </div>
       `;
-
-      container.appendChild(div);
     });
 
   });
