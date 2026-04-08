@@ -2,7 +2,7 @@ fetch("risultati.json")
   .then(res => res.json())
   .then(data => {
 
-    // ESTRAZIONI (CARD)
+    // 🧾 ESTRAZIONI
     const estrDiv = document.getElementById("estrazioni");
 
     for (const r in data.ultime_estrazioni) {
@@ -10,23 +10,23 @@ fetch("risultati.json")
       div.className = "card";
 
       div.innerHTML = `
-        <div class="small">${r}</div>
-        <div>${data.ultime_estrazioni[r].join(" - ")}</div>
+        <div class="title-small">${r}</div>
+        <div class="numbers">${data.ultime_estrazioni[r].join(" - ")}</div>
       `;
 
       estrDiv.appendChild(div);
     }
 
-    // GEMELLE (COMPATTE)
+    // 🔗 GEMELLE
     const gemDiv = document.getElementById("gemelle");
 
-    let txt = "";
     for (const r in data.ruote_gemelle) {
-      txt += `${r} → ${data.ruote_gemelle[r]}<br>`;
+      const div = document.createElement("div");
+      div.innerHTML = `${r} → ${data.ruote_gemelle[r]}`;
+      gemDiv.appendChild(div);
     }
-    gemDiv.innerHTML = txt;
 
-    // AMBI
+    // ⭐ AMBI
     const ambiDiv = document.getElementById("ambi");
 
     data.top_ambi.forEach(a => {
@@ -34,14 +34,14 @@ fetch("risultati.json")
       div.className = "card top";
 
       div.innerHTML = `
-        <div class="highlight">${a.numeri.join(" - ")}</div>
-        <div class="small">${a.prob}%</div>
+        <div class="numbers">${a.numeri.join(" - ")}</div>
+        <div class="percent">${a.prob}%</div>
       `;
 
       ambiDiv.appendChild(div);
     });
 
-    // TERNI
+    // 🔥 TERNI
     const terniDiv = document.getElementById("terni");
 
     data.top_terni.forEach(t => {
@@ -49,8 +49,8 @@ fetch("risultati.json")
       div.className = "card";
 
       div.innerHTML = `
-        <div class="highlight">${t.numeri.join(" - ")}</div>
-        <div class="small">${t.prob}%</div>
+        <div class="numbers">${t.numeri.join(" - ")}</div>
+        <div class="percent">${t.prob}%</div>
       `;
 
       terniDiv.appendChild(div);
