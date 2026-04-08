@@ -10,19 +10,20 @@ body {
   color: white;
   font-family: Arial;
   margin: 0;
-  padding: 20px;
+  padding: 15px;
 }
 
 h1 {
   text-align: center;
   color: #00ffcc;
+  margin-bottom: 20px;
 }
 
 .section {
-  margin: 25px 0;
+  margin-bottom: 25px;
 }
 
-.grid {
+.grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
@@ -30,10 +31,10 @@ h1 {
 
 .card {
   background: #06182c;
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: 12px;
+  padding: 12px;
   text-align: center;
-  border: 1px solid #0ff;
+  border: 1px solid #00ffcc33;
 }
 
 .top {
@@ -41,14 +42,28 @@ h1 {
   background: #1a1a00;
 }
 
-.small {
+.title-small {
   font-size: 12px;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-.highlight {
-  font-size: 22px;
+.numbers {
+  font-size: 18px;
   font-weight: bold;
+  margin-top: 5px;
+}
+
+.percent {
+  font-size: 12px;
+  margin-top: 5px;
+  color: #aaa;
+}
+
+.gemelle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 13px;
 }
 </style>
 </head>
@@ -59,22 +74,22 @@ h1 {
 
 <div class="section">
   <h3>🧾 Ultime Estrazioni</h3>
-  <div id="estrazioni" class="grid"></div>
+  <div id="estrazioni" class="grid-2"></div>
 </div>
 
 <div class="section">
   <h3>🔗 Ruote Gemelle</h3>
-  <div id="gemelle"></div>
+  <div id="gemelle" class="gemelle-grid"></div>
 </div>
 
 <div class="section">
   <h3>⭐ AMBI TOP</h3>
-  <div id="ambi" class="grid"></div>
+  <div id="ambi" class="grid-2"></div>
 </div>
 
 <div class="section">
   <h3>🔥 TERNI TOP</h3>
-  <div id="terni" class="grid"></div>
+  <div id="terni" class="grid-2"></div>
 </div>
 
 <script src="script.js"></script>
