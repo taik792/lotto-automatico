@@ -20,7 +20,7 @@ estrazioni_per_ruota = {
 ultime = {r: e[0] for r, e in estrazioni_per_ruota.items() if e}
 
 # ======================
-# UNIONE ESTRAZIONI
+# UNISCI TUTTE
 # ======================
 estrazioni = []
 for e in estrazioni_per_ruota.values():
@@ -67,7 +67,7 @@ score_num = {
 }
 
 # ======================
-# GENERA AMBI (BILANCIATI)
+# GENERA AMBI GLOBALI
 # ======================
 ambi = []
 
@@ -85,36 +85,32 @@ for n1 in range(1, 91):
             "score": score
         })
 
-# ORDINA
 ambi.sort(key=lambda x: x["score"], reverse=True)
 
 # ======================
-# FILTRO INTELLIGENTE
+# FILTRO INTELLIGENTE (2 AMBI)
 # ======================
-finali = []
+top = []
 uso_numeri = defaultdict(int)
 
 for a in ambi:
     n1, n2 = a["numeri"]
 
-    # max 2 volte lo stesso numero
     if uso_numeri[n1] >= 2 or uso_numeri[n2] >= 2:
         continue
 
-    finali.append(a)
+    top.append(a)
 
     uso_numeri[n1] += 1
     uso_numeri[n2] += 1
 
-    if len(finali) == 3:
+    if len(top) == 2:
         break
 
 # ======================
 # ASSEGNA RUOTA MIGLIORE
 # ======================
-top = []
-
-for a in finali:
+for a in top:
     best_ruota = None
     best_score = -1
 
@@ -132,15 +128,41 @@ for a in finali:
             best_ruota = r
 
     a["ruota"] = best_ruota
-    top.append(a)
+
+# ======================
+# AGGIUNGI AMBO DA RUOTA SCOPERTA
+# ======================
+ruote_usate = set(a["ruota"] for a in top)
+
+for r, estr in estrazioni_per_ruota.items():
+
+    if r not in ruote_usate:
+
+        freq_r = defaultdict(int)
+        for e in estr[:80]:
+            for n in e:
+                freq_r[n] += 1
+
+        migliori = sorted(freq_r.items(), key=lambda x: x[1], reverse=True)
+
+        if len(migliori) >= 2:
+            top.append({
+                "ruota": r,
+                "numeri": [migliori[0][0], migliori[1][0]],
+                "score": 0
+            })
+        break
 
 # ======================
 # PROBABILITÀ
 # ======================
-max_score = max(a["score"] for a in top)
+max_score = max(a["score"] for a in top if a["score"] > 0)
 
 for a in top:
-    a["prob"] = round((a["score"] / max_score) * 100, 2)
+    if a["score"] > 0:
+        a["prob"] = round((a["score"] / max_score) * 100, 2)
+    else:
+        a["prob"] = 70.0
 
 # ======================
 # RUOTA GEMELLA (JOLLY)
@@ -189,4 +211,4 @@ output = {
 with open(file_output, "w") as f:
     json.dump(output, f, indent=2)
 
-print("✅ SISTEMA BILANCIATO ATTIVO")
+print("✅ SISTEMA EQUILIBRATO ATTIVO")
