@@ -21,16 +21,25 @@ file_estrazioni = os.path.join(BASE_DIR, "estrazioni.json")
 file_output = os.path.join(BASE_DIR, "risultati.json")
 
 # ================================
-# CARICA ESTRAZIONI
+# CARICA ESTRAZIONI (ROBUSTO)
 # ================================
 with open(file_estrazioni, "r") as f:
-    estrazioni = json.load(f)
+    estrazioni_raw = json.load(f)
 
-# 🔥 INVERTI (recenti prima)
+estrazioni = []
+
+# 🔥 supporta sia dict che lista
+if isinstance(estrazioni_raw, dict):
+    for ruota in estrazioni_raw.values():
+        estrazioni.extend(ruota)
+else:
+    estrazioni = estrazioni_raw
+
+# 🔥 inverti (recenti prima)
 estrazioni = estrazioni[::-1]
 
 # ================================
-# CALCOLO RITARDI (FIX QUI ✅)
+# CALCOLO RITARDI
 # ================================
 ritardi = {i: 0 for i in range(1, 91)}
 
@@ -79,7 +88,7 @@ ranking = sorted(score_num.items(), key=lambda x: x[1], reverse=True)
 top_numbers = [n for n, _ in ranking[:TOP_NUMERI]]
 
 # ================================
-# GENERAZIONE AMBI
+# GENERA AMBI INTELLIGENTI
 # ================================
 ambi = []
 
@@ -107,6 +116,7 @@ for n1 in top_numbers:
     if best_n2:
         ambo = sorted([n1, best_n2])
 
+        # evita duplicati
         if ambo not in [a["ambo"] for a in ambi]:
             ambi.append({
                 "ambo": ambo,
@@ -114,15 +124,15 @@ for n1 in top_numbers:
             })
 
 # ================================
-# ORDINA
+# ORDINA E TAGLIA
 # ================================
 ambi.sort(key=lambda x: x["score"], reverse=True)
 ambi = ambi[:AMBI_FINALI]
 
 # ================================
-# SALVA JSON (FORMATO SITO ✅)
+# SALVA JSON (FORMATO SITO)
 # ================================
 with open(file_output, "w") as f:
     json.dump(ambi, f, indent=2)
 
-print("✅ risultati.json aggiornato")
+print("✅ risultati.json aggiornato correttamente")
