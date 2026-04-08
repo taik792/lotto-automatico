@@ -15,23 +15,32 @@ file_estrazioni = os.path.join(BASE_DIR, "estrazioni.json")
 file_output = os.path.join(BASE_DIR, "risultati.json")
 
 # ======================
-# CARICA DATI
+# CARICA DATI PER RUOTA
 # ======================
 with open(file_estrazioni, "r") as f:
     estrazioni_raw = json.load(f)
 
+estrazioni_per_ruota = {}
+
+for ruota, estrazioni in estrazioni_raw.items():
+    estrazioni_per_ruota[ruota] = estrazioni[::-1]  # recenti prima
+
+# ======================
+# ULTIME ESTRAZIONI 🔥
+# ======================
+ultime_estrazioni = {}
+
+for ruota, estrazioni in estrazioni_per_ruota.items():
+    if estrazioni:
+        ultime_estrazioni[ruota] = estrazioni[0]
+
+# ======================
+# UNISCI TUTTE LE ESTRAZIONI
+# ======================
 estrazioni = []
 
-if isinstance(estrazioni_raw, dict):
-    for ruota in estrazioni_raw.values():
-        estrazioni.extend(ruota)
-else:
-    estrazioni = estrazioni_raw
-
-# 🔥 inverti → recenti prima
-estrazioni = estrazioni[::-1]
-
-ultima_estrazione = estrazioni[0]
+for ruota in estrazioni_per_ruota.values():
+    estrazioni.extend(ruota)
 
 # ======================
 # RITARDI
@@ -80,7 +89,7 @@ ranking = sorted(score_num.items(), key=lambda x: x[1], reverse=True)
 top_numbers = [n for n, _ in ranking[:TOP_NUMERI]]
 
 # ======================
-# GENERAZIONE AMBI
+# GENERA AMBI
 # ======================
 ambi = []
 
@@ -112,7 +121,7 @@ for n1 in top_numbers:
             })
 
 # ======================
-# LIMITA RIPETIZIONI 🔥
+# LIMITA RIPETIZIONI
 # ======================
 conteggio = {}
 filtrati = []
@@ -141,10 +150,10 @@ ambi = ambi[:AMBI_FINALI]
 top = ambi[:3]
 
 # ======================
-# SALVA
+# SALVA OUTPUT
 # ======================
 output = {
-    "ultima_estrazione": ultima_estrazione,
+    "ultime_estrazioni": ultime_estrazioni,
     "top": top,
     "ambi": ambi
 }
@@ -152,4 +161,4 @@ output = {
 with open(file_output, "w") as f:
     json.dump(output, f, indent=2)
 
-print("✅ risultati aggiornati")
+print("✅ risultati aggiornati con ruote")
