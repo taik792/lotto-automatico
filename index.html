@@ -6,7 +6,7 @@
 
 <style>
 body {
-    background:#0b0f1a;
+    background: linear-gradient(180deg, #0b0f1a, #05070d);
     color:white;
     font-family:Arial;
     text-align:center;
@@ -15,8 +15,10 @@ body {
 /* TITOLI */
 h1 {
     margin-top:20px;
+    font-size:26px;
 }
 
+/* TOP */
 .top {
     margin:20px;
 }
@@ -25,7 +27,8 @@ h1 {
     display:block;
     color:#ffd700;
     font-weight:bold;
-    margin:3px;
+    margin:4px;
+    font-size:16px;
 }
 
 /* GRID */
@@ -40,9 +43,14 @@ h1 {
 .card {
     border:2px solid #00ff99;
     padding:15px;
-    border-radius:12px;
-    background:#0f1626;
-    box-shadow:0 0 10px rgba(0,255,153,0.2);
+    border-radius:15px;
+    background:linear-gradient(145deg, #0f1626, #0b1220);
+    box-shadow:0 0 15px rgba(0,255,153,0.2);
+    transition:0.2s;
+}
+
+.card:hover {
+    transform:scale(1.03);
 }
 
 /* RUOTA */
@@ -50,27 +58,60 @@ h1 {
     font-size:18px;
 }
 
-/* ULTIMA ESTRAZIONE */
-.ultima {
-    font-size:16px;
-    color:#ffffff;
-    margin-top:6px;
+/* NUMERI */
+.numeri {
+    margin-top:8px;
+}
+
+/* PALLINE NUMERI */
+.ball {
+    display:inline-block;
+    width:28px;
+    height:28px;
+    line-height:28px;
+    border-radius:50%;
+    margin:3px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+/* COLORI DINAMICI */
+.caldo {
+    background:#ff3b3b;
+    color:white;
+}
+
+.normale {
+    background:#1e2a44;
+}
+
+.freddo {
+    background:#00aaff;
+    color:black;
 }
 
 /* AMBO */
 .ambo {
-    color:#00ff99;
-    font-weight:bold;
-    font-size:22px;
     margin-top:10px;
+}
+
+.ambo span {
+    display:inline-block;
+    background:#00ff99;
+    color:black;
+    padding:6px 10px;
+    border-radius:8px;
+    margin:2px;
+    font-weight:bold;
+    font-size:18px;
 }
 
 /* SCORE */
 .score {
-    color:#ff4d4d;
     font-size:11px;
-    opacity:0.6;
-    margin-top:5px;
+    color:#ff4d4d;
+    opacity:0.5;
+    margin-top:6px;
 }
 
 /* MOBILE */
@@ -112,20 +153,41 @@ fetch("risultati.json")
     document.getElementById("jolly").innerHTML =
         `<span>💣 ${data.jolly.ruota} → ${data.jolly.ambo.join("-")}</span>`;
 
+    // ===== COLORI NUMERI =====
+    function coloreNumero(n){
+        if(n <= 30) return "freddo";     // 🔵 bassi
+        if(n >= 60) return "caldo";      // 🔴 alti
+        return "normale";                // ⚪ medi
+    }
+
     // ===== GRID =====
     let gridHtml = "";
 
     Object.entries(data.ruote).forEach(([ruota, r]) => {
 
-        // 🔥 sostituisce trattini con punti
-        const ultima = r.ultima.join(" • ");
+        let numeriHtml = "";
+
+        r.ultima.forEach(n => {
+            numeriHtml += `<span class="ball ${coloreNumero(n)}">${n}</span>`;
+        });
+
+        let amboHtml = r.ambo.map(n => `<span>${n}</span>`).join("");
 
         gridHtml += `
         <div class="card">
             <strong>${ruota}</strong>
-            <div class="ultima">${ultima}</div>
-            <div class="ambo">${r.ambo.join("-")}</div>
-            <div class="score">Score: ${r.score.toFixed(2)}</div>
+
+            <div class="numeri">
+                ${numeriHtml}
+            </div>
+
+            <div class="ambo">
+                ${amboHtml}
+            </div>
+
+            <div class="score">
+                Score: ${r.score.toFixed(2)}
+            </div>
         </div>
         `;
     });
