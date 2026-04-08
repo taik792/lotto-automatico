@@ -73,31 +73,31 @@
   },
   "top_ambi": [
     {
+      "numeri": [
+        41,
+        67
+      ],
+      "score": 145.60000000000002,
       "ruota": "Roma",
+      "prob": 100.0
+    },
+    {
+      "numeri": [
+        41,
+        66
+      ],
+      "score": 136.4,
+      "ruota": "Roma",
+      "prob": 93.68
+    },
+    {
       "numeri": [
         66,
         67
       ],
-      "score": 23,
-      "prob": 100.0
-    },
-    {
-      "ruota": "Genova",
-      "numeri": [
-        19,
-        43
-      ],
-      "score": 22,
-      "prob": 95.65
-    },
-    {
-      "ruota": "Bari",
-      "numeri": [
-        1,
-        24
-      ],
-      "score": 21,
-      "prob": 91.3
+      "score": 116.0,
+      "ruota": "Roma",
+      "prob": 79.67
     }
   ],
   "ruota_jolly": "Venezia"
