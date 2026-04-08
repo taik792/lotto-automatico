@@ -83,11 +83,9 @@ for ruota in RUOTE:
             penalita
         )
 
-        # boost ritardi veri
         if ritardi[n] > 20:
             score += ritardi[n] * 0.25
 
-        # stabilità storico
         if freq_breve.get(n, 0) > 2 and freq_lungo.get(n, 0) > 15:
             score += 5
 
@@ -96,28 +94,55 @@ for ruota in RUOTE:
     # ===== SCELTA AMBO INTELLIGENTE =====
 
     candidati = [n for n in range(1, 91) if n not in ultime]
+
+    # dividi numeri
+    ritardatari = [n for n in candidati if ritardi[n] > 20]
+    frequenti = [n for n in candidati if freq_breve.get(n, 0) >= 2]
+
     top_numeri = sorted(candidati, key=lambda x: score_num[x], reverse=True)[:20]
 
     miglior_ambo = None
     miglior_score = 0
 
-    for a, b in combinations(top_numeri, 2):
+    # ===== 1. MIX FORZATO =====
+    for a in ritardatari:
+        for b in frequenti:
 
-        base = score_num[a] + score_num[b]
+            if a == b:
+                continue
 
-        coppia = tuple(sorted((a, b)))
-        co_score = cooc.get(coppia, 0)
+            base = score_num[a] + score_num[b]
+            coppia = tuple(sorted((a, b)))
+            co_score = cooc.get(coppia, 0)
 
-        score_finale = base + (co_score * 4)
+            score_finale = base + (co_score * 4)
 
-        if score_finale > miglior_score:
-            miglior_score = score_finale
-            miglior_ambo = [a, b]
+            if score_finale > miglior_score:
+                miglior_score = score_finale
+                miglior_ambo = [a, b]
+
+    # ===== 2. FALLBACK =====
+    if not miglior_ambo:
+        for a, b in combinations(top_numeri, 2):
+
+            penalty = 1
+            if ritardi[a] > 25 and ritardi[b] > 25:
+                penalty = 0.6
+
+            base = score_num[a] + score_num[b]
+            coppia = tuple(sorted((a, b)))
+            co_score = cooc.get(coppia, 0)
+
+            score_finale = (base + co_score * 4) * penalty
+
+            if score_finale > miglior_score:
+                miglior_score = score_finale
+                miglior_ambo = [a, b]
 
     risultati["ruote"][ruota] = {
         "ultima": ultime,
         "ambo": miglior_ambo,
-        "score": miglior_score
+        "score": round(miglior_score, 2)
     }
 
 # ===== TOP 3 =====
@@ -186,4 +211,4 @@ risultati["jolly"] = {
 with open("risultati.json", "w", encoding="utf-8") as f:
     json.dump(risultati, f, indent=2)
 
-print("🔥 MOTORE PRO V2 ATTIVO (CO-OCCORRENZA + NO RANDOM)")
+print("🔥 MOTORE PRO V2 ATTIVO (AMBI REALI + MIX INTELLIGENTE)")
