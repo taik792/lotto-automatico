@@ -1,179 +1,81 @@
 {
   "top": [
-    "Bari",
-    "Milano",
-    "Firenze"
+    "TEST1",
+    "TEST2",
+    "TEST3"
   ],
-  "ruote": {
-    "Bari": {
-      "ultima": [
-        80,
-        54,
-        31,
-        75,
-        71
-      ],
-      "ambo": [
-        41,
-        67
-      ],
-      "score": 251.58
-    },
-    "Cagliari": {
-      "ultima": [
-        38,
-        23,
-        54,
-        50,
-        89
-      ],
-      "ambo": [
-        41,
-        26
-      ],
-      "score": 210.82
-    },
-    "Firenze": {
-      "ultima": [
-        57,
-        73,
-        82,
-        35,
-        45
-      ],
-      "ambo": [
-        90,
-        47
-      ],
-      "score": 235.81
-    },
-    "Genova": {
-      "ultima": [
-        58,
-        70,
-        12,
-        65,
-        85
-      ],
-      "ambo": [
-        66,
-        48
-      ],
-      "score": 192.79
-    },
-    "Milano": {
-      "ultima": [
-        82,
-        20,
-        35,
-        14,
-        8
-      ],
-      "ambo": [
-        85,
-        34
-      ],
-      "score": 238.42
-    },
-    "Napoli": {
-      "ultima": [
-        48,
-        65,
-        79,
-        52,
-        16
-      ],
-      "ambo": [
-        40,
-        22
-      ],
-      "score": 219.35
-    },
-    "Palermo": {
-      "ultima": [
-        5,
-        60,
-        56,
-        1,
-        25
-      ],
-      "ambo": [
-        46,
-        45
-      ],
-      "score": 225.9
-    },
-    "Roma": {
-      "ultima": [
-        65,
-        12,
-        73,
-        3,
-        49
-      ],
-      "ambo": [
-        17,
-        40
-      ],
-      "score": 202.37
-    },
-    "Torino": {
-      "ultima": [
-        39,
-        43,
-        44,
-        36,
-        67
-      ],
-      "ambo": [
-        49,
-        46
-      ],
-      "score": 203.48
-    },
-    "Venezia": {
-      "ultima": [
-        71,
-        76,
-        49,
-        6,
-        56
-      ],
-      "ambo": [
-        65,
-        32
-      ],
-      "score": 213.58
-    }
-  },
   "giocate": [
     {
-      "ruota": "Bari",
+      "ruota": "TEST1",
       "ambo": [
-        41,
-        67
+        11,
+        22
       ]
     },
     {
-      "ruota": "Milano",
+      "ruota": "TEST2",
       "ambo": [
-        85,
-        34
+        33,
+        44
       ]
     },
     {
-      "ruota": "Firenze",
+      "ruota": "TEST3",
       "ambo": [
-        90,
-        47
+        55,
+        66
       ]
     }
   ],
   "jolly": {
-    "ruota": "Napoli",
+    "ruota": "TEST-JOLLY",
     "ambo": [
-      41,
-      67
+      77,
+      88
     ]
+  },
+  "ruote": {
+    "TEST1": {
+      "ultima": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "ambo": [
+        11,
+        22
+      ],
+      "score": 100
+    },
+    "TEST2": {
+      "ultima": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "ambo": [
+        33,
+        44
+      ],
+      "score": 90
+    },
+    "TEST3": {
+      "ultima": [
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "ambo": [
+        55,
+        66
+      ],
+      "score": 80
+    }
   }
 }
