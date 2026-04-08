@@ -71,52 +71,34 @@
       56
     ]
   },
-  "ruote_gemelle": {
-    "Bari": "Torino",
-    "Cagliari": "Roma",
-    "Firenze": "Roma",
-    "Genova": "Milano",
-    "Milano": "Napoli",
-    "Napoli": "Milano",
-    "Palermo": "Roma",
-    "Roma": "Cagliari",
-    "Torino": "Bari",
-    "Venezia": "Milano"
-  },
-  "top_ambi": [
+  "top": [
     {
+      "ruota": "Bari",
       "numeri": [
-        41,
-        67
+        24,
+        81
       ],
-      "raw": 144.4,
+      "score": 25,
       "prob": 100.0
     },
     {
+      "ruota": "Genova",
       "numeri": [
-        41,
-        67
+        19,
+        43
       ],
-      "raw": 134.4,
-      "prob": 93.07
-    }
-  ],
-  "top_terni": [
-    {
-      "numeri": [
-        41,
-        66,
-        67
-      ],
-      "prob": 36.84
+      "score": 25,
+      "prob": 100.0
     },
     {
+      "ruota": "Roma",
       "numeri": [
-        41,
         66,
         67
       ],
-      "prob": 36.84
+      "score": 25,
+      "prob": 100.0
     }
-  ]
+  ],
+  "ruota_jolly": "Torino"
 }
