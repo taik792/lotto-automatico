@@ -1,7 +1,7 @@
 import json
 import random
 
-RUOTE = ["Bari","Cagliari","Firenze","Genova","Milano","Napoli","Palermo","Roma","Torino","Venezia"]
+RUOTE = ["Bari","Cagliari","Firenze","Genova","Milano","Napoli","Palermo","Roma","Torino","Venezia","Nazionale"]
 
 # ===== CARICA DATI =====
 with open("estrazioni.json", encoding="utf-8") as f:
@@ -14,7 +14,7 @@ risultati = {
     "jolly": {}
 }
 
-# ===== FUNZIONE FREQUENZE =====
+# ===== FREQUENZE =====
 def calcola_freq(lista):
     freq = {}
     for estr in lista:
@@ -22,7 +22,7 @@ def calcola_freq(lista):
             freq[n] = freq.get(n, 0) + 1
     return freq
 
-# ===== CICLO RUOTE =====
+# ===== ANALISI RUOTE =====
 for ruota in RUOTE:
 
     if ruota not in estrazioni:
@@ -54,15 +54,12 @@ for ruota in RUOTE:
         ritardi[n] = ritardo
 
     score_num = {}
-
     ultime_5 = estrazioni_ruota[-5:]
 
     for n in range(1, 91):
 
         penalita = 10 if n in ultime else 0
-
         presenze_recenti = sum(1 for estr in ultime_5 if n in estr)
-
         bonus_vicini = 1 if (n-1 in ultime or n+1 in ultime) else 0
 
         score = (
@@ -85,7 +82,7 @@ for ruota in RUOTE:
 
         score_num[n] = score
 
-    # ===== SCELTA AMBO =====
+    # ===== AMBO =====
     candidati = [n for n in range(1, 91) if n not in ultime]
     candidati.sort(key=lambda x: score_num[x], reverse=True)
 
@@ -106,9 +103,9 @@ top_sorted = sorted(
 )
 
 top3 = top_sorted[:3]
+
 risultati["top"] = [t[0] for t in top3]
 
-# ===== GIOCATE =====
 giocate = []
 for ruota, dati in top3:
     giocate.append({
@@ -118,37 +115,52 @@ for ruota, dati in top3:
 
 risultati["giocate"] = giocate
 
-# ===== JOLLY DINAMICO =====
+# ===== JOLLY GEMELLO =====
 
-# 1. ambo più forte globale
+gemelle = {
+    "Bari": "Napoli",
+    "Napoli": "Bari",
+    "Milano": "Torino",
+    "Torino": "Milano",
+    "Roma": "Nazionale",
+    "Nazionale": "Roma",
+    "Palermo": "Cagliari",
+    "Cagliari": "Palermo",
+    "Firenze": "Genova",
+    "Genova": "Firenze",
+    "Venezia": "Nazionale"
+}
+
+# miglior ambo globale
 miglior_ambo = None
 miglior_score = 0
+ruota_origine = None
 
 for ruota, dati in risultati["ruote"].items():
     if dati["score"] > miglior_score:
         miglior_score = dati["score"]
         miglior_ambo = dati["ambo"]
+        ruota_origine = ruota
 
-# 2. calcolo attività ruote (ultime 10 estrazioni)
-attivita_ruote = {}
+ruote_top = [g["ruota"] for g in risultati["giocate"]]
 
-for ruota in RUOTE:
-    if ruota not in estrazioni:
-        continue
+# scegli gemella
+ruota_jolly = gemelle.get(ruota_origine)
 
-    estrazioni_ruota = estrazioni[ruota]
-    ultime_10 = estrazioni_ruota[-10:]
+# fallback se non valida o già TOP
+if ruota_jolly not in risultati["ruote"] or ruota_jolly in ruote_top:
 
-    count = 0
-    for estr in ultime_10:
-        count += len(estr)
+    candidati = [
+        r for r in risultati["ruote"]
+        if r != ruota_origine and r not in ruote_top
+    ]
 
-    attivita_ruote[ruota] = count
+    if candidati:
+        ruota_jolly = max(candidati, key=lambda r: risultati["ruote"][r]["score"])
+    else:
+        ruota_jolly = ruota_origine
 
-# 3. scegli ruota più attiva
-ruota_jolly = max(attivita_ruote, key=attivita_ruote.get)
-
-# 4. assegna jolly
+# assegna jolly
 risultati["jolly"] = {
     "ruota": ruota_jolly,
     "ambo": miglior_ambo
@@ -158,4 +170,4 @@ risultati["jolly"] = {
 with open("risultati.json", "w", encoding="utf-8") as f:
     json.dump(risultati, f, indent=2)
 
-print("🔥 AUTO TOTALE + JOLLY DINAMICO ATTIVO")
+print("🔥 SISTEMA PRO MAX ATTIVO (TOP + JOLLY GEMELLO)")
