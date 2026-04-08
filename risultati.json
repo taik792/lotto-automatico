@@ -71,14 +71,14 @@
       56
     ]
   },
-  "top": [
+  "top_ambi": [
     {
-      "ruota": "Bari",
+      "ruota": "Roma",
       "numeri": [
-        24,
-        81
+        66,
+        67
       ],
-      "score": 25,
+      "score": 23,
       "prob": 100.0
     },
     {
@@ -87,18 +87,18 @@
         19,
         43
       ],
-      "score": 25,
-      "prob": 100.0
+      "score": 22,
+      "prob": 95.65
     },
     {
-      "ruota": "Roma",
+      "ruota": "Bari",
       "numeri": [
-        66,
-        67
+        1,
+        24
       ],
-      "score": 25,
-      "prob": 100.0
+      "score": 21,
+      "prob": 91.3
     }
   ],
-  "ruota_jolly": "Torino"
+  "ruota_jolly": "Venezia"
 }
