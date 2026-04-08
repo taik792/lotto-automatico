@@ -20,7 +20,7 @@ estrazioni_per_ruota = {
 ultime = {r: e[0] for r, e in estrazioni_per_ruota.items() if e}
 
 # ======================
-# UNISCI TUTTE
+# UNIONE ESTRAZIONI
 # ======================
 estrazioni = []
 for e in estrazioni_per_ruota.values():
@@ -30,7 +30,6 @@ for e in estrazioni_per_ruota.values():
 # FREQUENZE
 # ======================
 freq = defaultdict(int)
-
 for estr in estrazioni[:120]:
     for n in estr:
         freq[n] += 1
@@ -39,7 +38,6 @@ for estr in estrazioni[:120]:
 # RITARDI
 # ======================
 ritardi = {i: 0 for i in range(1, 91)}
-
 for n in range(1, 91):
     for idx, estr in enumerate(estrazioni):
         if n in estr:
@@ -50,7 +48,6 @@ for n in range(1, 91):
 # COPPIE
 # ======================
 freq_coppie = defaultdict(lambda: defaultdict(int))
-
 for estr in estrazioni[:150]:
     for i in range(len(estr)):
         for j in range(i+1, len(estr)):
@@ -67,67 +64,76 @@ score_num = {
 }
 
 # ======================
-# GENERA AMBI
+# PRE-CALCOLO FREQUENZE PER RUOTA
+# ======================
+freq_ruota = {}
+
+for r, estr in estrazioni_per_ruota.items():
+    f = defaultdict(int)
+    for e in estr[:80]:
+        for n in e:
+            f[n] += 1
+    freq_ruota[r] = f
+
+# ======================
+# GENERA AMBI + RUOTA SUBITO
 # ======================
 ambi = []
 
 for n1 in range(1, 91):
     for n2 in range(n1+1, 91):
 
-        score = (
+        base_score = (
             freq_coppie[n1][n2]*2 +
             score_num[n1] +
             score_num[n2]
         )
 
+        # trova subito la ruota migliore
+        best_ruota = None
+        best_score_ruota = -1
+
+        for r in freq_ruota:
+            score_r = freq_ruota[r][n1] + freq_ruota[r][n2]
+
+            if score_r > best_score_ruota:
+                best_score_ruota = score_r
+                best_ruota = r
+
         ambi.append({
             "numeri": [n1, n2],
-            "score": score
+            "score": base_score,
+            "ruota": best_ruota
         })
 
+# ======================
+# ORDINA
+# ======================
 ambi.sort(key=lambda x: x["score"], reverse=True)
 
 # ======================
-# FILTRO CORRETTO
+# FILTRO VERO
 # ======================
 top = []
 uso_numeri = defaultdict(int)
 ruote_usate = set()
 
 for a in ambi:
+
     n1, n2 = a["numeri"]
+    r = a["ruota"]
 
     if uso_numeri[n1] >= 2 or uso_numeri[n2] >= 2:
         continue
 
-    # trova ruota migliore
-    best_ruota = None
-    best_score = -1
-
-    for r, estr in estrazioni_per_ruota.items():
-
-        freq_r = defaultdict(int)
-        for e in estr[:80]:
-            for n in e:
-                freq_r[n] += 1
-
-        score = freq_r[n1] + freq_r[n2]
-
-        if score > best_score:
-            best_score = score
-            best_ruota = r
-
-    # blocca doppie ruote
-    if best_ruota in ruote_usate:
+    if r in ruote_usate:
         continue
-
-    a["ruota"] = best_ruota
 
     top.append(a)
 
     uso_numeri[n1] += 1
     uso_numeri[n2] += 1
-    ruote_usate.add(best_ruota)
+    ruote_usate.add(r)
 
     if len(top) == 2:
         break
@@ -135,16 +141,11 @@ for a in ambi:
 # ======================
 # AMBO COPERTURA
 # ======================
-for r, estr in estrazioni_per_ruota.items():
+for r in freq_ruota:
 
     if r not in ruote_usate:
 
-        freq_r = defaultdict(int)
-        for e in estr[:80]:
-            for n in e:
-                freq_r[n] += 1
-
-        migliori = sorted(freq_r.items(), key=lambda x: x[1], reverse=True)
+        migliori = sorted(freq_ruota[r].items(), key=lambda x: x[1], reverse=True)
 
         if len(migliori) >= 2:
             top.append({
@@ -168,15 +169,6 @@ for a in top:
 # ======================
 # RUOTA JOLLY
 # ======================
-freq_ruota = {}
-
-for r, estr in estrazioni_per_ruota.items():
-    f = defaultdict(int)
-    for e in estr[:80]:
-        for n in e:
-            f[n] += 1
-    freq_ruota[r] = f
-
 def similarita(f1, f2):
     return sum(min(f1[n], f2[n]) for n in range(1, 91))
 
@@ -212,4 +204,4 @@ output = {
 with open(file_output, "w") as f:
     json.dump(output, f, indent=2)
 
-print("✅ SISTEMA FIXATO DEFINITIVO")
+print("✅ SISTEMA CORRETTO DAVVERO")
