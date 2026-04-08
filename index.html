@@ -86,16 +86,16 @@ h1 {
     font-weight:bold;
 }
 
-/* COLORI */
+/* COLORI BASE */
 .caldo { background:#ff3b3b; }
 .freddo { background:#00aaff; color:black; }
 .normale { background:#1e2a44; }
 
-/* ⭐ ULTIMA ESTRAZIONE */
+/* ⭐ ULTIMA ESTRAZIONE SOFT */
 .ultima {
-    background: gold;
-    color:black;
-    border:2px solid white;
+    background: rgba(255, 215, 0, 0.25);
+    color: #ffd700;
+    border: 1px solid #ffd700;
 }
 
 /* AMBO */
@@ -103,10 +103,12 @@ h1 {
     display:inline-block;
     background:#00ff99;
     color:black;
-    padding:6px 10px;
+    padding:6px 12px;
     border-radius:8px;
     margin:2px;
     font-weight:bold;
+    font-size:20px;
+    box-shadow:0 0 8px rgba(0,255,153,0.5);
 }
 
 /* SCORE */
@@ -168,7 +170,7 @@ fetch("risultati.json")
 
     // ===== COLORI =====
     function coloreNumero(n, ultima){
-        if(ultima.includes(n)) return "ultima"; // evidenzia ultima estrazione
+        if(ultima.includes(n)) return "ultima";
         if(n <= 30) return "freddo";
         if(n >= 60) return "caldo";
         return "normale";
