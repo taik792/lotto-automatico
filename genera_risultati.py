@@ -28,7 +28,10 @@ if isinstance(estrazioni_raw, dict):
 else:
     estrazioni = estrazioni_raw
 
+# 🔥 inverti → recenti prima
 estrazioni = estrazioni[::-1]
+
+ultima_estrazione = estrazioni[0]
 
 # ======================
 # RITARDI
@@ -56,10 +59,7 @@ for estr in estrazioni[:100]:
 score_num = {}
 
 for n in range(1, 91):
-    score_num[n] = (
-        freq_num[n] * 1.2 +
-        ritardi[n] * 0.8
-    )
+    score_num[n] = freq_num[n] * 1.2 + ritardi[n] * 0.8
 
 # ======================
 # COPPIE
@@ -74,18 +74,17 @@ for estr in estrazioni[:150]:
             freq_coppie[b][a] += 1
 
 # ======================
-# TOP
+# TOP NUMERI
 # ======================
 ranking = sorted(score_num.items(), key=lambda x: x[1], reverse=True)
 top_numbers = [n for n, _ in ranking[:TOP_NUMERI]]
 
 # ======================
-# AMBI
+# GENERAZIONE AMBI
 # ======================
 ambi = []
 
 for n1 in top_numbers:
-
     best_score = -1
     best_n2 = None
 
@@ -109,16 +108,48 @@ for n1 in top_numbers:
         if ambo not in [a["ambo"] for a in ambi]:
             ambi.append({
                 "ambo": ambo,
-                "score": round(best_score, 4)
+                "score": round(best_score, 2)
             })
 
+# ======================
+# LIMITA RIPETIZIONI 🔥
+# ======================
+conteggio = {}
+filtrati = []
+
+for item in ambi:
+    n1, n2 = item["ambo"]
+
+    if conteggio.get(n1, 0) >= 3:
+        continue
+    if conteggio.get(n2, 0) >= 3:
+        continue
+
+    filtrati.append(item)
+
+    conteggio[n1] = conteggio.get(n1, 0) + 1
+    conteggio[n2] = conteggio.get(n2, 0) + 1
+
+ambi = filtrati
+
+# ======================
+# ORDINA
+# ======================
 ambi.sort(key=lambda x: x["score"], reverse=True)
 ambi = ambi[:AMBI_FINALI]
+
+top = ambi[:3]
 
 # ======================
 # SALVA
 # ======================
-with open(file_output, "w") as f:
-    json.dump(ambi, f, indent=2)
+output = {
+    "ultima_estrazione": ultima_estrazione,
+    "top": top,
+    "ambi": ambi
+}
 
-print("✅ risultati.json aggiornato")
+with open(file_output, "w") as f:
+    json.dump(output, f, indent=2)
+
+print("✅ risultati aggiornati")
