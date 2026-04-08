@@ -26,13 +26,13 @@ freq_ruota = {}
 
 for r, estr in estrazioni_per_ruota.items():
     f = defaultdict(int)
-    for e in estr[:100]:
+    for e in estr[:80]:
         for n in e:
             f[n] += 1
     freq_ruota[r] = f
 
 # ======================
-# RUOTE GEMELLE
+# RUOTE GEMELLE (serve solo per jolly)
 # ======================
 def similarita(f1, f2):
     return sum(min(f1[n], f2[n]) for n in range(1, 91))
@@ -62,10 +62,7 @@ candidati = []
 
 for r, estr in estrazioni_per_ruota.items():
 
-    freq = defaultdict(int)
-    for e in estr[:100]:
-        for n in e:
-            freq[n] += 1
+    freq = freq_ruota[r]
 
     for n1 in range(1, 91):
         for n2 in range(n1+1, 91):
@@ -84,7 +81,7 @@ for r, estr in estrazioni_per_ruota.items():
 candidati.sort(key=lambda x: x["score"], reverse=True)
 
 # ======================
-# FILTRO FORTE
+# FILTRO FORTE (NO RIPETIZIONI)
 # ======================
 top = []
 numeri_usati = set()
@@ -103,8 +100,7 @@ for c in candidati:
 
     top.append(c)
 
-    numeri_usati.add(n1)
-    numeri_usati.add(n2)
+    numeri_usati.update([n1, n2])
     ruote_usate.add(r)
 
     if len(top) == 3:
@@ -119,21 +115,21 @@ for c in top:
     c["prob"] = round((c["score"] / max_score) * 100, 2)
 
 # ======================
-# RUOTA JOLLY
+# RUOTA JOLLY (SOLO 1)
 # ======================
-ruota_top = top[0]["ruota"]
-ruota_jolly = ruota_gemella[ruota_top]
+ruota_migliore = top[0]["ruota"]
+ruota_jolly = ruota_gemella[ruota_migliore]
 
 # ======================
 # OUTPUT
 # ======================
 output = {
     "ultime_estrazioni": ultime,
-    "top": top,
+    "top_ambi": top,
     "ruota_jolly": ruota_jolly
 }
 
 with open(file_output, "w") as f:
     json.dump(output, f, indent=2)
 
-print("✅ VERSIONE STRATEGICA ATTIVA")
+print("✅ ORA È COME VOLEVI")
