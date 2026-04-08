@@ -15,10 +15,9 @@ body {
 /* TITOLI */
 h1 {
     margin-top:20px;
-    font-size:26px;
 }
 
-/* ===== TOP GIOCATE GRANDI ===== */
+/* ===== TOP ===== */
 .top-container {
     margin:20px;
 }
@@ -27,36 +26,31 @@ h1 {
     display:grid;
     grid-template-columns: repeat(3, 1fr);
     gap:10px;
-    margin-top:10px;
 }
 
 .top-card {
-    background: linear-gradient(145deg, #1a2338, #0e1628);
-    border:2px solid #ffd700;
-    border-radius:15px;
-    padding:15px;
-    box-shadow:0 0 15px rgba(255,215,0,0.3);
+    border:2px solid gold;
+    border-radius:12px;
+    padding:10px;
+    background:#111;
 }
 
 .top-ruota {
-    font-size:16px;
-    color:#ffd700;
+    color:gold;
+    font-size:14px;
 }
 
 .top-ambo {
     font-size:26px;
     font-weight:bold;
-    color:white;
-    margin-top:5px;
 }
 
 /* JOLLY */
 .jolly {
     margin-top:15px;
-    background:#2a1a1a;
     border:2px solid red;
-    padding:12px;
     border-radius:12px;
+    padding:10px;
     display:inline-block;
 }
 
@@ -65,7 +59,7 @@ h1 {
     font-weight:bold;
 }
 
-/* GRID RUOTE */
+/* ===== GRID ===== */
 .grid {
     display:grid;
     grid-template-columns: repeat(3, 1fr);
@@ -73,13 +67,11 @@ h1 {
     padding:10px;
 }
 
-/* CARD */
 .card {
     border:2px solid #00ff99;
-    padding:15px;
-    border-radius:15px;
-    background:linear-gradient(145deg, #0f1626, #0b1220);
-    box-shadow:0 0 15px rgba(0,255,153,0.2);
+    border-radius:12px;
+    padding:10px;
+    background:#0e1628;
 }
 
 /* NUMERI */
@@ -99,11 +91,14 @@ h1 {
 .freddo { background:#00aaff; color:black; }
 .normale { background:#1e2a44; }
 
-/* AMBO */
-.ambo-box {
-    margin-top:10px;
+/* ⭐ ULTIMA ESTRAZIONE */
+.ultima {
+    background: gold;
+    color:black;
+    border:2px solid white;
 }
 
+/* AMBO */
 .ambo-box span {
     display:inline-block;
     background:#00ff99;
@@ -112,14 +107,13 @@ h1 {
     border-radius:8px;
     margin:2px;
     font-weight:bold;
-    font-size:18px;
 }
 
 /* SCORE */
 .score {
     font-size:11px;
     color:#ff4d4d;
-    opacity:0.5;
+    opacity:0.6;
 }
 
 /* MOBILE */
@@ -140,6 +134,7 @@ h1 {
     <h2>🎯 GIOCATE CONSIGLIATE</h2>
     <div class="top-grid" id="top"></div>
 
+    <h2>💣 JOLLY</h2>
     <div id="jolly"></div>
 </div>
 
@@ -151,7 +146,7 @@ fetch("risultati.json")
 .then(res => res.json())
 .then(data => {
 
-    // ===== TOP GRANDI =====
+    // ===== TOP =====
     let topHtml = "";
     data.giocate.forEach(g => {
         topHtml += `
@@ -166,13 +161,14 @@ fetch("risultati.json")
     // ===== JOLLY =====
     document.getElementById("jolly").innerHTML = `
         <div class="jolly">
-            💣 ${data.jolly.ruota}<br>
+            ${data.jolly.ruota}<br>
             <div class="ambo">${data.jolly.ambo.join(" — ")}</div>
         </div>
     `;
 
     // ===== COLORI =====
-    function coloreNumero(n){
+    function coloreNumero(n, ultima){
+        if(ultima.includes(n)) return "ultima"; // evidenzia ultima estrazione
         if(n <= 30) return "freddo";
         if(n >= 60) return "caldo";
         return "normale";
@@ -184,7 +180,7 @@ fetch("risultati.json")
     Object.entries(data.ruote).forEach(([ruota, r]) => {
 
         let numeri = r.ultima.map(n =>
-            `<span class="ball ${coloreNumero(n)}">${n}</span>`
+            `<span class="ball ${coloreNumero(n, r.ultima)}">${n}</span>`
         ).join("");
 
         let ambo = r.ambo.map(n => `<span>${n}</span>`).join("");
