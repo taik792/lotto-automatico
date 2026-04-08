@@ -27,7 +27,7 @@ for e in estrazioni_per_ruota.values():
     estrazioni.extend(e)
 
 # ======================
-# FREQUENZE GLOBALI
+# FREQUENZE
 # ======================
 freq = defaultdict(int)
 
@@ -67,7 +67,7 @@ score_num = {
 }
 
 # ======================
-# GENERA AMBI GLOBALI
+# GENERA AMBI
 # ======================
 ambi = []
 
@@ -88,10 +88,11 @@ for n1 in range(1, 91):
 ambi.sort(key=lambda x: x["score"], reverse=True)
 
 # ======================
-# FILTRO INTELLIGENTE (2 AMBI)
+# FILTRO CORRETTO
 # ======================
 top = []
 uso_numeri = defaultdict(int)
+ruote_usate = set()
 
 for a in ambi:
     n1, n2 = a["numeri"]
@@ -99,18 +100,7 @@ for a in ambi:
     if uso_numeri[n1] >= 2 or uso_numeri[n2] >= 2:
         continue
 
-    top.append(a)
-
-    uso_numeri[n1] += 1
-    uso_numeri[n2] += 1
-
-    if len(top) == 2:
-        break
-
-# ======================
-# ASSEGNA RUOTA MIGLIORE
-# ======================
-for a in top:
+    # trova ruota migliore
     best_ruota = None
     best_score = -1
 
@@ -121,19 +111,30 @@ for a in top:
             for n in e:
                 freq_r[n] += 1
 
-        score = freq_r[a["numeri"][0]] + freq_r[a["numeri"][1]]
+        score = freq_r[n1] + freq_r[n2]
 
         if score > best_score:
             best_score = score
             best_ruota = r
 
+    # blocca doppie ruote
+    if best_ruota in ruote_usate:
+        continue
+
     a["ruota"] = best_ruota
 
-# ======================
-# AGGIUNGI AMBO DA RUOTA SCOPERTA
-# ======================
-ruote_usate = set(a["ruota"] for a in top)
+    top.append(a)
 
+    uso_numeri[n1] += 1
+    uso_numeri[n2] += 1
+    ruote_usate.add(best_ruota)
+
+    if len(top) == 2:
+        break
+
+# ======================
+# AMBO COPERTURA
+# ======================
 for r, estr in estrazioni_per_ruota.items():
 
     if r not in ruote_usate:
@@ -165,7 +166,7 @@ for a in top:
         a["prob"] = 70.0
 
 # ======================
-# RUOTA GEMELLA (JOLLY)
+# RUOTA JOLLY
 # ======================
 freq_ruota = {}
 
@@ -211,4 +212,4 @@ output = {
 with open(file_output, "w") as f:
     json.dump(output, f, indent=2)
 
-print("✅ SISTEMA EQUILIBRATO ATTIVO")
+print("✅ SISTEMA FIXATO DEFINITIVO")
