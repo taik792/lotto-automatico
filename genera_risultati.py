@@ -82,7 +82,7 @@ for ruota in RUOTE:
 
         score_num[n] = score
 
-    # ===== AMBO =====
+    # ===== SCELTA AMBO =====
     candidati = [n for n in range(1, 91) if n not in ultime]
     candidati.sort(key=lambda x: score_num[x], reverse=True)
 
@@ -115,23 +115,20 @@ for ruota, dati in top3:
 
 risultati["giocate"] = giocate
 
-# ===== JOLLY GEMELLO =====
+# ===== JOLLY INTELLIGENTE =====
 
 gemelle = {
     "Bari": "Napoli",
     "Napoli": "Bari",
     "Milano": "Torino",
     "Torino": "Milano",
-    "Roma": "Nazionale",
-    "Nazionale": "Roma",
     "Palermo": "Cagliari",
     "Cagliari": "Palermo",
     "Firenze": "Genova",
-    "Genova": "Firenze",
-    "Venezia": "Nazionale"
+    "Genova": "Firenze"
 }
 
-# miglior ambo globale
+# 1. miglior ambo globale
 miglior_ambo = None
 miglior_score = 0
 ruota_origine = None
@@ -144,23 +141,42 @@ for ruota, dati in risultati["ruote"].items():
 
 ruote_top = [g["ruota"] for g in risultati["giocate"]]
 
-# scegli gemella
-ruota_jolly = gemelle.get(ruota_origine)
+# ===== TEST NAZIONALE =====
+usa_nazionale = False
 
-# fallback se non valida o già TOP
-if ruota_jolly not in risultati["ruote"] or ruota_jolly in ruote_top:
+if "Nazionale" in estrazioni:
 
-    candidati = [
-        r for r in risultati["ruote"]
-        if r != ruota_origine and r not in ruote_top
-    ]
+    ultime_20_naz = estrazioni["Nazionale"][-20:]
+    presenza = 0
 
-    if candidati:
-        ruota_jolly = max(candidati, key=lambda r: risultati["ruote"][r]["score"])
-    else:
-        ruota_jolly = ruota_origine
+    for estr in ultime_20_naz:
+        for n in miglior_ambo:
+            if n in estr:
+                presenza += 1
 
-# assegna jolly
+    if presenza >= 1:
+        usa_nazionale = True
+
+# ===== SCELTA RUOTA JOLLY =====
+
+if usa_nazionale and "Nazionale" not in ruote_top:
+    ruota_jolly = "Nazionale"
+
+else:
+    ruota_jolly = gemelle.get(ruota_origine)
+
+    if ruota_jolly not in risultati["ruote"] or ruota_jolly in ruote_top:
+        candidati = [
+            r for r in risultati["ruote"]
+            if r != ruota_origine and r not in ruote_top
+        ]
+
+        if candidati:
+            ruota_jolly = max(candidati, key=lambda r: risultati["ruote"][r]["score"])
+        else:
+            ruota_jolly = ruota_origine
+
+# ===== ASSEGNA JOLLY =====
 risultati["jolly"] = {
     "ruota": ruota_jolly,
     "ambo": miglior_ambo
@@ -170,4 +186,4 @@ risultati["jolly"] = {
 with open("risultati.json", "w", encoding="utf-8") as f:
     json.dump(risultati, f, indent=2)
 
-print("🔥 SISTEMA PRO MAX ATTIVO (TOP + JOLLY GEMELLO)")
+print("🔥 PRO MAX ATTIVO (TOP + JOLLY SMART + NAZIONALE INTELLIGENTE)")
