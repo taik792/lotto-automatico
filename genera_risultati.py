@@ -1,189 +1,113 @@
-import json
 import random
+from collections import defaultdict
 
-RUOTE = ["Bari","Cagliari","Firenze","Genova","Milano","Napoli","Palermo","Roma","Torino","Venezia","Nazionale"]
+# ================================
+# CONFIG
+# ================================
+PESO_FREQ_COPPIA = 0.5
+PESO_SCORE_SINGOLO = 0.3
+PESO_RITARDO = 0.2
 
-# ===== CARICA DATI =====
-with open("estrazioni.json", encoding="utf-8") as f:
-    estrazioni = json.load(f)
+TOP_NUMERI = 10   # quanti numeri top usare
+AMBI_FINALI = 20  # quanti ambi generare
 
-risultati = {
-    "top": [],
-    "ruote": {},
-    "giocate": [],
-    "jolly": {}
-}
 
-# ===== FREQUENZE =====
-def calcola_freq(lista):
-    freq = {}
-    for estr in lista:
-        for n in estr:
-            freq[n] = freq.get(n, 0) + 1
-    return freq
+# ================================
+# MOCK DATI (SOSTITUISCI CON I TUOI)
+# ================================
 
-# ===== ANALISI RUOTE =====
-for ruota in RUOTE:
+# score generale numeri (dal tuo algoritmo)
+score_numeri = {i: random.uniform(0, 1) for i in range(1, 91)}
 
-    if ruota not in estrazioni:
-        continue
+# ritardi (più alto = più ritardatario)
+ritardi = {i: random.randint(0, 100) for i in range(1, 91)}
 
-    estrazioni_ruota = estrazioni[ruota]
+# frequenza coppie (simulata)
+freq_coppie = defaultdict(lambda: defaultdict(int))
 
-    if len(estrazioni_ruota) < 20:
-        continue
+for i in range(1, 91):
+    for j in range(1, 91):
+        if i != j:
+            freq_coppie[i][j] = random.randint(0, 20)
 
-    ultime = estrazioni_ruota[-1]
 
-    breve = estrazioni_ruota[-20:]
-    medio = estrazioni_ruota[-100:]
-    lungo = estrazioni_ruota[-500:]
+# ================================
+# STEP 1 - PRENDI NUMERI TOP
+# ================================
+def get_top_numbers(score_numeri, ritardi, n=TOP_NUMERI):
+    ranking = []
 
-    freq_breve = calcola_freq(breve)
-    freq_medio = calcola_freq(medio)
-    freq_lungo = calcola_freq(lungo)
+    for num in range(1, 91):
+        score = (
+            score_numeri[num] * 0.7 +
+            (ritardi[num] / 100) * 0.3
+        )
+        ranking.append((num, score))
 
-    # ===== RITARDI =====
-    ritardi = {}
-    for n in range(1, 91):
-        ritardo = 0
-        for estr in reversed(estrazioni_ruota):
-            if n in estr:
-                break
-            ritardo += 1
-        ritardi[n] = ritardo
+    ranking.sort(key=lambda x: x[1], reverse=True)
 
-    score_num = {}
-    ultime_5 = estrazioni_ruota[-5:]
+    return [num for num, _ in ranking[:n]]
 
-    for n in range(1, 91):
 
-        penalita = 10 if n in ultime else 0
-        presenze_recenti = sum(1 for estr in ultime_5 if n in estr)
-        bonus_vicini = 1 if (n-1 in ultime or n+1 in ultime) else 0
+# ================================
+# STEP 2 - TROVA MIGLIOR COMPAGNO
+# ================================
+def trova_miglior_compagno(n1, score_numeri, ritardi, freq_coppie):
+    best_score = -1
+    best_num = None
+
+    for n2 in range(1, 91):
+        if n2 == n1:
+            continue
 
         score = (
-            freq_breve.get(n, 0) * 3 +
-            freq_medio.get(n, 0) * 1.5 +
-            freq_lungo.get(n, 0) * 1 +
-            (ritardi[n] ** 1.2) * 0.5 +
-            presenze_recenti * 2 +
-            bonus_vicini -
-            penalita
+            freq_coppie[n1][n2] * PESO_FREQ_COPPIA +
+            score_numeri[n2] * PESO_SCORE_SINGOLO +
+            (ritardi[n2] / 100) * PESO_RITARDO
         )
 
-        if ritardi[n] > 20:
-            score += ritardi[n] * 0.3
+        if score > best_score:
+            best_score = score
+            best_num = n2
 
-        if freq_breve.get(n, 0) > 2 and freq_lungo.get(n, 0) > 15:
-            score += 5
+    return best_num, best_score
 
-        score += random.uniform(0, 0.5)
 
-        score_num[n] = score
+# ================================
+# STEP 3 - GENERA AMBI
+# ================================
+def genera_ambi():
+    ambi = []
 
-    # ===== SCELTA AMBO =====
-    candidati = [n for n in range(1, 91) if n not in ultime]
-    candidati.sort(key=lambda x: score_num[x], reverse=True)
+    top_numbers = get_top_numbers(score_numeri, ritardi)
 
-    ambo = [candidati[0], candidati[1]]
-    score_ambo = score_num[ambo[0]] + score_num[ambo[1]]
+    for n1 in top_numbers:
+        n2, score = trova_miglior_compagno(
+            n1,
+            score_numeri,
+            ritardi,
+            freq_coppie
+        )
 
-    risultati["ruote"][ruota] = {
-        "ultima": ultime,
-        "ambo": ambo,
-        "score": score_ambo
-    }
+        if n2:
+            ambi.append({
+                "ambo": tuple(sorted([n1, n2])),
+                "score": round(score, 4)
+            })
 
-# ===== TOP 3 =====
-top_sorted = sorted(
-    risultati["ruote"].items(),
-    key=lambda x: x[1]["score"],
-    reverse=True
-)
+    # ordina per qualità
+    ambi.sort(key=lambda x: x["score"], reverse=True)
 
-top3 = top_sorted[:3]
+    return ambi[:AMBI_FINALI]
 
-risultati["top"] = [t[0] for t in top3]
 
-giocate = []
-for ruota, dati in top3:
-    giocate.append({
-        "ruota": ruota,
-        "ambo": dati["ambo"]
-    })
+# ================================
+# RUN
+# ================================
+if __name__ == "__main__":
+    risultati = genera_ambi()
 
-risultati["giocate"] = giocate
+    print("\n🔥 AMBI GENERATI:\n")
 
-# ===== JOLLY INTELLIGENTE =====
-
-gemelle = {
-    "Bari": "Napoli",
-    "Napoli": "Bari",
-    "Milano": "Torino",
-    "Torino": "Milano",
-    "Palermo": "Cagliari",
-    "Cagliari": "Palermo",
-    "Firenze": "Genova",
-    "Genova": "Firenze"
-}
-
-# 1. miglior ambo globale
-miglior_ambo = None
-miglior_score = 0
-ruota_origine = None
-
-for ruota, dati in risultati["ruote"].items():
-    if dati["score"] > miglior_score:
-        miglior_score = dati["score"]
-        miglior_ambo = dati["ambo"]
-        ruota_origine = ruota
-
-ruote_top = [g["ruota"] for g in risultati["giocate"]]
-
-# ===== TEST NAZIONALE =====
-usa_nazionale = False
-
-if "Nazionale" in estrazioni:
-
-    ultime_20_naz = estrazioni["Nazionale"][-20:]
-    presenza = 0
-
-    for estr in ultime_20_naz:
-        for n in miglior_ambo:
-            if n in estr:
-                presenza += 1
-
-    if presenza >= 1:
-        usa_nazionale = True
-
-# ===== SCELTA RUOTA JOLLY =====
-
-if usa_nazionale and "Nazionale" not in ruote_top:
-    ruota_jolly = "Nazionale"
-
-else:
-    ruota_jolly = gemelle.get(ruota_origine)
-
-    if ruota_jolly not in risultati["ruote"] or ruota_jolly in ruote_top:
-        candidati = [
-            r for r in risultati["ruote"]
-            if r != ruota_origine and r not in ruote_top
-        ]
-
-        if candidati:
-            ruota_jolly = max(candidati, key=lambda r: risultati["ruote"][r]["score"])
-        else:
-            ruota_jolly = ruota_origine
-
-# ===== ASSEGNA JOLLY =====
-risultati["jolly"] = {
-    "ruota": ruota_jolly,
-    "ambo": miglior_ambo
-}
-
-# ===== SALVA =====
-with open("risultati.json", "w", encoding="utf-8") as f:
-    json.dump(risultati, f, indent=2)
-
-print("🔥 PRO MAX ATTIVO (TOP + JOLLY SMART + NAZIONALE INTELLIGENTE)")
+    for r in risultati:
+        print(f"{r['ambo']}  | score: {r['score']}")
