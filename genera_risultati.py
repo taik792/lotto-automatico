@@ -1,24 +1,45 @@
 import json
+import random
+from itertools import combinations
 
-risultati = {
-    "top": ["TEST1", "TEST2", "TEST3"],
-    "giocate": [
-        {"ruota": "TEST1", "ambo": [11, 22]},
-        {"ruota": "TEST2", "ambo": [33, 44]},
-        {"ruota": "TEST3", "ambo": [55, 66]}
-    ],
-    "jolly": {
-        "ruota": "TEST-JOLLY",
-        "ambo": [77, 88]
-    },
-    "ruote": {
-        "TEST1": {"ultima": [1,2,3,4,5], "ambo": [11,22], "score": 100},
-        "TEST2": {"ultima": [6,7,8,9,10], "ambo": [33,44], "score": 90},
-        "TEST3": {"ultima": [11,12,13,14,15], "ambo": [55,66], "score": 80}
-    }
-}
+RUOTE = ["Bari","Cagliari","Firenze","Genova","Milano","Napoli","Palermo","Roma","Torino","Venezia","Nazionale"]
 
-with open("risultati.json", "w", encoding="utf-8") as f:
-    json.dump(risultati, f, indent=2)
+BREVE = 20
+MEDIO = 80
+LUNGO = 200
 
-print("🔥 TEST ATTIVO - SE NON VEDI QUESTO SUL SITO C'È UN PROBLEMA")
+with open("estrazioni.json", encoding="utf-8") as f:
+    estrazioni = json.load(f)
+
+risultati = {"top": [], "ruote": {}, "giocate": [], "jolly": {}}
+
+def freq(lista):
+    f = {}
+    for e in lista:
+        for n in e:
+            f[n] = f.get(n, 0) + 1
+    return f
+
+# ===== ANALISI =====
+for ruota in RUOTE:
+
+    if ruota not in estrazioni:
+        continue
+
+    data = estrazioni[ruota]
+    ultime = data[-1]
+
+    breve = data[-BREVE:]
+    medio = data[-MEDIO:]
+    lungo = data[-LUNGO:]
+
+    fb, fm, fl = freq(breve), freq(medio), freq(lungo)
+
+    # ritardi
+    ritardi = {}
+    for n in range(1,91):
+        r = 0
+        for e in reversed(data):
+            if n in e:
+                break
+            r +=
