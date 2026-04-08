@@ -12,7 +12,11 @@ body {
     text-align:center;
 }
 
-/* TOP */
+/* TITOLI */
+h1 {
+    margin-top:20px;
+}
+
 .top {
     margin:20px;
 }
@@ -21,9 +25,10 @@ body {
     display:block;
     color:#ffd700;
     font-weight:bold;
+    margin:3px;
 }
 
-/* GRID 3 COLONNE */
+/* GRID */
 .grid {
     display:grid;
     grid-template-columns: repeat(3, 1fr);
@@ -34,30 +39,45 @@ body {
 /* CARD */
 .card {
     border:2px solid #00ff99;
-    padding:12px;
-    border-radius:10px;
+    padding:15px;
+    border-radius:12px;
+    background:#0f1626;
+    box-shadow:0 0 10px rgba(0,255,153,0.2);
 }
 
-/* CENTRA ULTIMA RIGA */
-.grid:after {
-    content: "";
-    grid-column: span 3;
+/* RUOTA */
+.card strong {
+    font-size:18px;
 }
 
-/* TESTI */
+/* ULTIMA ESTRAZIONE */
+.ultima {
+    font-size:16px;
+    color:#ffffff;
+    margin-top:6px;
+}
+
+/* AMBO */
 .ambo {
     color:#00ff99;
     font-weight:bold;
+    font-size:22px;
+    margin-top:10px;
 }
 
-.ultima {
-    font-size:12px;
-    color:#ccc;
-}
-
+/* SCORE */
 .score {
-    color:red;
-    font-size:12px;
+    color:#ff4d4d;
+    font-size:11px;
+    opacity:0.6;
+    margin-top:5px;
+}
+
+/* MOBILE */
+@media (max-width:600px){
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 </style>
 </head>
@@ -83,28 +103,27 @@ fetch("risultati.json")
 
     // ===== TOP =====
     let topHtml = "";
-
     data.giocate.forEach(g => {
         topHtml += `<span>👉 ${g.ruota} → ${g.ambo.join("-")}</span>`;
     });
-
     document.getElementById("top").innerHTML = topHtml;
 
     // ===== JOLLY =====
     document.getElementById("jolly").innerHTML =
         `<span>💣 ${data.jolly.ruota} → ${data.jolly.ambo.join("-")}</span>`;
 
-    // ===== GRID RUOTE =====
+    // ===== GRID =====
     let gridHtml = "";
 
     Object.entries(data.ruote).forEach(([ruota, r]) => {
 
-        const ultima = r.ultima.join(" - ");
+        // 🔥 sostituisce trattini con punti
+        const ultima = r.ultima.join(" • ");
 
         gridHtml += `
         <div class="card">
-            <strong>${ruota}</strong><br>
-            <div class="ultima">Ultima: ${ultima}</div><br>
+            <strong>${ruota}</strong>
+            <div class="ultima">${ultima}</div>
             <div class="ambo">${r.ambo.join("-")}</div>
             <div class="score">Score: ${r.score.toFixed(2)}</div>
         </div>
