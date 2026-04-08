@@ -20,7 +20,130 @@ estrazioni_per_ruota = {
 ultime = {r: e[0] for r, e in estrazioni_per_ruota.items() if e}
 
 # ======================
-# FREQUENZE PER RUOTA
+# UNIONE ESTRAZIONI
+# ======================
+estrazioni = []
+for e in estrazioni_per_ruota.values():
+    estrazioni.extend(e)
+
+# ======================
+# FREQUENZE GLOBALI
+# ======================
+freq = defaultdict(int)
+
+for estr in estrazioni[:120]:
+    for n in estr:
+        freq[n] += 1
+
+# ======================
+# RITARDI
+# ======================
+ritardi = {i: 0 for i in range(1, 91)}
+
+for n in range(1, 91):
+    for idx, estr in enumerate(estrazioni):
+        if n in estr:
+            ritardi[n] = idx
+            break
+
+# ======================
+# COPPIE
+# ======================
+freq_coppie = defaultdict(lambda: defaultdict(int))
+
+for estr in estrazioni[:150]:
+    for i in range(len(estr)):
+        for j in range(i+1, len(estr)):
+            a, b = estr[i], estr[j]
+            freq_coppie[a][b] += 1
+            freq_coppie[b][a] += 1
+
+# ======================
+# SCORE NUMERI
+# ======================
+score_num = {
+    n: freq[n]*1.2 + ritardi[n]*0.8
+    for n in range(1, 91)
+}
+
+# ======================
+# GENERA AMBI (BILANCIATI)
+# ======================
+ambi = []
+
+for n1 in range(1, 91):
+    for n2 in range(n1+1, 91):
+
+        score = (
+            freq_coppie[n1][n2]*2 +
+            score_num[n1] +
+            score_num[n2]
+        )
+
+        ambi.append({
+            "numeri": [n1, n2],
+            "score": score
+        })
+
+# ORDINA
+ambi.sort(key=lambda x: x["score"], reverse=True)
+
+# ======================
+# FILTRO INTELLIGENTE
+# ======================
+finali = []
+uso_numeri = defaultdict(int)
+
+for a in ambi:
+    n1, n2 = a["numeri"]
+
+    # max 2 volte lo stesso numero
+    if uso_numeri[n1] >= 2 or uso_numeri[n2] >= 2:
+        continue
+
+    finali.append(a)
+
+    uso_numeri[n1] += 1
+    uso_numeri[n2] += 1
+
+    if len(finali) == 3:
+        break
+
+# ======================
+# ASSEGNA RUOTA MIGLIORE
+# ======================
+top = []
+
+for a in finali:
+    best_ruota = None
+    best_score = -1
+
+    for r, estr in estrazioni_per_ruota.items():
+
+        freq_r = defaultdict(int)
+        for e in estr[:80]:
+            for n in e:
+                freq_r[n] += 1
+
+        score = freq_r[a["numeri"][0]] + freq_r[a["numeri"][1]]
+
+        if score > best_score:
+            best_score = score
+            best_ruota = r
+
+    a["ruota"] = best_ruota
+    top.append(a)
+
+# ======================
+# PROBABILITÀ
+# ======================
+max_score = max(a["score"] for a in top)
+
+for a in top:
+    a["prob"] = round((a["score"] / max_score) * 100, 2)
+
+# ======================
+# RUOTA GEMELLA (JOLLY)
 # ======================
 freq_ruota = {}
 
@@ -31,9 +154,6 @@ for r, estr in estrazioni_per_ruota.items():
             f[n] += 1
     freq_ruota[r] = f
 
-# ======================
-# RUOTE GEMELLE (serve solo per jolly)
-# ======================
 def similarita(f1, f2):
     return sum(min(f1[n], f2[n]) for n in range(1, 91))
 
@@ -55,70 +175,7 @@ for r1 in freq_ruota:
 
     ruota_gemella[r1] = best
 
-# ======================
-# GENERA AMBI PER RUOTA
-# ======================
-candidati = []
-
-for r, estr in estrazioni_per_ruota.items():
-
-    freq = freq_ruota[r]
-
-    for n1 in range(1, 91):
-        for n2 in range(n1+1, 91):
-
-            score = freq[n1] + freq[n2]
-
-            candidati.append({
-                "ruota": r,
-                "numeri": [n1, n2],
-                "score": score
-            })
-
-# ======================
-# ORDINA
-# ======================
-candidati.sort(key=lambda x: x["score"], reverse=True)
-
-# ======================
-# FILTRO FORTE (NO RIPETIZIONI)
-# ======================
-top = []
-numeri_usati = set()
-ruote_usate = set()
-
-for c in candidati:
-
-    n1, n2 = c["numeri"]
-    r = c["ruota"]
-
-    if n1 in numeri_usati or n2 in numeri_usati:
-        continue
-
-    if r in ruote_usate:
-        continue
-
-    top.append(c)
-
-    numeri_usati.update([n1, n2])
-    ruote_usate.add(r)
-
-    if len(top) == 3:
-        break
-
-# ======================
-# PROBABILITÀ
-# ======================
-max_score = max(c["score"] for c in top)
-
-for c in top:
-    c["prob"] = round((c["score"] / max_score) * 100, 2)
-
-# ======================
-# RUOTA JOLLY (SOLO 1)
-# ======================
-ruota_migliore = top[0]["ruota"]
-ruota_jolly = ruota_gemella[ruota_migliore]
+ruota_jolly = ruota_gemella[top[0]["ruota"]]
 
 # ======================
 # OUTPUT
@@ -132,4 +189,4 @@ output = {
 with open(file_output, "w") as f:
     json.dump(output, f, indent=2)
 
-print("✅ ORA È COME VOLEVI")
+print("✅ SISTEMA BILANCIATO ATTIVO")
