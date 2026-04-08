@@ -14,10 +14,10 @@ fetch("risultati.json")
       `;
     }
 
-    // AMBI CON RUOTA
+    // AMBI TOP (CON RUOTA)
     const ambiDiv = document.getElementById("ambi");
 
-    data.top.forEach(a => {
+    data.top_ambi.forEach(a => {
       ambiDiv.innerHTML += `
         <div class="card top">
           <b>${a.ruota}</b><br>
@@ -27,13 +27,13 @@ fetch("risultati.json")
       `;
     });
 
-    // JOLLY
+    // RUOTA JOLLY
     const terniDiv = document.getElementById("terni");
 
     terniDiv.innerHTML = `
       <div class="card">
-        🎯 Ruota Jolly: <b>${data.ruota_jolly}</b>
+        🎯 RUOTA JOLLY<br>
+        <b>${data.ruota_jolly}</b>
       </div>
     `;
-
   });
