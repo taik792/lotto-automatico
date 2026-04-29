@@ -1,8 +1,8 @@
 {
   "top": [
     "Bari",
-    "Palermo",
-    "Roma"
+    "Firenze",
+    "Palermo"
   ],
   "ruote": {
     "Bari": {
@@ -17,7 +17,7 @@
         10,
         67
       ],
-      "score": 1274.71
+      "score": 1187.71
     },
     "Cagliari": {
       "ultima": [
@@ -31,7 +31,7 @@
         56,
         31
       ],
-      "score": 1185.66
+      "score": 1104.66
     },
     "Firenze": {
       "ultima": [
@@ -45,7 +45,7 @@
         28,
         33
       ],
-      "score": 1209.14
+      "score": 1158.14
     },
     "Genova": {
       "ultima": [
@@ -56,10 +56,10 @@
         13
       ],
       "ambo": [
-        76,
-        30
+        3,
+        66
       ],
-      "score": 1159.25
+      "score": 1074.07
     },
     "Milano": {
       "ultima": [
@@ -73,7 +73,7 @@
         77,
         70
       ],
-      "score": 1224.61
+      "score": 1143.61
     },
     "Napoli": {
       "ultima": [
@@ -87,7 +87,7 @@
         1,
         29
       ],
-      "score": 1148.94
+      "score": 1088.94
     },
     "Palermo": {
       "ultima": [
@@ -101,7 +101,7 @@
         30,
         90
       ],
-      "score": 1229.23
+      "score": 1154.23
     },
     "Roma": {
       "ultima": [
@@ -115,7 +115,7 @@
         40,
         6
       ],
-      "score": 1225.36
+      "score": 1129.36
     },
     "Torino": {
       "ultima": [
@@ -129,7 +129,7 @@
         49,
         68
       ],
-      "score": 1175.71
+      "score": 1097.71
     },
     "Venezia": {
       "ultima": [
@@ -143,7 +143,7 @@
         34,
         45
       ],
-      "score": 1178.62
+      "score": 1109.62
     }
   },
   "giocate": [
@@ -155,17 +155,17 @@
       ]
     },
     {
+      "ruota": "Firenze",
+      "ambo": [
+        28,
+        33
+      ]
+    },
+    {
       "ruota": "Palermo",
       "ambo": [
         30,
         90
-      ]
-    },
-    {
-      "ruota": "Roma",
-      "ambo": [
-        40,
-        6
       ]
     }
   ],
