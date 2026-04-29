@@ -1,8 +1,8 @@
 {
   "top": [
-    "Palermo",
-    "Bari",
-    "Cagliari"
+    "Milano",
+    "Torino",
+    "Firenze"
   ],
   "ruote": {
     "Bari": {
@@ -28,10 +28,10 @@
         13
       ],
       "ambo": [
-        56,
-        33
+        41,
+        50
       ],
-      "score": 782.74
+      "score": 733.62
     },
     "Firenze": {
       "ultima": [
@@ -43,9 +43,9 @@
       ],
       "ambo": [
         33,
-        80
+        1
       ],
-      "score": 755.28
+      "score": 800.19
     },
     "Genova": {
       "ultima": [
@@ -56,10 +56,10 @@
         86
       ],
       "ambo": [
-        76,
-        81
+        81,
+        30
       ],
-      "score": 767.92
+      "score": 772.34
     },
     "Milano": {
       "ultima": [
@@ -71,9 +71,9 @@
       ],
       "ambo": [
         77,
-        20
+        70
       ],
-      "score": 773.89
+      "score": 812.74
     },
     "Napoli": {
       "ultima": [
@@ -98,10 +98,10 @@
         46
       ],
       "ambo": [
-        90,
-        28
+        45,
+        78
       ],
-      "score": 827.79
+      "score": 774.6
     },
     "Roma": {
       "ultima": [
@@ -127,9 +127,9 @@
       ],
       "ambo": [
         49,
-        26
+        38
       ],
-      "score": 781.37
+      "score": 803.8
     },
     "Venezia": {
       "ultima": [
@@ -141,39 +141,39 @@
       ],
       "ambo": [
         45,
-        54
+        53
       ],
-      "score": 743.55
+      "score": 789.53
     }
   },
   "giocate": [
     {
-      "ruota": "Palermo",
+      "ruota": "Milano",
       "ambo": [
-        90,
-        28
+        77,
+        70
       ]
     },
     {
-      "ruota": "Bari",
+      "ruota": "Torino",
       "ambo": [
-        67,
-        26
+        49,
+        38
       ]
     },
     {
-      "ruota": "Cagliari",
+      "ruota": "Firenze",
       "ambo": [
-        56,
-        33
+        33,
+        1
       ]
     }
   ],
   "jolly": {
-    "ruota": "Torino",
+    "ruota": "Venezia",
     "ambo": [
-      90,
-      28
+      77,
+      70
     ]
   }
 }
