@@ -38,7 +38,7 @@ for ruota in RUOTE:
 
     estrazioni_ruota = estrazioni[ruota]
 
-    if len(estrazioni_ruota) < 50:
+    if len(estrazioni_ruota) < 120:
         continue
 
     ultime = estrazioni_ruota[-1]
