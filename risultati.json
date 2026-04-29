@@ -17,7 +17,7 @@
         41,
         47
       ],
-      "score": 534.22
+      "score": 538.72
     },
     "Cagliari": {
       "ultima": [
@@ -31,7 +31,7 @@
         41,
         42
       ],
-      "score": 489.11
+      "score": 495.11
     },
     "Firenze": {
       "ultima": [
@@ -45,7 +45,7 @@
         33,
         73
       ],
-      "score": 490.94
+      "score": 493.94
     },
     "Genova": {
       "ultima": [
@@ -57,9 +57,9 @@
       ],
       "ambo": [
         66,
-        81
+        71
       ],
-      "score": 466.15
+      "score": 468.61
     },
     "Milano": {
       "ultima": [
@@ -73,7 +73,7 @@
         77,
         21
       ],
-      "score": 480.94
+      "score": 489.94
     },
     "Napoli": {
       "ultima": [
@@ -87,7 +87,7 @@
         40,
         45
       ],
-      "score": 516.04
+      "score": 517.54
     },
     "Palermo": {
       "ultima": [
@@ -101,7 +101,7 @@
         45,
         20
       ],
-      "score": 513.11
+      "score": 514.61
     },
     "Roma": {
       "ultima": [
@@ -115,7 +115,7 @@
         40,
         6
       ],
-      "score": 471.86
+      "score": 474.86
     },
     "Torino": {
       "ultima": [
@@ -129,7 +129,7 @@
         49,
         38
       ],
-      "score": 485.37
+      "score": 489.87
     },
     "Venezia": {
       "ultima": [
@@ -143,7 +143,7 @@
         79,
         34
       ],
-      "score": 487.74
+      "score": 489.24
     }
   },
   "giocate": [
@@ -170,7 +170,7 @@
     }
   ],
   "jolly": {
-    "ruota": "Firenze",
+    "ruota": "Cagliari",
     "ambo": [
       41,
       47
