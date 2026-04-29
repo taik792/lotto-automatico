@@ -14,10 +14,10 @@
         33
       ],
       "ambo": [
-        67,
+        41,
         47
       ],
-      "score": 641.89
+      "score": 567.22
     },
     "Cagliari": {
       "ultima": [
@@ -29,9 +29,9 @@
       ],
       "ambo": [
         41,
-        31
+        73
       ],
-      "score": 567.51
+      "score": 512.72
     },
     "Firenze": {
       "ultima": [
@@ -43,9 +43,9 @@
       ],
       "ambo": [
         33,
-        1
+        58
       ],
-      "score": 601.09
+      "score": 529.57
     },
     "Genova": {
       "ultima": [
@@ -57,9 +57,9 @@
       ],
       "ambo": [
         66,
-        81
+        71
       ],
-      "score": 574.65
+      "score": 505.61
     },
     "Milano": {
       "ultima": [
@@ -73,7 +73,7 @@
         77,
         86
       ],
-      "score": 604.87
+      "score": 536.37
     },
     "Napoli": {
       "ultima": [
@@ -87,7 +87,7 @@
         40,
         45
       ],
-      "score": 585.04
+      "score": 535.54
     },
     "Palermo": {
       "ultima": [
@@ -98,10 +98,10 @@
         11
       ],
       "ambo": [
-        90,
+        45,
         66
       ],
-      "score": 611.48
+      "score": 548.36
     },
     "Roma": {
       "ultima": [
@@ -115,7 +115,7 @@
         40,
         6
       ],
-      "score": 588.86
+      "score": 512.86
     },
     "Torino": {
       "ultima": [
@@ -127,9 +127,9 @@
       ],
       "ambo": [
         49,
-        8
+        38
       ],
-      "score": 583.87
+      "score": 525.37
     },
     "Venezia": {
       "ultima": [
@@ -141,23 +141,23 @@
       ],
       "ambo": [
         79,
-        45
+        34
       ],
-      "score": 591.24
+      "score": 523.24
     }
   },
   "giocate": [
     {
       "ruota": "Bari",
       "ambo": [
-        67,
+        41,
         47
       ]
     },
     {
       "ruota": "Palermo",
       "ambo": [
-        90,
+        45,
         66
       ]
     },
@@ -172,7 +172,7 @@
   "jolly": {
     "ruota": "Napoli",
     "ambo": [
-      67,
+      41,
       47
     ]
   }
