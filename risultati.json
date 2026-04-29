@@ -1,8 +1,8 @@
 {
   "top": [
     "Bari",
-    "Milano",
-    "Firenze"
+    "Napoli",
+    "Palermo"
   ],
   "ruote": {
     "Bari": {
@@ -15,9 +15,9 @@
       ],
       "ambo": [
         41,
-        53
+        71
       ],
-      "score": 398.39
+      "score": 204.71
     },
     "Cagliari": {
       "ultima": [
@@ -29,9 +29,9 @@
       ],
       "ambo": [
         41,
-        31
+        23
       ],
-      "score": 349.51
+      "score": 165.01
     },
     "Firenze": {
       "ultima": [
@@ -43,9 +43,9 @@
       ],
       "ambo": [
         33,
-        45
+        49
       ],
-      "score": 368.07
+      "score": 140.09
     },
     "Genova": {
       "ultima": [
@@ -57,9 +57,9 @@
       ],
       "ambo": [
         66,
-        81
+        60
       ],
-      "score": 360.65
+      "score": 142.56
     },
     "Milano": {
       "ultima": [
@@ -70,10 +70,10 @@
         84
       ],
       "ambo": [
-        61,
-        27
+        77,
+        5
       ],
-      "score": 370.63
+      "score": 134.89
     },
     "Napoli": {
       "ultima": [
@@ -87,7 +87,7 @@
         40,
         16
       ],
-      "score": 349.94
+      "score": 184.44
     },
     "Palermo": {
       "ultima": [
@@ -98,10 +98,10 @@
         11
       ],
       "ambo": [
-        90,
-        25
+        45,
+        65
       ],
-      "score": 358.24
+      "score": 165.17
     },
     "Roma": {
       "ultima": [
@@ -113,9 +113,9 @@
       ],
       "ambo": [
         17,
-        6
+        67
       ],
-      "score": 357.58
+      "score": 143.34
     },
     "Torino": {
       "ultima": [
@@ -126,10 +126,10 @@
         76
       ],
       "ambo": [
-        49,
-        5
+        65,
+        85
       ],
-      "score": 355.13
+      "score": 140.7
     },
     "Venezia": {
       "ultima": [
@@ -140,10 +140,10 @@
         53
       ],
       "ambo": [
-        39,
-        14
+        79,
+        23
       ],
-      "score": 333.13
+      "score": 142.19
     }
   },
   "giocate": [
@@ -151,29 +151,29 @@
       "ruota": "Bari",
       "ambo": [
         41,
-        53
+        71
       ]
     },
     {
-      "ruota": "Milano",
+      "ruota": "Napoli",
       "ambo": [
-        61,
-        27
+        40,
+        16
       ]
     },
     {
-      "ruota": "Firenze",
+      "ruota": "Palermo",
       "ambo": [
-        33,
-        45
+        45,
+        65
       ]
     }
   ],
   "jolly": {
-    "ruota": "Napoli",
+    "ruota": "Cagliari",
     "ambo": [
       41,
-      53
+      71
     ]
   }
 }
