@@ -43,7 +43,7 @@ for ruota in RUOTE:
 
     ultime = estrazioni_ruota[-1]
 
-    breve = estrazioni_ruota[-500:]
+    breve = estrazioni_ruota[-100:]
     medio = estrazioni_ruota[-2000:]
     lungo = estrazioni_ruota[-3000:]
 
