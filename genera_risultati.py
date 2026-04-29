@@ -96,7 +96,7 @@ for ruota in RUOTE:
     candidati = [n for n in range(1, 91) if n not in ultime]
 
     # dividi numeri
-    ritardatari = [n for n in candidati if ritardi[n] > 80]
+    ritardatari = [n for n in candidati if ritardi[n] > 20]
     frequenti = [n for n in candidati if freq_breve.get(n, 0) >= 2]
 
     top_numeri = sorted(candidati, key=lambda x: score_num[x], reverse=True)[:20]
