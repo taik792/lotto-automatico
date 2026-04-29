@@ -38,12 +38,12 @@ for ruota in RUOTE:
 
     estrazioni_ruota = estrazioni[ruota]
 
-    if len(estrazioni_ruota) < 120:
+    if len(estrazioni_ruota) < 50:
         continue
 
     ultime = estrazioni_ruota[-1]
 
-    breve = estrazioni_ruota[-1000:]
+    breve = estrazioni_ruota[-700:]
     medio = estrazioni_ruota[-2000:]
     lungo = estrazioni_ruota[-3000:]
 
