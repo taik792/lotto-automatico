@@ -14,7 +14,7 @@ risultati = {
     "jolly": {}
 }
 
-# ===== FREQUENZE =====
+# ===== FUNZIONI STATISTICHE =====
 def calcola_freq(lista):
     freq = {}
     for estr in lista:
@@ -22,7 +22,6 @@ def calcola_freq(lista):
             freq[n] = freq.get(n, 0) + 1
     return freq
 
-# ===== CO-OCCORRENZA =====
 def calcola_cooccorrenze(lista):
     coppie = {}
     for estr in lista:
@@ -32,25 +31,25 @@ def calcola_cooccorrenze(lista):
 
 # ===== ANALISI RUOTE =====
 for ruota in RUOTE:
-
     if ruota not in estrazioni:
         continue
 
     estrazioni_ruota = estrazioni[ruota]
-
     if len(estrazioni_ruota) < 50:
         continue
 
     ultime = estrazioni_ruota[-1]
 
-    breve = estrazioni_ruota[-18:]
-    medio = estrazioni_ruota[-540:]
-    lungo = estrazioni_ruota[-1000:]
+    # --- NUOVI CICLI BILANCIATI ---
+    breve = estrazioni_ruota[-18:]   # Ciclo naturale (18)
+    medio = estrazioni_ruota[-540:]  # Stabilità 3 anni (540)
+    lungo = estrazioni_ruota[-1000:] # Memoria storica (1000)
 
     freq_breve = calcola_freq(breve)
     freq_medio = calcola_freq(medio)
     freq_lungo = calcola_freq(lungo)
 
+    # Co-occorrenze basate sul periodo medio per massima attendibilità
     cooc = calcola_cooccorrenze(medio)
 
     # ===== RITARDI =====
@@ -63,21 +62,21 @@ for ruota in RUOTE:
             ritardo += 1
         ritardi[n] = ritardo
 
-    # ===== SCORE NUMERI =====
+    # ===== SCORE NUMERI (PESI AGGIORNATI) =====
     score_num = {}
     ultime_5 = estrazioni_ruota[-5:]
 
     for n in range(1, 91):
-
         penalita = 10 if n in ultime else 0
         presenze_recenti = sum(1 for estr in ultime_5 if n in estr)
         bonus_vicini = 1 if (n-1 in ultime or n+1 in ultime) else 0
 
+        # Formula bilanciata per i nuovi archi temporali
         score = (
-            freq_breve.get(n, 0) * 2 +
-            freq_medio.get(n, 0) * 1.2 +
-            freq_lungo.get(n, 0) * 0.8 +
-            (ritardi[n] ** 1.15) * 0.6 +
+            freq_breve.get(n, 0) * 2.5 +     # Peso sulla frequenza attuale
+            freq_medio.get(n, 0) * 1.2 +     # Peso sulla costanza media
+            freq_lungo.get(n, 0) * 0.8 +     # Peso sullo storico
+            (ritardi[n] ** 1.15) * 0.6 + 
             presenze_recenti * 2 +
             bonus_vicini -
             penalita
@@ -92,48 +91,46 @@ for ruota in RUOTE:
         score_num[n] = score
 
     # ===== SCELTA AMBO INTELLIGENTE =====
-
     candidati = [n for n in range(1, 91) if n not in ultime]
-
-    # dividi numeri
     ritardatari = [n for n in candidati if ritardi[n] > 20]
     frequenti = [n for n in candidati if freq_breve.get(n, 0) >= 2]
-
     top_numeri = sorted(candidati, key=lambda x: score_num[x], reverse=True)[:20]
 
     miglior_ambo = None
     miglior_score = 0
 
-    # ===== 1. MIX FORZATO =====
-    for a in ritardatari:
-        for b in frequenti:
+    # Liste per i due tipi di ricerca (1. Mix Forzato, 2. Fallback)
+    ricerche = [
+        (ritardatari, frequenti, 1.0), 
+        (top_numeri, top_numeri, 0.6) # 0.6 è la penalty se entrambi sono ritardatari
+    ]
 
-            if a == b:
-                continue
-
-            base = score_num[a] + score_num[b]
-            coppia = tuple(sorted((a, b)))
-            co_score = cooc.get(coppia, 0)
-
-            score_finale = base + (co_score * 4)
-
-            if score_finale > miglior_score:
-                miglior_score = score_finale
-                miglior_ambo = [a, b]
-
-    # ===== 2. FALLBACK =====
-    if not miglior_ambo:
-        for a, b in combinations(top_numeri, 2):
-
-            penalty = 1
-            if ritardi[a] > 25 and ritardi[b] > 25:
+    for lista_a, lista_b, penalty_base in ricerche:
+        if miglior_ambo and lista_a == top_numeri: break # Se abbiamo già un ambo dal mix, saltiamo il fallback
+        
+        for a, b in combinations(set(lista_a + lista_b), 2):
+            if a == b: continue
+            
+            # Controllo: se entrambi sono super-ritardatari nel fallback, applica penalty
+            penalty = penalty_base
+            if lista_a == top_numeri and ritardi[a] > 25 and ritardi[b] > 25:
                 penalty = 0.6
 
             base = score_num[a] + score_num[b]
             coppia = tuple(sorted((a, b)))
             co_score = cooc.get(coppia, 0)
 
-            score_finale = (base + co_score * 4) * penalty
+            # POTENZIAMENTO CO-OCCORRENZE (x8)
+            score_finale = (base + co_score * 8) * penalty
+
+            # FILTRO SICUREZZA: Ambo non uscito negli ultimi 50 turni
+            ambo_recente = False
+            for estr in estrazioni_ruota[-50:]:
+                if a in estr and b in estr:
+                    ambo_recente = True
+                    break
+            if ambo_recente:
+                score_finale *= 0.5
 
             if score_finale > miglior_score:
                 miglior_score = score_finale
@@ -145,70 +142,26 @@ for ruota in RUOTE:
         "score": round(miglior_score, 2)
     }
 
-# ===== TOP 3 =====
-top_sorted = sorted(
-    risultati["ruote"].items(),
-    key=lambda x: x[1]["score"],
-    reverse=True
-)
-
+# ===== GESTIONE TOP 3 E JOLLY (RESTO DEL CODICE INVARIATO) =====
+top_sorted = sorted(risultati["ruote"].items(), key=lambda x: x[1]["score"], reverse=True)
 top3 = top_sorted[:3]
-
 risultati["top"] = [t[0] for t in top3]
 
-giocate = []
 for ruota, dati in top3:
-    giocate.append({
-        "ruota": ruota,
-        "ambo": dati["ambo"]
-    })
+    risultati["giocate"].append({"ruota": ruota, "ambo": dati["ambo"]})
 
-risultati["giocate"] = giocate
-
-# ===== JOLLY =====
-
-gemelle = {
-    "Bari": "Napoli",
-    "Napoli": "Bari",
-    "Milano": "Torino",
-    "Torino": "Milano",
-    "Palermo": "Cagliari",
-    "Cagliari": "Palermo",
-    "Firenze": "Genova",
-    "Genova": "Firenze"
-}
-
-miglior_ambo = None
-miglior_score = 0
-ruota_origine = None
-
-for ruota, dati in risultati["ruote"].items():
-    if dati["score"] > miglior_score:
-        miglior_score = dati["score"]
-        miglior_ambo = dati["ambo"]
-        ruota_origine = ruota
-
-ruote_top = [g["ruota"] for g in risultati["giocate"]]
-
+gemelle = {"Bari":"Napoli","Napoli":"Bari","Milano":"Torino","Torino":"Milano","Palermo":"Cagliari","Cagliari":"Palermo","Firenze":"Genova","Genova":"Firenze"}
+miglior_ambo_assoluto = top_sorted[0][1]["ambo"]
+ruota_origine = top_sorted[0][0]
 ruota_jolly = gemelle.get(ruota_origine)
 
-if ruota_jolly not in risultati["ruote"] or ruota_jolly in ruote_top:
-    candidati = [
-        r for r in risultati["ruote"]
-        if r != ruota_origine and r not in ruote_top
-    ]
-    if candidati:
-        ruota_jolly = max(candidati, key=lambda r: risultati["ruote"][r]["score"])
-    else:
-        ruota_jolly = ruota_origine
+if not ruota_jolly or ruota_jolly in risultati["top"]:
+    candidati_j = [r for r in risultati["ruote"] if r != ruota_origine and r not in risultati["top"]]
+    ruota_jolly = max(candidati_j, key=lambda r: risultati["ruote"][r]["score"]) if candidati_j else ruota_origine
 
-risultati["jolly"] = {
-    "ruota": ruota_jolly,
-    "ambo": miglior_ambo
-}
+risultati["jolly"] = {"ruota": ruota_jolly, "ambo": miglior_ambo_assoluto}
 
-# ===== SALVA =====
 with open("risultati.json", "w", encoding="utf-8") as f:
     json.dump(risultati, f, indent=2)
 
-print("🔥 MOTORE PRO V2 ATTIVO (AMBI REALI + MIX INTELLIGENTE)")
+print("🔥 MOTORE PRO V2 AGGIORNATO (18/540/1000 + CO-OCCORRENZE X8)")
