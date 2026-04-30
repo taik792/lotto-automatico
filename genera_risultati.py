@@ -43,9 +43,9 @@ for ruota in RUOTE:
 
     ultime = estrazioni_ruota[-1]
 
-    breve = estrazioni_ruota[-10:]
-    medio = estrazioni_ruota[-1500:]
-    lungo = estrazioni_ruota[-3000:]
+    breve = estrazioni_ruota[-18:]
+    medio = estrazioni_ruota[-540:]
+    lungo = estrazioni_ruota[-1000:]
 
     freq_breve = calcola_freq(breve)
     freq_medio = calcola_freq(medio)
@@ -74,9 +74,9 @@ for ruota in RUOTE:
         bonus_vicini = 1 if (n-1 in ultime or n+1 in ultime) else 0
 
         score = (
-            freq_breve.get(n, 0) * 3 +
-            freq_medio.get(n, 0) * 1.5 +
-            freq_lungo.get(n, 0) * 1 +
+            freq_breve.get(n, 0) * 2 +
+            freq_medio.get(n, 0) * 1.2 +
+            freq_lungo.get(n, 0) * 0.8 +
             (ritardi[n] ** 1.15) * 0.6 +
             presenze_recenti * 2 +
             bonus_vicini -
