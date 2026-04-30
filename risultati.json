@@ -1,8 +1,8 @@
 {
   "top": [
     "Bari",
-    "Firenze",
-    "Genova"
+    "Palermo",
+    "Torino"
   ],
   "ruote": {
     "Bari": {
@@ -15,9 +15,9 @@
       ],
       "ambo": [
         41,
-        53
+        67
       ],
-      "score": 360.58
+      "score": 480.38
     },
     "Cagliari": {
       "ultima": [
@@ -29,9 +29,9 @@
       ],
       "ambo": [
         41,
-        31
+        52
       ],
-      "score": 309.98
+      "score": 350.96
     },
     "Firenze": {
       "ultima": [
@@ -42,10 +42,10 @@
         47
       ],
       "ambo": [
-        33,
-        58
+        28,
+        33
       ],
-      "score": 327.64
+      "score": 377.84
     },
     "Genova": {
       "ultima": [
@@ -56,10 +56,10 @@
         86
       ],
       "ambo": [
-        66,
-        81
+        3,
+        66
       ],
-      "score": 317.54
+      "score": 383.2
     },
     "Milano": {
       "ultima": [
@@ -71,9 +71,9 @@
       ],
       "ambo": [
         77,
-        20
+        88
       ],
-      "score": 310.29
+      "score": 379.97
     },
     "Napoli": {
       "ultima": [
@@ -84,10 +84,10 @@
         46
       ],
       "ambo": [
-        40,
-        90
+        1,
+        40
       ],
-      "score": 314.53
+      "score": 372.95
     },
     "Palermo": {
       "ultima": [
@@ -98,10 +98,10 @@
         46
       ],
       "ambo": [
-        90,
-        74
+        45,
+        90
       ],
-      "score": 315.94
+      "score": 391.0
     },
     "Roma": {
       "ultima": [
@@ -112,10 +112,10 @@
         32
       ],
       "ambo": [
-        17,
-        6
+        34,
+        37
       ],
-      "score": 312.44
+      "score": 361.19
     },
     "Torino": {
       "ultima": [
@@ -127,9 +127,9 @@
       ],
       "ambo": [
         49,
-        5
+        68
       ],
-      "score": 312.36
+      "score": 386.2
     },
     "Venezia": {
       "ultima": [
@@ -140,10 +140,10 @@
         69
       ],
       "ambo": [
-        79,
-        18
+        33,
+        79
       ],
-      "score": 293.62
+      "score": 335.66
     }
   },
   "giocate": [
@@ -151,21 +151,21 @@
       "ruota": "Bari",
       "ambo": [
         41,
-        53
+        67
       ]
     },
     {
-      "ruota": "Firenze",
+      "ruota": "Palermo",
       "ambo": [
-        33,
-        58
+        45,
+        90
       ]
     },
     {
-      "ruota": "Genova",
+      "ruota": "Torino",
       "ambo": [
-        66,
-        81
+        49,
+        68
       ]
     }
   ],
@@ -173,7 +173,7 @@
     "ruota": "Napoli",
     "ambo": [
       41,
-      53
+      67
     ]
   }
 }
