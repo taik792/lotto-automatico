@@ -41,9 +41,9 @@ for ruota in RUOTE:
     ultime = estrazioni_ruota[-1]
 
     # --- NUOVI CICLI BILANCIATI ---
-    breve = estrazioni_ruota[-18:]   # Ciclo naturale (18)
-    medio = estrazioni_ruota[-540:]  # Stabilità 3 anni (540)
-    lungo = estrazioni_ruota[-1000:] # Memoria storica (1000)
+    breve = estrazioni_ruota[-100:]   # Ciclo naturale (100)
+    medio = estrazioni_ruota[-250:]  # Stabilità 3 anni (250)
+    lungo = estrazioni_ruota[-500:] # Memoria storica (500)
 
     freq_breve = calcola_freq(breve)
     freq_medio = calcola_freq(medio)
