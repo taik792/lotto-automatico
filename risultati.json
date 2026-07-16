@@ -1,7 +1,7 @@
 {
   "top": [
-    "Bari",
     "Napoli",
+    "Bari",
     "Torino"
   ],
   "ruote": {
@@ -17,7 +17,7 @@
         10,
         67
       ],
-      "score": 547.02
+      "score": 429.82
     },
     "Cagliari": {
       "ultima": [
@@ -28,10 +28,10 @@
         72
       ],
       "ambo": [
-        62,
-        90
+        19,
+        54
       ],
-      "score": 325.63
+      "score": 256.3
     },
     "Firenze": {
       "ultima": [
@@ -45,7 +45,7 @@
         38,
         53
       ],
-      "score": 338.33
+      "score": 268.53
     },
     "Genova": {
       "ultima": [
@@ -59,7 +59,7 @@
         50,
         63
       ],
-      "score": 357.48
+      "score": 306.28
     },
     "Milano": {
       "ultima": [
@@ -70,10 +70,10 @@
         24
       ],
       "ambo": [
-        6,
+        31,
         39
       ],
-      "score": 368.8
+      "score": 303.41
     },
     "Napoli": {
       "ultima": [
@@ -87,7 +87,7 @@
         1,
         40
       ],
-      "score": 510.78
+      "score": 440.78
     },
     "Palermo": {
       "ultima": [
@@ -98,10 +98,10 @@
         38
       ],
       "ambo": [
-        52,
-        57
+        57,
+        61
       ],
-      "score": 358.99
+      "score": 291.49
     },
     "Roma": {
       "ultima": [
@@ -115,7 +115,7 @@
         66,
         67
       ],
-      "score": 322.42
+      "score": 287.82
     },
     "Torino": {
       "ultima": [
@@ -129,7 +129,7 @@
         37,
         49
       ],
-      "score": 445.12
+      "score": 363.02
     },
     "Venezia": {
       "ultima": [
@@ -143,22 +143,22 @@
         25,
         47
       ],
-      "score": 406.0
+      "score": 327.2
     }
   },
   "giocate": [
-    {
-      "ruota": "Bari",
-      "ambo": [
-        10,
-        67
-      ]
-    },
     {
       "ruota": "Napoli",
       "ambo": [
         1,
         40
+      ]
+    },
+    {
+      "ruota": "Bari",
+      "ambo": [
+        10,
+        67
       ]
     },
     {
@@ -172,8 +172,8 @@
   "jolly": {
     "ruota": "Venezia",
     "ambo": [
-      10,
-      67
+      1,
+      40
     ]
   }
 }
